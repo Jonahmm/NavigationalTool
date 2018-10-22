@@ -2,6 +2,46 @@
 An app to help navigate around difficult building layouts.
 
 ## Requirements
+
+### Stakeholders
+
+*   Client
+    *   Needs to be able to apply the app to the new maths building
+*   Building Users
+    *   Students
+        *   Students will be the majority of users of the product
+    *   Staff
+        *   The building is new so staff may need help to navigate
+    *   Visitors
+        *   Visitors will not know the layout so will need navigational help
+    *   Disabled Users
+        *   Disabled routes will require different pathways
+*   The University
+    *   The building owner/manager would need to be involved if we were to use beacons etc
+
+### Functional Requirements
+
+*   The product must be an app that works on Android devices
+*   The model must use a modular design that allows the client to switch between building layouts
+    *   There should be nothing hard-coded except a file path giving building information
+*   It must find the shortest route allowed from origin to destination
+*   The navigation must support different routes for disabled users and different access levels
+*   The route must be displayed graphically on screen
+    *   Should display (at least) a floor plan with the route overlaid
+
+### Non-Functional Requirements
+
+*   The app should have an intuitive and usable interface
+    *   Users should be able to use the app properly with under 5 minutes' screen time
+*   The interface should appear polished and perform smoothly
+    *   The UI should not wait for the model, instead display 'calculating' or similar when working
+*   It should be optimised enough to calculate any route in under 2 seconds
+*   It should be packaged small enough to fit on most smartphones
+    *   ≤100MB
+*   The app should be reliable and shouldn't crash or hang
+    *   Test all sensible use cases: different rooms, access levels (inc. disabled) etc
+
+---Previous
 #### Top priority (ie: "Must")
 - Work on Android.
 - Be able to switch out the building layout easily.
