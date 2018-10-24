@@ -6,3 +6,8 @@ target/
 /bin/
 build/
 local.properties
+
+gradlew
+gradlew.bat
+gradle/
+.gradle/
