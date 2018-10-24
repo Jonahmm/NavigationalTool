@@ -25,12 +25,17 @@ public class Graph {
     }
 
     public Node getNodeFromName(String s){
-        //graph.keySet().(n -> n.);
-        return null;
+        Node n = graph.keySet().stream().filter(n2 -> n2.roomCode.equals(s) || n2.additionalName.equals(s)).findFirst().orElse(null);
+        return n;
     }
 
     public ArrayList<Edge> getEdgesFromNode(Node n){
-        return null;
+        if(graph.containsKey(n)) return graph.get(n);
+        throw new RuntimeException("Tried to get edges from node that does not exist on the graph.");
+    }
+
+    public ArrayList<Edge> getEdgesFromNodeName(String s){
+        return getEdgesFromNode(getNodeFromName(s));
     }
 
 }
