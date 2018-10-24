@@ -34,10 +34,6 @@ public class Edge {
     }
 
 
-    public enum AccessLevel{
-        ANYONE,
-        STUDENTCARD,
-        STAFF
-    }
+
 
 }
