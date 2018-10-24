@@ -8,12 +8,12 @@ public class Graph {
     private HashMap<Node, ArrayList<Edge>> graph = new HashMap<Node, ArrayList<Edge>>();
 
     public void addNode(Node n){
-        if(graph.containsKey(n)) System.err.println("Warning: Overwriting node that already exists.");
+        if(graph.containsKey(n)) throw new IllegalArgumentException("Cannot add node that is already in the graph");
         graph.put(n, new ArrayList<Edge>());
     }
 
     public void addNode(Node n, ArrayList<Edge> edges){
-        if(graph.containsKey(n)) System.err.println("Warning: Overwriting node that already exists.");
+        if(graph.containsKey(n)) throw new IllegalArgumentException("Cannot add node that is already in the graph"
         graph.put(n, edges);
     }
 
