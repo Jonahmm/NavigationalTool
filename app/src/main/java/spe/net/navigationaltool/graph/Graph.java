@@ -18,6 +18,8 @@ public class Graph {
     }
 
     public void addEdge(Edge e){
+        if(!graph.containsKey(e.nodeB) || !graph.containsKey(e.nodeB)) throw new IllegalArgumentException(
+                "Cannot add an edge that connects to nodes not in the graph");
         graph.get(e.nodeA).add(e);
         graph.get(e.nodeB).add(e);
     }
