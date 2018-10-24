@@ -1,4 +1,4 @@
-package spe.net.navigationaltool.spe.net.navigationaltool.graph;
+package spe.net.navigationaltool.graph;
 
 import java.util.HashMap;
 import java.util.ArrayList;

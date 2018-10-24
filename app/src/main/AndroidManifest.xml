@@ -19,7 +19,8 @@
         <activity
             android:name=".DisplayDrawer"
             android:label="@string/title_activity_display_drawer"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".StartScreen"></activity>
     </application>
 
 </manifest>

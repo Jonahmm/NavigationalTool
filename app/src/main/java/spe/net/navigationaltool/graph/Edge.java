@@ -1,4 +1,4 @@
-package spe.net.navigationaltool.spe.net.navigationaltool.graph;
+package spe.net.navigationaltool.graph;
 
 public class Edge {
 
@@ -9,8 +9,8 @@ public class Edge {
     public AccessLevel accessLevel;
 
     public Edge(Node a, Node b){
-        this.a = a;
-        this.b = b;
+        this.nodeA = a;
+        this.nodeB = b;
 
         disabled = true; // Just as an assumption, most routes are corridors.
         accessLevel = AccessLevel.STUDENTCARD; // As an assumption, most places will require a ucard to get to.
