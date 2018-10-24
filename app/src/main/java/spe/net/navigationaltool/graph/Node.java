@@ -4,10 +4,10 @@ import android.graphics.Point;
 
 public class Node {
 
-    public Point location;
-    public int floor;
+    public final Point location;
+    public final int floor;
 
-    public String roomCode;
+    public final String roomCode;
     public String additionalName;
 
     public Node(Point loc, int floor, String roomCode){
@@ -20,6 +20,22 @@ public class Node {
     public Node(Point loc, int floor, String roomCode, String additionalName){
         this(loc, floor, roomCode);
         this.additionalName = additionalName;
+    }
+
+    public Point getLocation() {
+        return location;
+    }
+
+    public int getFloor() {
+        return floor;
+    }
+
+    public String getRoomCode() {
+        return roomCode;
+    }
+
+    public String getAdditionalName() {
+        return additionalName;
     }
 
 }
