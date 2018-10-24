@@ -4,3 +4,5 @@ target/
 
 *.class
 /bin/
+build/
+local.properties
