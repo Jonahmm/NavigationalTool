@@ -13,7 +13,7 @@ public class Graph {
     }
 
     public void addNode(Node n, ArrayList<Edge> edges){
-        if(graph.containsKey(n)) throw new IllegalArgumentException("Cannot add node that is already in the graph"
+        if(graph.containsKey(n)) throw new IllegalArgumentException("Cannot add node that is already in the graph");
         graph.put(n, edges);
     }
 
