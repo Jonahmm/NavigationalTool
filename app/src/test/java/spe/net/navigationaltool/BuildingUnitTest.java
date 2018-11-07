@@ -1,6 +1,7 @@
 package spe.net.navigationaltool;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *  This class contains unit tests written for the Building class' methods.
@@ -11,11 +12,6 @@ import org.junit.Test;
 public class BuildingUnitTest {
 
     ///// Construction Tests /////
-
-    @Test
-    public void testCorrectConstruction(){
-
-    }
 
     @Test
     public void testOnlyAndAllListedLocationsInGraph() throws Exception{
