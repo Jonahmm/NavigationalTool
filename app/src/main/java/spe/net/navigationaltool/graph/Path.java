@@ -2,10 +2,10 @@ package spe.net.navigationaltool.graph;
 
 import android.graphics.Point;
 
-public class Edge {
+public class Path {
 
-    public final Node nodeA;
-    public final Node nodeB;
+    public final Location locationA;
+    public final Location locationB;
 
     public final int length;
     public final Point direction;
@@ -13,14 +13,14 @@ public class Edge {
     public boolean disabled;
     public AccessLevel accessLevel;
 
-    public Edge(Node a, Node b){
-        this.nodeA = a;
-        this.nodeB = b;
+    public Path(Location a, Location b){
+        this.locationA = a;
+        this.locationB = b;
 
         // Assuming straight line:
-        length = (int) Math.sqrt(Math.pow(nodeA.location.x - nodeB.location.x, 2) + Math.pow(nodeA.location.y - nodeB.location.y, 2));
+        length = (int) Math.sqrt(Math.pow(locationA.location.x - locationB.location.x, 2) + Math.pow(locationA.location.y - locationB.location.y, 2));
         // This is undirected, so use backwards too.
-        direction = new Point(nodeA.location.x - nodeB.location.x, nodeA.location.y - nodeB.location.y);
+        direction = new Point(locationA.location.x - locationB.location.x, locationA.location.y - locationB.location.y);
 
 
         // Just as an assumption, most routes are corridors.
@@ -29,7 +29,7 @@ public class Edge {
         accessLevel = AccessLevel.STUDENTCARD;
     }
 
-    public Edge(Node a, Node b, AccessLevel access, boolean disabledRoute){
+    public Path(Location a, Location b, AccessLevel access, boolean disabledRoute){
         this(a, b);
 
         disabled = disabledRoute;
@@ -44,12 +44,12 @@ public class Edge {
         return direction;
     }
 
-    public Node getNodeA() {
-        return nodeA;
+    public Location getLocationA() {
+        return locationA;
     }
 
-    public Node getNodeB() {
-        return nodeB;
+    public Location getLocationB() {
+        return locationB;
     }
 
     public boolean isDisabled() {

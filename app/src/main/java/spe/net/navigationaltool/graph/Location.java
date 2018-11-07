@@ -2,7 +2,7 @@ package spe.net.navigationaltool.graph;
 
 import android.graphics.Point;
 
-public class Node {
+public class Location {
 
     public final Point location;
     public final int floor;
@@ -10,14 +10,14 @@ public class Node {
     public final String roomCode;
     public String additionalName;
 
-    public Node(Point loc, int floor, String roomCode){
+    public Location(Point loc, int floor, String roomCode){
         this.location = loc;
         this.floor = floor;
 
         this.roomCode = roomCode;
     }
 
-    public Node(Point loc, int floor, String roomCode, String additionalName){
+    public Location(Point loc, int floor, String roomCode, String additionalName){
         this(loc, floor, roomCode);
         this.additionalName = additionalName;
     }

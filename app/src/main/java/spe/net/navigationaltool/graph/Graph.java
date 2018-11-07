@@ -5,36 +5,36 @@ import java.util.ArrayList;
 
 public class Graph {
 
-    private HashMap<Node, ArrayList<Edge>> graph = new HashMap<Node, ArrayList<Edge>>();
+    private HashMap<Location, ArrayList<Path>> graph = new HashMap<Location, ArrayList<Path>>();
 
-    public void addNode(Node n){
+    public void addNode(Location n){
         if(graph.containsKey(n)) throw new IllegalArgumentException("Cannot add node that is already in the graph");
-        graph.put(n, new ArrayList<Edge>());
+        graph.put(n, new ArrayList<Path>());
     }
 
-    public void addNode(Node n, ArrayList<Edge> edges){
+    public void addNode(Location n, ArrayList<Path> paths){
         if(graph.containsKey(n)) throw new IllegalArgumentException("Cannot add node that is already in the graph");
-        graph.put(n, edges);
+        graph.put(n, paths);
     }
 
-    public void addEdge(Edge e){
-        if(!graph.containsKey(e.nodeB) || !graph.containsKey(e.nodeB)) throw new IllegalArgumentException(
+    public void addEdge(Path e){
+        if(!graph.containsKey(e.locationB) || !graph.containsKey(e.locationB)) throw new IllegalArgumentException(
                 "Cannot add an edge that connects to nodes not in the graph");
-        graph.get(e.nodeA).add(e);
-        graph.get(e.nodeB).add(e);
+        graph.get(e.locationA).add(e);
+        graph.get(e.locationB).add(e);
     }
 
-    public Node getNodeFromName(String s){
-        Node n = graph.keySet().stream().filter(n2 -> n2.roomCode.equals(s) || n2.additionalName.equals(s)).findFirst().orElse(null);
+    public Location getNodeFromName(String s){
+        Location n = graph.keySet().stream().filter(n2 -> n2.roomCode.equals(s) || n2.additionalName.equals(s)).findFirst().orElse(null);
         return n;
     }
 
-    public ArrayList<Edge> getEdgesFromNode(Node n){
+    public ArrayList<Path> getEdgesFromNode(Location n){
         if(graph.containsKey(n)) return graph.get(n);
         throw new RuntimeException("Tried to get edges from node that does not exist on the graph.");
     }
 
-    public ArrayList<Edge> getEdgesFromNodeName(String s){
+    public ArrayList<Path> getEdgesFromNodeName(String s){
         return getEdgesFromNode(getNodeFromName(s));
     }
 
