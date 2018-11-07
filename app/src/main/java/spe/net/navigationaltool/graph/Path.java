@@ -2,38 +2,38 @@ package spe.net.navigationaltool.graph;
 
 import android.graphics.Point;
 
+import java.util.List;
+
 public class Path {
 
-    public final Location locationA;
-    public final Location locationB;
+    public final Location locA;
+    public final Location locB;
 
     public final int length;
     public final Point direction;
 
-    public boolean disabled;
-    public AccessLevel accessLevel;
+    public final List<User> users;
 
-    public Path(Location a, Location b){
-        this.locationA = a;
-        this.locationB = b;
+    public Path(Location a, Location b, List<User> users){
+        this.locA = a;
+        this.locB = b;
 
         // Assuming straight line:
-        length = (int) Math.sqrt(Math.pow(locationA.location.x - locationB.location.x, 2) + Math.pow(locationA.location.y - locationB.location.y, 2));
+        length = (int) Math.sqrt(Math.pow(locA.location.x - locB.location.x, 2) + Math.pow(locA.location.y - locB.location.y, 2));
         // This is undirected, so use backwards too.
-        direction = new Point(locationA.location.x - locationB.location.x, locationA.location.y - locationB.location.y);
+        direction = new Point(locA.location.x - locB.location.x, locA.location.y - locB.location.y);
 
-
-        // Just as an assumption, most routes are corridors.
-        disabled = true;
-        // As an assumption, most places will require a ucard to get to.
-        accessLevel = AccessLevel.STUDENTCARD;
+        this.users = users;
     }
 
-    public Path(Location a, Location b, AccessLevel access, boolean disabledRoute){
-        this(a, b);
+    public Location getOtherLocation(Location l){
+        // TODO
+        return null;
+    }
 
-        disabled = disabledRoute;
-        accessLevel = access;
+    public Location[] getLocations(){
+        // TODO
+        return null;
     }
 
     public int getLength(){
@@ -44,20 +44,16 @@ public class Path {
         return direction;
     }
 
-    public Location getLocationA() {
-        return locationA;
+    public Location getLocA() {
+        return locA;
     }
 
-    public Location getLocationB() {
-        return locationB;
+    public Location getLocB() {
+        return locB;
     }
 
-    public boolean isDisabled() {
-        return disabled;
-    }
-
-    public AccessLevel getAccessLevel() {
-        return accessLevel;
+    public List<User> getUser() {
+        return users;
     }
 
 }

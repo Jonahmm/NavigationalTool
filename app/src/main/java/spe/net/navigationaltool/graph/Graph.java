@@ -7,35 +7,35 @@ public class Graph {
 
     private HashMap<Location, ArrayList<Path>> graph = new HashMap<Location, ArrayList<Path>>();
 
-    public void addNode(Location n){
+    public void addLocation(Location n){
         if(graph.containsKey(n)) throw new IllegalArgumentException("Cannot add node that is already in the graph");
         graph.put(n, new ArrayList<Path>());
     }
 
-    public void addNode(Location n, ArrayList<Path> paths){
+    public void addLocation(Location n, ArrayList<Path> paths){
         if(graph.containsKey(n)) throw new IllegalArgumentException("Cannot add node that is already in the graph");
         graph.put(n, paths);
     }
 
-    public void addEdge(Path e){
-        if(!graph.containsKey(e.locationB) || !graph.containsKey(e.locationB)) throw new IllegalArgumentException(
+    public void addPath(Path e){
+        if(!graph.containsKey(e.locB) || !graph.containsKey(e.locB)) throw new IllegalArgumentException(
                 "Cannot add an edge that connects to nodes not in the graph");
-        graph.get(e.locationA).add(e);
-        graph.get(e.locationB).add(e);
+        graph.get(e.locA).add(e);
+        graph.get(e.locB).add(e);
     }
 
-    public Location getNodeFromName(String s){
-        Location n = graph.keySet().stream().filter(n2 -> n2.roomCode.equals(s) || n2.additionalName.equals(s)).findFirst().orElse(null);
+    public Location getLocationByCode(String s){
+        Location n = graph.keySet().stream().filter(n2 -> n2.code.equals(s) || n2.name.equals(s)).findFirst().orElse(null);
         return n;
     }
 
-    public ArrayList<Path> getEdgesFromNode(Location n){
+    public ArrayList<Path> getPathsFromLocation(Location n){
         if(graph.containsKey(n)) return graph.get(n);
         throw new RuntimeException("Tried to get edges from node that does not exist on the graph.");
     }
 
-    public ArrayList<Path> getEdgesFromNodeName(String s){
-        return getEdgesFromNode(getNodeFromName(s));
+    public ArrayList<Path> getPathsFromLocationCode(String s){
+        return getPathsFromLocation(getLocationByCode(s));
     }
 
 }

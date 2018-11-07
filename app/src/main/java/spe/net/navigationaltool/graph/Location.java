@@ -7,19 +7,19 @@ public class Location {
     public final Point location;
     public final int floor;
 
-    public final String roomCode;
-    public String additionalName;
+    public final String code;
+    public String name;
 
-    public Location(Point loc, int floor, String roomCode){
+    public Location(Point loc, int floor, String code){
         this.location = loc;
         this.floor = floor;
 
-        this.roomCode = roomCode;
+        this.code = code;
     }
 
-    public Location(Point loc, int floor, String roomCode, String additionalName){
-        this(loc, floor, roomCode);
-        this.additionalName = additionalName;
+    public Location(Point loc, int floor, String code, String name){
+        this(loc, floor, code);
+        this.name = name;
     }
 
     public Point getLocation() {
@@ -30,12 +30,12 @@ public class Location {
         return floor;
     }
 
-    public String getRoomCode() {
-        return roomCode;
+    public String getCode() {
+        return code;
     }
 
-    public String getAdditionalName() {
-        return additionalName;
+    public String getName() {
+        return name;
     }
 
 }
