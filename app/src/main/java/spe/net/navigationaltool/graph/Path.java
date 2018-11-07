@@ -36,6 +36,11 @@ public class Path {
         return null;
     }
 
+    public boolean allowsUser(User user){
+        // TODO
+        return false;
+    }
+
     public int getLength(){
         return length;
     }
