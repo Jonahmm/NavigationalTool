@@ -2,6 +2,7 @@ package uk.ac.bris.cs.spe.navigationaltool.graph;
 
 import android.graphics.Point;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Path {
@@ -27,18 +28,19 @@ public class Path {
     }
 
     public Location getOtherLocation(Location l){
-        // TODO
-        return null;
+        if(l == locA) return locB;
+        else return locA;
     }
 
-    public Location[] getLocations(){
-        // TODO
-        return null;
+    public List<Location> getLocations(){
+        List<Location> locations = new ArrayList<>();
+        locations.add(locA);
+        locations.add(locB);
+        return locations;
     }
 
     public boolean allowsUser(User user){
-        // TODO
-        return false;
+        return users.contains(user);
     }
 
     public int getLength(){
