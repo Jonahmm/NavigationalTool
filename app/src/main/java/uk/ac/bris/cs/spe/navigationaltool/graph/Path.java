@@ -27,8 +27,8 @@ public class Path {
     }
 
     public Location getOtherLocation(Location l){
-        // TODO
-        return null;
+        if(l == locA) return locB;
+        else return locA;
     }
 
     public Location[] getLocations(){
