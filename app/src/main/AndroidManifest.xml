@@ -9,18 +9,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="uk.ac.bris.cs.spe.navigationaltool.StartScreen">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <activity android:name="uk.ac.bris.cs.spe.navigationaltool.SearchScreen">
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="uk.ac.bris.cs.spe.navigationaltool.DisplayDrawer"
             android:label="@string/title_activity_display_drawer"
             android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName="uk.ac.bris.cs.spe.navigationaltool.StartScreen"></activity>
+            android:parentActivityName="uk.ac.bris.cs.spe.navigationaltool.SearchScreen"><intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter></activity>
     </application>
 
 </manifest>

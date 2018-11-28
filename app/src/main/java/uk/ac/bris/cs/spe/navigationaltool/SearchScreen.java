@@ -1,9 +1,9 @@
-package spe.net.navigationaltool;
+package uk.ac.bris.cs.spe.navigationaltool;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class StartScreen extends AppCompatActivity {
+public class SearchScreen extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="uk.ac.bris.cs.spe.navigationaltool.StartScreen">
+    tools:context="uk.ac.bris.cs.spe.navigationaltool.SearchScreen">
 
     <TextView
         android:layout_width="wrap_content"
