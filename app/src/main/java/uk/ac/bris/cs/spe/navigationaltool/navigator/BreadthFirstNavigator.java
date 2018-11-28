@@ -6,10 +6,11 @@ import java.util.List;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Graph;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
+import uk.ac.bris.cs.spe.navigationaltool.graph.User;
 
 public class BreadthFirstNavigator implements Navigator {
 
-    public List<Path> navigate(Location start, Location end, Graph graph){
+    public List<Path> navigate(Location start, Location end, Graph graph, User user){
 
         Tree<Location> routes = new Tree<Location>(start);
         ArrayList<Path> pathList = new ArrayList<Path>();
@@ -19,9 +20,10 @@ public class BreadthFirstNavigator implements Navigator {
             // Go through each of the end nodes
             for(Node<Location> node : routes.getLeafs()){
 
-                // Add each joined node on the end, forming a new 'route'
+                // Add each allowed joined node on the end, forming a new 'route'
                 for(Path p : graph.getPathsFromLocation(node.data))
-                    node.addChild(p.getOtherLocation(node.data));
+                    if(p.allowsUser(user))
+                        node.addChild(p.getOtherLocation(node.data));
 
             }
         }
