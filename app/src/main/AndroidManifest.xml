@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="spe.net.navigationaltool">
+    package="uk.ac.bris.cs.spe.navigationaltool">
 
     <application
         android:allowBackup="true"
@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".StartScreen">
+        <activity android:name="uk.ac.bris.cs.spe.navigationaltool.StartScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -17,10 +17,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DisplayDrawer"
+            android:name="uk.ac.bris.cs.spe.navigationaltool.DisplayDrawer"
             android:label="@string/title_activity_display_drawer"
             android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".StartScreen"></activity>
+            android:parentActivityName="uk.ac.bris.cs.spe.navigationaltool.StartScreen"></activity>
     </application>
 
 </manifest>

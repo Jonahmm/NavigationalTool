@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "spe.net.navigationaltool"
+        applicationId 'uk.ac.bris.cs.spe.navigationaltool'
         minSdkVersion 25
         targetSdkVersion 26
         versionCode 1
