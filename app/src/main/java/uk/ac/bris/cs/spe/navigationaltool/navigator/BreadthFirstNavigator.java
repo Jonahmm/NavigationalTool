@@ -6,23 +6,41 @@ import java.util.List;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Graph;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
+import uk.ac.bris.cs.spe.navigationaltool.graph.User;
 
 public class BreadthFirstNavigator implements Navigator {
 
-    public List<Path> navigate(Location start, Location end, Graph graph){
+    public List<Path> navigate(Location start, Location end, Graph graph, User user){
+        // Variables to stop infinite loop when the graph is poorly constructed.
+        boolean newLocationsFound;
+        ArrayList<Location> foundLocations = new ArrayList<Location>();
 
+        // Breadth First Search Variables
         Tree<Location> routes = new Tree<Location>(start);
         ArrayList<Path> pathList = new ArrayList<Path>();
 
         // While no route has found the end
         while(!routes.contains(end)){
+            newLocationsFound = false;
+
             // Go through each of the end nodes
-            for(Node<Location> node : routes.getLeafs()){
+            for(Node<Location> node : routes.getLeafs()) {
 
-                // Add each joined node on the end, forming a new 'route'
-                for(Path p : graph.getPathsFromLocation(node.data))
-                    node.addChild(p.getOtherLocation(node.data));
+                // Add each allowed joined node on the end, forming a new 'route'
+                for (Path p : graph.getPathsFromLocation(node.data)) {
+                    if (p.allowsUser(user)) {
+                        node.addChild(p.getOtherLocation(node.data));
 
+                        if (!foundLocations.contains(p.getOtherLocation(node.data))) {
+                            foundLocations.add(p.getOtherLocation(node.data));
+                            newLocationsFound = true;
+                        }
+                    }
+                }
+            }
+
+            if(!newLocationsFound){
+                throw new RuntimeException("Can't find route, graph must be poorly constructed.");
             }
         }
 
