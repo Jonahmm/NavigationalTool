@@ -44,7 +44,7 @@ public class NavigatorUnitTest {
 
 //        List<User>
 
-        graph.addPath(new Path(a,b,));
+        //graph.addPath(new Path(a,b,));
 
     }
 

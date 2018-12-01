@@ -2,12 +2,14 @@ package uk.ac.bris.cs.spe.navigationaltool.graph;
 
 import java.util.HashMap;
 import java.util.ArrayList;
+import static java.util.Objects.requireNonNull;
 
 public class Graph {
 
     private HashMap<Location, ArrayList<Path>> graph = new HashMap<Location, ArrayList<Path>>();
 
     public void addLocation(Location n){
+        requireNonNull(n);
         if(graph.containsKey(n)) throw new IllegalArgumentException("Cannot add node that is already in the graph");
         graph.put(n, new ArrayList<Path>());
     }
