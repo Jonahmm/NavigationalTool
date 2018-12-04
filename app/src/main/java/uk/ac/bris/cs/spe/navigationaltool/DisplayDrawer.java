@@ -1,5 +1,6 @@
 package uk.ac.bris.cs.spe.navigationaltool;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,8 +14,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import uk.ac.bris.cs.spe.navigationaltool.graph.User;
+import uk.ac.bris.cs.spe.navigationaltool.navigator.Navigator;
+
 public class DisplayDrawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    Building building;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +28,10 @@ public class DisplayDrawer extends AppCompatActivity
         setContentView(R.layout.activity_display_drawer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Integer access = getPreferences(MODE_PRIVATE).getInt(getString(R.string.saved_access), 1);
+        Boolean disabl = getPreferences(MODE_PRIVATE).getBoolean(getString(R.string.saved_disabl), false);
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -39,6 +49,10 @@ public class DisplayDrawer extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+        navigationView.getMenu().getItem(access).setChecked(true); //Set the menu options according to saved preferences
+        navigationView.getMenu().getItem(5).setChecked(disabl);
+
         navigationView.setNavigationItemSelectedListener(this);
     }
 
@@ -67,9 +81,9 @@ public class DisplayDrawer extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -78,6 +92,7 @@ public class DisplayDrawer extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
+        SharedPreferences.Editor e = getPreferences(MODE_PRIVATE).edit();
         int id = item.getItemId();
 
         if (id == R.id.item_ug) {

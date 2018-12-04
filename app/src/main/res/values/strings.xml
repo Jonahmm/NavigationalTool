@@ -3,8 +3,8 @@
     <string name="title_activity_display_drawer">Physics Building</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_title">University of Bristol</string>
+    <string name="nav_header_subtitle">Navigational Tool</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="undergrad_student">Undergraduate Student</string>
@@ -13,4 +13,7 @@
     <string name="staff_member">Staff Member</string>
     <string name="disabled_access">Disabled Access?</string>
     <string name="i_am_a">I am a...</string>
+    <string name="saved_access">ACCESS</string>
+    <string name="saved_disabl">SAVEDDISAB</string>
+    <string name="search_title">Search for a location</string>
 </resources>
