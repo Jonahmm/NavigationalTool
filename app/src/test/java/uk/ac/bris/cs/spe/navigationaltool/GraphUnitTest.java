@@ -33,6 +33,7 @@ public class GraphUnitTest {
         ArrayList<Path> paths = new ArrayList<Path>(0);
         paths.add(path1);
 
+
         assertThatThrownBy(() -> {
             g.addLocation(locA);
             g.addLocation(locA);
