@@ -2,19 +2,16 @@ package uk.ac.bris.cs.spe.navigationaltool;
 
 import android.graphics.Point;
 
-import junit.framework.Assert;
-
-import org.assertj.core.internal.bytebuddy.pool.TypePool;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.Graph;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
 import uk.ac.bris.cs.spe.navigationaltool.graph.User;
-import static org.assertj.core.api.Java6Assertions.*;
+import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 /**
  *  This class contains unit tests written for the Graph class' methods.
@@ -145,9 +142,9 @@ public class GraphUnitTest {
         paths.add(path1);
         paths.add(path2);
 
-        assert(g.getPathsFromLocation(locA).equals(paths));
+        assertThat(g.getPathsFromLocation(locA).equals(paths)).isTrue();
 
-        assert(g.getPathsFromLocationCode(locA.code).equals(paths));
+        assertThat(g.getPathsFromLocationCode(locA.code).equals(paths)).isTrue();
 
         assertThatThrownBy(() -> {
             g.getPathsFromLocation(locD);
@@ -168,8 +165,8 @@ public class GraphUnitTest {
         g.addLocation(locA);
         g.addLocation(locB);
 
-        assert(g.getLocationByCode("locA").equals(locA));
-        assert(g.getLocationByCode("locB").equals((locB)));
+        assertThat(g.getLocationByCode("locA").equals(locA)).isTrue();
+        assertThat(g.getLocationByCode("locB").equals((locB))).isTrue();
 
         assertThatThrownBy(() -> {
             g.getLocationByCode("locC");
