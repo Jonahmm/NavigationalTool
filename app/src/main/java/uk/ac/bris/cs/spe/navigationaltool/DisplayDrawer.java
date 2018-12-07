@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Switch;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.User;
 import uk.ac.bris.cs.spe.navigationaltool.navigator.Navigator;
@@ -20,7 +21,10 @@ import uk.ac.bris.cs.spe.navigationaltool.navigator.Navigator;
 public class DisplayDrawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    Building building;
+    private Building building;
+    private int access;
+    private Boolean disabl;
+    Menu options;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +33,8 @@ public class DisplayDrawer extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Integer access = getPreferences(MODE_PRIVATE).getInt(getString(R.string.saved_access), 1);
-        Boolean disabl = getPreferences(MODE_PRIVATE).getBoolean(getString(R.string.saved_disabl), false);
+        access = getPreferences(MODE_PRIVATE).getInt(getString(R.string.saved_access), R.id.item_ug);
+        disabl = getPreferences(MODE_PRIVATE).getBoolean(getString(R.string.saved_disabl), false);
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -50,10 +54,20 @@ public class DisplayDrawer extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 
-        navigationView.getMenu().getItem(access).setChecked(true); //Set the menu options according to saved preferences
-        navigationView.getMenu().getItem(5).setChecked(disabl);
+        //Set menu items to be checked depending on saved values
+        navigationView.getMenu().findItem(access).setChecked(true);
+        navigationView.getMenu().findItem(R.id.disabled_switch).setChecked(disabl);
 
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    //Quick and dirty menu -> User implementation
+    private User getUserFromParams(Integer access, Boolean disabl) {
+        switch (access) {
+            case R.id.item_ug: return disabl ? User.DISABLED_STUDENT : User.STUDENT;
+            case R.id.item_staff: return disabl ? User.DISABLED_STAFF : User.STAFF;
+            default: return User.STUDENT;
+        }
     }
 
     @Override
@@ -70,6 +84,7 @@ public class DisplayDrawer extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.display_drawer, menu);
+        options = menu;
         return true;
     }
 
@@ -95,20 +110,18 @@ public class DisplayDrawer extends AppCompatActivity
         SharedPreferences.Editor e = getPreferences(MODE_PRIVATE).edit();
         int id = item.getItemId();
 
-        if (id == R.id.item_ug) {
-            // Handle the camera action
-        } else if (id == R.id.item_pg) {
-
-        } else if (id == R.id.item_phd) {
-
-        } else if (id == R.id.item_staff) {
-
-        } else if (id == R.id.disabled_switch) {
-
+        if (id == R.id.disabled_switch) {
+            e.putBoolean(getString(R.string.saved_disabl), item.isChecked());
+            disabl = item.isChecked();
+        } else {
+            e.putInt(getString(R.string.saved_access), id);
+            access = id;
         }
+        e.apply();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
 }
