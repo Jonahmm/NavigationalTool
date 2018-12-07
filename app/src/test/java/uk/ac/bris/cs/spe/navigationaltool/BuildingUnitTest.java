@@ -2,6 +2,9 @@ package uk.ac.bris.cs.spe.navigationaltool;
 
 import org.junit.Test;
 
+import uk.ac.bris.cs.spe.navigationaltool.graph.Graph;
+import uk.ac.bris.cs.spe.navigationaltool.navigator.BreadthFirstNavigator;
+
 /**
  *  This class contains unit tests written for the Building class' methods.
  *
@@ -14,6 +17,9 @@ public class BuildingUnitTest {
 
     @Test
     public void testOnlyAndAllListedLocationsInGraph() throws Exception{
+        Building building = new Building ("test.buildingLayout", new BreadthFirstNavigator());
+        Graph g = building.getGraph();
+
 
     }
 
