@@ -90,7 +90,7 @@ public class BreadthFirstNavigator implements Navigator {
     }
 
     public class Node<T> {
-        public T data;
+        public final T data;
         public Node<T> parent;
         public List<Node<T>> children;
 
@@ -100,7 +100,9 @@ public class BreadthFirstNavigator implements Navigator {
         }
 
         public void addChild(T t){
-            children.add(new Node<T>(t));
+            Node<T> n = new Node<T>(t);
+            children.add(n);
+            n.parent = this;
         }
 
         public ArrayList<Node<T>> getLeafs(){
