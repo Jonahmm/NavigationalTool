@@ -47,15 +47,15 @@ public class BreadthFirstNavigator implements Navigator {
         // Once 'end' is in the structure, go through all leafs (end must be a leaf) and find it.
         for(Node<Location> node : routes.getLeafs()){
             if(node.data.equals(end)){
-                Node currentNode = node;
+                Node<Location> currentNode = node;
 
                 // If you haven't yet reached the start location
                 while(!currentNode.data.equals(start)){
                     Path p = null;
 
                     // Search all paths leading from the current Node, for one that goes to the node's parent's node.
-                    for(Path possiblePath : graph.getPathsFromLocation(node.data))
-                        if(possiblePath.getOtherLocation(node.data).equals(node.parent.data))
+                    for(Path possiblePath : graph.getPathsFromLocation(currentNode.data))
+                        if(possiblePath.getOtherLocation(currentNode.data).equals(currentNode.parent.data))
                             p = possiblePath;
 
                     // Add this path to the pathList and set the parent node as the new current Node.
@@ -65,8 +65,6 @@ public class BreadthFirstNavigator implements Navigator {
 
             }
         }
-
-
 
         return pathList;
     }

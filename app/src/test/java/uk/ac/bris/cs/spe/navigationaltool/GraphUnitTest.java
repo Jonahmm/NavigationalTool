@@ -23,8 +23,8 @@ public class GraphUnitTest {
     @Test
     public void testAddLocation() throws Exception{
         Graph g = new Graph();
-        Location locA = new Location (new Point(0, 0), 0, "locA");
-        Location locB = new Location (new Point(0,1), 0, "locB");
+        Location locA = new Location (0, 0, 0, "locA");
+        Location locB = new Location (0,1, 0, "locB");
 
         Path path1 = new Path (locA, locB, new ArrayList<>());
         ArrayList<Path> paths = new ArrayList<Path>(0);
@@ -55,9 +55,9 @@ public class GraphUnitTest {
     @Test
     public void testAddPath() throws Exception{
         Graph g = new Graph();
-        Location locA = new Location (new Point(0, 0), 0, "locA");
-        Location locB = new Location (new Point(0,1), 0, "locB");
-        Location locC = new Location (new Point(0,2), 0, "locC");
+        Location locA = new Location (0, 0, 0, "locA");
+        Location locB = new Location (0,1, 0, "locB");
+        Location locC = new Location (0,2, 0, "locC");
 
         Path path1 = new Path (locC, locB, new ArrayList<User>());
         Path path2 = new Path (locA, locC, new ArrayList<User>());
@@ -75,7 +75,7 @@ public class GraphUnitTest {
     @Test // This may be better to include in the method above? Check when filling out the tests.
     public void testAddPathFailsWithUnknownLocation() throws Exception{
         Graph g = new Graph();
-        Location locA = new Location (new Point(0, 0), 0, "locA");
+        Location locA = new Location (0, 0, 0, "locA");
         g.addLocation(locA);
         assertThatThrownBy(() -> g.addPath(new Path(null, locA, new ArrayList<>())))
                 .isInstanceOf(NullPointerException.class);
@@ -88,8 +88,8 @@ public class GraphUnitTest {
     @Test
     public void testNoDuplicateLocationCodes() throws Exception{
         Graph g = new Graph();
-        Location locA1 = new Location (new Point(0, 0), 0, "locA");
-        Location locA2 = new Location (new Point(0, 1), 0, "locA");
+        Location locA1 = new Location (0, 0, 0, "locA");
+        Location locA2 = new Location (0, 1, 0, "locA");
 
         assertThatThrownBy(() -> {
             g.addLocation(locA1);
@@ -105,8 +105,8 @@ public class GraphUnitTest {
     @Test
     public void testNoDuplicatePositions() throws Exception{
         Graph g = new Graph();
-        Location locA = new Location (new Point(0, 0), 0, "locA", "Location A");
-        Location locB = new Location (new Point(0, 0), 0, "locB", "Location B");
+        Location locA = new Location (0, 0, 0, "locA", "Location A");
+        Location locB = new Location (0, 0, 0, "locB", "Location B");
 
         assertThatThrownBy(() -> {
             g.addLocation(locA);
@@ -123,10 +123,10 @@ public class GraphUnitTest {
     @Test
     public void testGetPathsFromLocationsReturnsCorrectPaths() throws Exception{
         Graph g = new Graph();
-        Location locA = new Location (new Point(0, 0), 0, "locA", "Location A");
-        Location locB = new Location (new Point(1, 0), 1, "locB", "Location B");
-        Location locC = new Location (new Point(2,0),2, "locC", "Location C");
-        Location locD = new Location (new Point (3,0), 4, "locD", "Location D");
+        Location locA = new Location (0, 0, 0, "locA", "Location A");
+        Location locB = new Location (1, 0, 1, "locB", "Location B");
+        Location locC = new Location (2, 0, 2, "locC", "Location C");
+        Location locD = new Location (3, 0, 4, "locD", "Location D");
 
         Path path1 = new Path(locA, locB, new ArrayList<>());
         Path path2 = new Path(locA, locC, new ArrayList<>());
@@ -159,8 +159,8 @@ public class GraphUnitTest {
     @Test
     public void testGetLocationsReturnsAllAddedLocations() throws Exception{
         Graph g = new Graph();
-        Location locA = new Location (new Point(0, 0), 0, "locA", "Location A");
-        Location locB = new Location (new Point(1, 0), 1, "locB", "Location B");
+        Location locA = new Location (0, 0, 0, "locA", "Location A");
+        Location locB = new Location (1, 0, 1, "locB", "Location B");
 
         g.addLocation(locA);
         g.addLocation(locB);

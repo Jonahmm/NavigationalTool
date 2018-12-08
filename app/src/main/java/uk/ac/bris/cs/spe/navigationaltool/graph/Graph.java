@@ -15,8 +15,8 @@ public class Graph {
         if(graph.keySet().stream().anyMatch(n2 -> n2.code.equals(n.code)))
             throw new IllegalArgumentException("Another node with the same code already exists in the graph");
 
-        //if(graph.keySet().stream().anyMatch(n2 -> (n2.location.x == n.location.x) && (n2.location.y == n.location.y)))
-         //   throw new IllegalArgumentException("Another node at the same point already exists in the graph");
+        if(graph.keySet().stream().anyMatch(n2 -> (n2.x == n.x) && (n2.y == n.y)))
+            throw new IllegalArgumentException("Another node at the same point already exists in the graph");
 
         graph.put(n, new ArrayList<Path>());
     }
@@ -28,8 +28,8 @@ public class Graph {
         if(graph.keySet().stream().anyMatch(n2 -> n2.code.equals(n.code)))
             throw new IllegalArgumentException("Another node with the same code already exists in the graph");
 
-//        if(graph.keySet().stream().anyMatch(n2 -> n2.location.x == n.location.x && n2.location.y == n.location.y))
-//            throw new IllegalArgumentException("Another node at the same point already exists in the graph");
+        if(graph.keySet().stream().anyMatch(n2 -> n2.x == n.x && n2.y == n.y))
+            throw new IllegalArgumentException("Another node at the same point already exists in the graph");
 
         graph.put(n, paths);
     }
