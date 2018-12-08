@@ -64,8 +64,8 @@ public class NavigatorUnitTest {
         Path p4 = new Path (a, d, onlyStaff); // only staff
         Path p5 = new Path (d, c, onlyStaff); // only staff
 
-        graph.addLocation(a); graph.addLocation(b); graph.addLocation(c);
-        graph.addPath(p1); graph.addPath(p2); graph.addPath(p3);
+        graph.addLocation(a); graph.addLocation(b); graph.addLocation(c); graph.addLocation(d);
+        graph.addPath(p1); graph.addPath(p2); graph.addPath(p3); graph.addPath(p4); graph.addPath(p5);
 
         List<Path> result = nav.navigate(a, c, graph, User.STUDENT);
         assertThat(result.equals(new ArrayList<>(Arrays.asList(p1, p2)))).isTrue();

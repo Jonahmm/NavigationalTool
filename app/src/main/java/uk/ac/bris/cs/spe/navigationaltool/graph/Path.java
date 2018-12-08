@@ -68,13 +68,13 @@ public class Path {
         if(!(o instanceof Path)) return false;
 
         // Checks forward and backwards
-        if(((Path) o).locA != locA){
-            if(((Path) o).locA != locB) return false;
-            else if(((Path) o).locB != locA) return false;
+        if(!((Path) o).locA.equals(locA)){
+            if(!((Path) o).locA.equals(locB)) return false;
+            else if(!((Path) o).locB.equals(locA)) return false;
         }
-        else if(((Path) o).locB != locB) return false;
+        else if(!((Path) o).locB.equals(locB)) return false;
         if(((Path) o).users.size() != users.size()) return false;
-        if(!((Path) o).users.contains(users))  return false;
+        if(!((Path) o).users.containsAll(users))  return false;
 
         return true;
     }

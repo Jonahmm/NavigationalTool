@@ -40,7 +40,7 @@ public class BreadthFirstNavigator implements Navigator {
             }
 
             if(!newLocationsFound){
-                throw new RuntimeException("Can't find route, graph must be poorly constructed.");
+                throw new IllegalArgumentException("Can't find route, graph must be poorly constructed.");
             }
         }
 
@@ -66,7 +66,10 @@ public class BreadthFirstNavigator implements Navigator {
             }
         }
 
-        return pathList;
+        ArrayList<Path> flippedPath = new ArrayList<Path>();
+        for(int i = pathList.size()-1; i >= 0; i--) flippedPath.add(pathList.get(i));
+
+        return flippedPath;
     }
 
 
