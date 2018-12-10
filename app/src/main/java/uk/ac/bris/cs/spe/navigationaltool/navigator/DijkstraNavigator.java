@@ -34,25 +34,31 @@ public class DijkstraNavigator implements Navigator{
                                                                 .min((e, e2) -> e.getValue() > e2.getValue() ? 1 : e.getValue() == e2.getValue() ? 0 : -1)
                                                                 .get().getKey(); // If the get fails, it's all rip, no point in an orElse()
 
-            for(Path p : (Path[]) graph.getPathsFromLocation(closest).stream().filter(e -> (!e.allowsUser(user))).toArray()){
-                Location other = p.getOtherLocation(closest);
-                int distance = (int) Math.sqrt(Math.pow(other.x - closest.x, 2) + Math.pow(other.y - closest.y, 2)) + shortestDistTo.get(closest);
+            for(Path p : graph.getPathsFromLocation(closest)){
+                if(p.allowsUser(user)) {
+                    Location other = p.getOtherLocation(closest);
+                    int distance = (int) Math.sqrt(Math.pow(other.x - closest.x, 2) + Math.pow(other.y - closest.y, 2)) + shortestDistTo.get(closest);
 
-                if(shortestDistTo.containsKey(other)){
-                    if(shortestDistTo.get(other) > distance){
+                    if (shortestDistTo.containsKey(other)) {
+                        if (shortestDistTo.get(other) > distance) {
+                            shortestDistTo.put(other, distance);
+
+                            ArrayList<Path> newPath = new ArrayList<>(shortestPathTo.get(closest));
+                            newPath.add(p);
+                            shortestPathTo.put(other, newPath);
+                        }
+                    } else {
                         shortestDistTo.put(other, distance);
 
-                        ArrayList<Path> newPath = new ArrayList<>(shortestPathTo.get(closest));
+                        ArrayList<Path> newPath;
+                        if(shortestPathTo.containsKey(closest))
+                            newPath = new ArrayList<>(shortestPathTo.get(closest));
+                        else
+                            newPath = new ArrayList<>();
+
                         newPath.add(p);
                         shortestPathTo.put(other, newPath);
                     }
-                }
-                else{
-                    shortestDistTo.put(other, distance);
-
-                    ArrayList<Path> newPath = new ArrayList<>(shortestPathTo.get(closest));
-                    newPath.add(p);
-                    shortestPathTo.put(other, newPath);
                 }
             }
 
