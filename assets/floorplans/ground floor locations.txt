@@ -48,7 +48,6 @@ B.G.019,,Ground Floor
 G.36,,Ground Floor
 G.35,Lab,Ground Floor
 B.G.020,,Ground Floor
-B.G.020,,Ground Floor
 G.34A,,Ground Floor
 G.34B,,Ground Floor
 G.32,,Ground Floor
@@ -77,7 +76,6 @@ B.G.032,,Ground Floor
 G.18,,Ground Floor
 G.18B,,Ground Floor
 G.18A,,Ground Floor
-B.G.033,,Ground Floor
 G.15,,Ground Floor
 G.15A,Toilet,Ground Floor
 G.15B,Toilet,Ground Floor

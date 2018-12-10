@@ -25,6 +25,8 @@ import android.graphics.*;
 
 import com.github.chrisbanes.photoview.PhotoView;
 
+import java.io.IOException;
+
 public class DisplayDrawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -76,7 +78,19 @@ public class DisplayDrawer extends AppCompatActivity
         mapView.setImageBitmap(map);
         mapView.setMaximumScale(12);
 
-        building = new Building("ground", new BreadthFirstNavigator(), getApplicationContext());
+        try {
+            building = new Building("ground", new BreadthFirstNavigator(),
+                getApplicationContext());
+            Snackbar.make(findViewById(R.id.constraint_layout), "Imported " +
+                    building.getGraph().getAllLocations().size()
+                    + " locations.", Snackbar.LENGTH_LONG)
+                    .show();
+        } catch (IOException e) {
+            Snackbar.make(findViewById(R.id.constraint_layout), "Error importing building", Snackbar.LENGTH_SHORT)
+                    .show();
+        }
+
+
     }
 
     //Quick and dirty menu -> User implementation

@@ -2,6 +2,8 @@ package uk.ac.bris.cs.spe.navigationaltool.graph;
 
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Set;
+
 import static java.util.Objects.requireNonNull;
 
 public class Graph {
@@ -15,8 +17,9 @@ public class Graph {
         if(graph.keySet().stream().anyMatch(n2 -> n2.code.equals(n.code)))
             throw new IllegalArgumentException("Another node with the same code already exists in the graph");
 
-        if(graph.keySet().stream().anyMatch(n2 -> (n2.x == n.x) && (n2.y == n.y)))
-            throw new IllegalArgumentException("Another node at the same point already exists in the graph");
+//        //Commented for testing before we have x, y recorded
+//        if(graph.keySet().stream().anyMatch(n2 -> (n2.x == n.x) && (n2.y == n.y)))
+//            throw new IllegalArgumentException("Another node at the same point already exists in the graph");
 
         graph.put(n, new ArrayList<Path>());
     }
@@ -56,6 +59,10 @@ public class Graph {
 
     public ArrayList<Path> getPathsFromLocationCode(String s){
         return getPathsFromLocation(getLocationByCode(s));
+    }
+
+    public Set<Location> getAllLocations() {
+        return graph.keySet();
     }
 
 }

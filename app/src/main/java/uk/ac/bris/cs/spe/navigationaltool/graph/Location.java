@@ -16,6 +16,7 @@ public class Location {
 
     public Location(int x, int y, String floor, String code){
         requireNonNull(code);
+        if (code.equals("")) throw new IllegalArgumentException("Location cannot have empty code");
         this.x = x;
         this.y = y;
 
@@ -23,10 +24,11 @@ public class Location {
         this.code = code;
     }
 
+    //Edited to ensure "" goes to null name
     public Location(int x, int y, String floor, String code, String name){
         this(x,y,floor,code);
         requireNonNull(name);
-        this.name = name;
+        if (!name.equals("")) this.name = name;
     }
 
 
@@ -71,7 +73,7 @@ public class Location {
     public boolean equals(Object o){
         if(!(o instanceof Location))          return false;
         if(!((Location) o).code.equals(code)) return false;
-        if(((Location) o).floor != floor)     return false;
+        if(!((Location) o).floor.equals(floor))     return false;
         if(((Location) o).getX() != getX())   return false;
         if(((Location) o).getY() != getY())   return false;
 
