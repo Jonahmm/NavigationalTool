@@ -95,4 +95,16 @@ public class BuildingUnitTest {
         assertThat(building.getName().equals(testBuildingFileLocation)).isTrue();
 
     }
+
+    @Test
+    public void testNullArgs(){
+        assertThatThrownBy(() -> new Building(testBuildingFileLocation, new BreadthFirstNavigator(), null))
+                .hasCauseInstanceOf(IllegalArgumentException.class);
+
+        assertThatThrownBy(() -> new Building(testBuildingFileLocation, null, null))
+                .hasCauseInstanceOf(IllegalArgumentException.class);
+
+        assertThatThrownBy(() -> new Building(null, new BreadthFirstNavigator(), null))
+                .hasCauseInstanceOf(IllegalArgumentException.class);
+    }
 }
