@@ -1,6 +1,7 @@
 package uk.ac.bris.cs.spe.navigationaltool;
 
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,10 +14,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.Switch;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.User;
 import uk.ac.bris.cs.spe.navigationaltool.navigator.Navigator;
+
+import android.graphics.*;
 
 public class DisplayDrawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -25,6 +29,8 @@ public class DisplayDrawer extends AppCompatActivity
     private int access;
     private Boolean disabl;
     Menu options;
+
+    Bitmap map;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +65,10 @@ public class DisplayDrawer extends AppCompatActivity
         navigationView.getMenu().findItem(R.id.disabled_switch).setChecked(disabl);
 
         navigationView.setNavigationItemSelectedListener(this);
+
+        map = BitmapFactory.decodeResource(getResources(), R.drawable.mapg);
+        ImageView im = (ImageView) findViewById(R.id.mapviewer);
+        im.setImageBitmap(map);
     }
 
     //Quick and dirty menu -> User implementation
