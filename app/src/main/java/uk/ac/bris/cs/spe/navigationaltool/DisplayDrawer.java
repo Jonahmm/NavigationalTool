@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.Switch;
 
+import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 import uk.ac.bris.cs.spe.navigationaltool.graph.User;
 import uk.ac.bris.cs.spe.navigationaltool.navigator.BreadthFirstNavigator;
 import uk.ac.bris.cs.spe.navigationaltool.navigator.Navigator;
@@ -26,6 +27,7 @@ import android.graphics.*;
 import com.github.chrisbanes.photoview.PhotoView;
 
 import java.io.IOException;
+import java.util.function.BinaryOperator;
 
 public class DisplayDrawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -83,7 +85,8 @@ public class DisplayDrawer extends AppCompatActivity
                 getApplicationContext());
             Snackbar.make(findViewById(R.id.constraint_layout), "Imported " +
                     building.getGraph().getAllLocations().size()
-                    + " locations.", Snackbar.LENGTH_LONG)
+                    + " locations.",
+                    Snackbar.LENGTH_LONG)
                     .show();
         } catch (IOException e) {
             Snackbar.make(findViewById(R.id.constraint_layout), "Error importing building", Snackbar.LENGTH_SHORT)

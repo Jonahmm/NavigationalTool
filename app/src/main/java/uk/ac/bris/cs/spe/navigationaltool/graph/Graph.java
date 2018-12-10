@@ -39,7 +39,8 @@ public class Graph {
 
     public void addPath(Path e){
         if(!graph.containsKey(e.locA) || !graph.containsKey(e.locB)) throw new IllegalArgumentException(
-                "Cannot add an edge that connects to nodes not in the graph");
+                "Cannot add an edge that connects to nodes not in the graph: occurred when adding "
+                        + e.locA.getCode() + "," + e.locB.getCode());
         if(e.locA.equals(e.locB)) throw new IllegalArgumentException(
                 "Cannot add an edge that connects the same node to itself");
         graph.get(e.locA).add(e);
@@ -47,7 +48,7 @@ public class Graph {
     }
 
     public Location getLocationByCode(String s){
-        Location n = graph.keySet().stream().filter(n2 -> n2.code.equals(s) || n2.name.equals(s)).findFirst().orElse(null);
+        Location n = graph.keySet().stream().filter(n2 -> n2.code.equals(s) /* Causes error and not required yet || n2.name.equals(s)*/).findFirst().orElse(null);
         if(n == null) throw new IllegalArgumentException("Location does not exist.");
         return n;
     }

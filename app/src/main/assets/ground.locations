@@ -38,9 +38,10 @@ B.G.011,STAIRCASE,Ground Floor
 B.G.013,,Ground Floor
 B.G.012,,Ground Floor
 G.44,Frank,Ground Floor
-B.G.014,,Ground Floor
-B.G.015,,Ground Floor
+B.G.014,Powell Foyer,Ground Floor
+B.G.015,Powell Stairs,Ground Floor
 G.42,Powell Lecture Theatre,Ground Floor
+#G.42A, Powell Foyer,Ground Floor ##added then removed, not needed
 B.G.016,,Ground Floor
 G.41,,Ground Floor
 G.39,,Ground Floor
