@@ -45,6 +45,7 @@ public class Graph {
 
     public Location getLocationByCode(String s){
         Location n = graph.keySet().stream().filter(n2 -> n2.code.equals(s) || n2.name.equals(s)).findFirst().orElse(null);
+        if(n == null) throw new IllegalArgumentException("Location does not exist.");
         return n;
     }
 
