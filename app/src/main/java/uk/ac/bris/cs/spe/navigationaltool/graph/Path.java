@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static java.util.Objects.requireNonNull;
+
 public class Path {
 
     public final Location locA;
@@ -17,6 +19,13 @@ public class Path {
     public final List<User> users;
 
     public Path(Location a, Location b, List<User> users){
+        requireNonNull(a);
+        requireNonNull(b);
+        requireNonNull(users);
+
+        if(users.size() == 0) throw new IllegalArgumentException("users cannot be an empty list");
+        if(users.contains(null)) throw new IllegalArgumentException("users cannot contain a null value");
+
         this.locA = a;
         this.locB = b;
 

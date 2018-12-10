@@ -19,24 +19,39 @@ public class LocationUnitTest {
         // first constructor
         assertThatThrownBy(() -> {
             Location loc = new Location(null, 0, "loc");
-        }).isInstanceOf(IllegalArgumentException.class);
+        }).isInstanceOf(NullPointerException.class);
 
         assertThatThrownBy(() -> {
-            Location loc = new Location(new Point(0, 0), 0, null);
-        }).isInstanceOf(IllegalArgumentException.class);
+            Location loc = new Location(0, 0, 0, null);
+        }).isInstanceOf(NullPointerException.class);
 
         // second constructor
         assertThatThrownBy(() -> {
             Location loc = new Location(null, 0, "loc", "Location");
-        }).isInstanceOf(IllegalArgumentException.class);
+        }).isInstanceOf(NullPointerException.class);
 
         assertThatThrownBy(() -> {
-            Location loc = new Location(new Point(0, 0), 0, null, "Location");
-        }).isInstanceOf(IllegalArgumentException.class);
+            Location loc = new Location(0, 0, 0, null, "Location");
+        }).isInstanceOf(NullPointerException.class);
 
         assertThatThrownBy(() -> {
-            Location loc = new Location(new Point(0, 0), 0, "loc", null);
-        }).isInstanceOf(IllegalArgumentException.class);
+            Location loc = new Location(0, 0, 0, "loc", null);
+        }).isInstanceOf(NullPointerException.class);
+    }
+
+    @Test
+    public void testEqualsMethodCorrectlyFlagsEqualLocations(){
+        Location a = new Location(0,0,0,"testA");
+        Location b = new Location(451, 459313, -5, "testB", "second room");
+
+        assertThat(a.equals(a)).isTrue();
+        assertThat(b.equals(b)).isTrue();
+
+        assertThat(a.equals(b)).isFalse();
+        assertThat(b.equals(a)).isFalse();
+
+        assertThat(b.hashCode() == b.hashCode()).isTrue();
+        assertThat(a.hashCode() != b.hashCode()).isTrue();
     }
 
 }
