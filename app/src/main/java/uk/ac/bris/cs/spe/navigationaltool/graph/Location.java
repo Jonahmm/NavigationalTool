@@ -4,6 +4,8 @@ import android.graphics.Point;
 
 import java.util.Objects;
 
+import static java.util.Objects.requireNonNull;
+
 public class Location {
 
     public final int x, y;
@@ -13,6 +15,7 @@ public class Location {
     public String name;
 
     public Location(int x, int y, int floor, String code){
+        requireNonNull(code);
         this.x = x;
         this.y = y;
 
@@ -22,6 +25,7 @@ public class Location {
 
     public Location(int x, int y, int floor, String code, String name){
         this(x,y,floor,code);
+        requireNonNull(name);
         this.name = name;
     }
 

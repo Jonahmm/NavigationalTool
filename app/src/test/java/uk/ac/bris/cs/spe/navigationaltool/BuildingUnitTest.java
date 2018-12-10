@@ -2,16 +2,9 @@ package uk.ac.bris.cs.spe.navigationaltool;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import uk.ac.bris.cs.spe.navigationaltool.graph.Graph;
-import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
-import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
-import uk.ac.bris.cs.spe.navigationaltool.graph.User;
 import uk.ac.bris.cs.spe.navigationaltool.navigator.BreadthFirstNavigator;
-import uk.ac.bris.cs.spe.navigationaltool.navigator.Navigator;
+import uk.ac.bris.cs.spe.navigationaltool.navigator.DijkstraNavigator;
 
 import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -24,120 +17,82 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
  */
 public class BuildingUnitTest {
 
+    private String testBuildingFileLocation = ""; // TODO: make this the path directly to the fire
+    private String badBuildingFileLocation = ""; // TODO: make this the path to the directory, name files after their failures
+
     ///// Construction Tests /////
 
     @Test
-    public void testOnlyAndAllListedLocationsInGraph() throws Exception {
-        Building building = new Building("test1.buildingLocations", new BreadthFirstNavigator());
+    public void testOnlyAndAllListedLocationsInGraph() throws Exception{
+        Building building = new Building (testBuildingFileLocation, new BreadthFirstNavigator());
         Graph g = building.getGraph();
 
-        List<User> allUsers = new ArrayList<>(Arrays.asList(User.STAFF, User.STUDENT, User.DISABLED_STAFF, User.DISABLED_STUDENT));
-        List<User> onlyStaff = new ArrayList<>(Arrays.asList(User.STAFF, User.DISABLED_STUDENT));
-        List<User> noDisabled = new ArrayList<>(Arrays.asList(User.STAFF, User.STUDENT));
+        // TODO: Requires creating the test files & knowing what's in them, and converting that into this.
 
-        Location locA = new Location(0, 0, 0, "locA", "Location A");
-        Location locB = new Location(1, 0, 1, "locB", "Location B");
-        Location locC = new Location(3, 2, 2, "locC", "Location C");
-        Location locD = new Location(0, 4, -1, "locD", "Location D");
-
-        Path p1 = new Path(locA, locB, noDisabled);
-        Path p2 = new Path(locB, locC, onlyStaff);
-        Path p3 = new Path(locA, locC, allUsers);
-        Path p4 = new Path(locD, locB, onlyStaff);
-
-        // check locations
-        assertThat(g.getLocationByCode("locA").equals(locA)).isTrue();
-        assertThat(g.getLocationByCode("locB").equals(locB)).isTrue();
-        assertThat(g.getLocationByCode("locC").equals(locC)).isTrue();
-        assertThat(g.getLocationByCode("locD").equals(locD)).isTrue();
     }
 
     @Test
     public void testOnlyAndAllListedPathsInGraph() throws Exception{
-        Building building = new Building ("test1.buildingLocations", new BreadthFirstNavigator());
-        Graph g = building.getGraph();
-
-        List<User> allUsers = new ArrayList<>(Arrays.asList(User.STAFF,User.STUDENT,User.DISABLED_STAFF,User.DISABLED_STUDENT));
-        List<User> onlyStaff = new ArrayList<>(Arrays.asList(User.STAFF,User.DISABLED_STUDENT));
-        List<User> noDisabled = new ArrayList<>(Arrays.asList(User.STAFF,User.STUDENT));
-
-        Location locA = new Location(0,0,0,"locA","Location A");
-        Location locB = new Location(1,0,1,"locB","Location B");
-        Location locC = new Location(3,2,2,"locC","Location C");
-        Location locD = new Location(0,4,-1,"locD","Location D");
-
-        Path p1 = new Path (locA,locB,noDisabled);
-        Path p2 = new Path (locB,locC,onlyStaff);
-        Path p3 = new Path (locA,locC, allUsers);
-        Path p4 = new Path (locD,locB,onlyStaff);
-
-        // check paths
-        assertThat(g.getPathsFromLocationCode("locA").equals(new ArrayList<>(Arrays.asList(p1,p3)))).isTrue();
-        assertThat(g.getPathsFromLocationCode("locB").equals(new ArrayList<>(Arrays.asList(p2)))).isTrue();
-        assertThat(g.getPathsFromLocationCode("locC").isEmpty()).isTrue();
-        assertThat(g.getPathsFromLocationCode("locD").equals(new ArrayList<>(Arrays.asList(p4)))).isTrue();
+        // TODO: Requires creating the test files & knowing what's in them, and converting that into this.
     }
 
     @Test
-    public void testNoFileFails() throws Exception{
-        assertThatThrownBy(() -> {
-            Building building = new Building ("test.buildingLocations", new BreadthFirstNavigator());
-        }).isInstanceOf(IllegalArgumentException.class);
+    public void testBadArgumentFails() throws Exception{
+        assertThatThrownBy(() -> new Building("incorrect file name.bad file extension", new BreadthFirstNavigator()))
+                .hasCauseInstanceOf(IllegalArgumentException.class);
+
+        assertThatThrownBy(() -> new Building(testBuildingFileLocation, null))
+                .hasCauseInstanceOf(IllegalArgumentException.class);
+
+        assertThatThrownBy(() -> new Building(null, new BreadthFirstNavigator()))
+                .hasCauseInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void testBadFileLayoutFails() throws Exception{
-        assertThatThrownBy(() -> {
-            Building building = new Building ("test2.buildingLocations", new BreadthFirstNavigator());
-        }).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new Building(badBuildingFileLocation + "layout", new BreadthFirstNavigator()))
+                .hasCauseInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void testDuplicateLocationFails() throws Exception{
-
+        assertThatThrownBy(() -> new Building(badBuildingFileLocation + "duplicateLocation", new BreadthFirstNavigator()))
+                .hasCauseInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void testDuplicatePathFails() throws Exception{
-
+        assertThatThrownBy(() -> new Building(badBuildingFileLocation + "duplicatePath", new BreadthFirstNavigator()))
+                .hasCauseInstanceOf(IllegalArgumentException.class);
     }
 
-    @Test // TODO: See if this is actually necessary with the implementation we have. = probably not necessary
+    @Test // TODO: See if this is actually necessary with the implementation we have.
     public void testAddingLocationWithUnknownFloorFails() throws Exception{
-//        assertThatThrownBy(() -> {
-//            Building building = new Building("test2.buildingLocations",new BreadthFirstNavigator());
-//        }).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> new Building(badBuildingFileLocation + "LocationFloor", new BreadthFirstNavigator()))
+                .hasCauseInstanceOf(IllegalArgumentException.class);
     }
 
     @Test // ie: If you have two 'islands' of locations that do not have connecting paths, then this should fail after loading.
     public void testHavingUnconnectedLocationsFails() throws Exception{
-        assertThatThrownBy(() -> {
-            Building building = new Building("test3.buildingLocations",new BreadthFirstNavigator());
-        }).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> new Building(badBuildingFileLocation + "unconnectedLocations", new BreadthFirstNavigator()))
+                .hasCauseInstanceOf(IllegalArgumentException.class);
     }
 
     ///// Construction Tests End /////
 
-
     @Test
     public void testSetNavigatorChangesNavigator() throws Exception{
-        Navigator nav1 = new BreadthFirstNavigator();
-        Navigator nav2 = new BreadthFirstNavigator();
-        Building building = new Building("test1.buildingLocations", nav1);
-        building.setNavigator(nav2);
+        Building building = new Building(testBuildingFileLocation, new BreadthFirstNavigator());
+        assertThat(building.getNavigator() instanceof BreadthFirstNavigator).isTrue();
 
-        assertThat(building.getNavigator().equals(nav2)).isTrue();
+        building.setNavigator(new DijkstraNavigator());
+        assertThat(building.getNavigator() instanceof DijkstraNavigator).isTrue();
     }
 
     @Test
-    public void testGetNameIsCorrect() throws Exception{
-        Building building = new Building("test1.buildingLocations", new BreadthFirstNavigator());
+    public void testGetNameIsCorrect() throws Exception {
+        Building building = new Building(testBuildingFileLocation, new BreadthFirstNavigator());
+        assertThat(building.getName().equals(testBuildingFileLocation)).isTrue();
 
-        assertThat(building.getName().equals("test1.buildingLocations")).isTrue();
-    }
-
-    @Test // is this necessary? already done in the first 2 tests.
-    public void testGetGraphReturnsCorrectGraph() throws Exception{
-//        Building building = new Building()
     }
 }

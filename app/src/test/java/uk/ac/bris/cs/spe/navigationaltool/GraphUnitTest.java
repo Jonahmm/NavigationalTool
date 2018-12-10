@@ -5,6 +5,8 @@ import android.graphics.Point;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.Graph;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
@@ -25,8 +27,9 @@ public class GraphUnitTest {
         Graph g = new Graph();
         Location locA = new Location (0, 0, 0, "locA");
         Location locB = new Location (0,1, 0, "locB");
+        List<User> allUsers = new ArrayList<>(Arrays.asList(User.STUDENT, User.DISABLED_STUDENT, User.STAFF, User.DISABLED_STAFF));
 
-        Path path1 = new Path (locA, locB, new ArrayList<>());
+        Path path1 = new Path (locA, locB, allUsers);
         ArrayList<Path> paths = new ArrayList<Path>(0);
         paths.add(path1);
 
@@ -58,10 +61,11 @@ public class GraphUnitTest {
         Location locA = new Location (0, 0, 0, "locA");
         Location locB = new Location (0,1, 0, "locB");
         Location locC = new Location (0,2, 0, "locC");
+        List<User> allUsers = new ArrayList<>(Arrays.asList(User.STUDENT, User.DISABLED_STUDENT, User.STAFF, User.DISABLED_STAFF));
 
-        Path path1 = new Path (locC, locB, new ArrayList<User>());
-        Path path2 = new Path (locA, locC, new ArrayList<User>());
-        Path path3 = new Path (locA, locA, new ArrayList<User>());
+        Path path1 = new Path (locC, locB, allUsers);
+        Path path2 = new Path (locA, locC, allUsers);
+        Path path3 = new Path (locA, locA, allUsers);
 
         g.addLocation(locA);
         g.addLocation(locB);
@@ -76,12 +80,14 @@ public class GraphUnitTest {
     public void testAddPathFailsWithUnknownLocation() throws Exception{
         Graph g = new Graph();
         Location locA = new Location (0, 0, 0, "locA");
+        List<User> allUsers = new ArrayList<>(Arrays.asList(User.STUDENT, User.DISABLED_STUDENT, User.STAFF, User.DISABLED_STAFF));
+
         g.addLocation(locA);
-        assertThatThrownBy(() -> g.addPath(new Path(null, locA, new ArrayList<>())))
+        assertThatThrownBy(() -> g.addPath(new Path(null, locA, allUsers)))
                 .isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> g.addPath(new Path(null, null, new ArrayList<>())))
+        assertThatThrownBy(() -> g.addPath(new Path(null, null, allUsers)))
                 .isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> g.addPath(new Path(locA, null, new ArrayList<>())))
+        assertThatThrownBy(() -> g.addPath(new Path(locA, null, allUsers)))
                 .isInstanceOf(NullPointerException.class);
     }
 
@@ -127,9 +133,10 @@ public class GraphUnitTest {
         Location locB = new Location (1, 0, 1, "locB", "Location B");
         Location locC = new Location (2, 0, 2, "locC", "Location C");
         Location locD = new Location (3, 0, 4, "locD", "Location D");
+        List<User> allUsers = new ArrayList<>(Arrays.asList(User.STUDENT, User.DISABLED_STUDENT, User.STAFF, User.DISABLED_STAFF));
 
-        Path path1 = new Path(locA, locB, new ArrayList<>());
-        Path path2 = new Path(locA, locC, new ArrayList<>());
+        Path path1 = new Path(locA, locB, allUsers);
+        Path path2 = new Path(locA, locC, allUsers);
 
         g.addLocation(locA);
         g.addLocation(locB);
