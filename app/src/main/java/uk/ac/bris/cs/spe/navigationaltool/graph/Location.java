@@ -9,12 +9,12 @@ import static java.util.Objects.requireNonNull;
 public class Location {
 
     public final int x, y;
-    public final int floor;
+    public final String floor;
 
     public final String code;
     public String name;
 
-    public Location(int x, int y, int floor, String code){
+    public Location(int x, int y, String floor, String code){
         requireNonNull(code);
         this.x = x;
         this.y = y;
@@ -23,18 +23,18 @@ public class Location {
         this.code = code;
     }
 
-    public Location(int x, int y, int floor, String code, String name){
+    public Location(int x, int y, String floor, String code, String name){
         this(x,y,floor,code);
         requireNonNull(name);
         this.name = name;
     }
 
 
-    public Location(Point loc, int floor, String code){
+    public Location(Point loc, String floor, String code){
         this(loc.x, loc.y, floor, code);
     }
 
-    public Location(Point loc, int floor, String code, String name){
+    public Location(Point loc, String floor, String code, String name){
         this(loc.x, loc.y, floor, code);
         this.name = name;
     }
@@ -51,7 +51,7 @@ public class Location {
         return y;
     }
 
-    public int getFloor() {
+    public String getFloor() {
         return floor;
     }
 

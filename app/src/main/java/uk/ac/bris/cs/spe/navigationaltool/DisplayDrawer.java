@@ -18,9 +18,12 @@ import android.widget.ImageView;
 import android.widget.Switch;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.User;
+import uk.ac.bris.cs.spe.navigationaltool.navigator.BreadthFirstNavigator;
 import uk.ac.bris.cs.spe.navigationaltool.navigator.Navigator;
 
 import android.graphics.*;
+
+import com.github.chrisbanes.photoview.PhotoView;
 
 public class DisplayDrawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -29,8 +32,9 @@ public class DisplayDrawer extends AppCompatActivity
     private int access;
     private Boolean disabl;
     Menu options;
-
+    PhotoView mapView;
     Bitmap map;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +51,9 @@ public class DisplayDrawer extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+                drawPathOnImage(new Point(100,100), new Point(200,400));
             }
         });
 
@@ -67,8 +72,11 @@ public class DisplayDrawer extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         map = BitmapFactory.decodeResource(getResources(), R.drawable.mapg);
-        ImageView im = (ImageView) findViewById(R.id.mapviewer);
-        im.setImageBitmap(map);
+        mapView = (PhotoView) findViewById(R.id.mapviewer);
+        mapView.setImageBitmap(map);
+        mapView.setMaximumScale(12);
+
+        building = new Building("ground", new BreadthFirstNavigator(), getApplicationContext());
     }
 
     //Quick and dirty menu -> User implementation
@@ -132,6 +140,15 @@ public class DisplayDrawer extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void drawPathOnImage(Point p1, Point p2) {
+        Bitmap tmp = Bitmap.createBitmap(map.getWidth(), map.getHeight(), map.getConfig());
+        Canvas c = new Canvas(tmp);
+        Paint p = new Paint(Color.RED);
+        c.drawBitmap(map, 0, 0, null);
+        c.drawLine(p1.x, p1.y, p2.x, p2.y, p);
+        mapView.setImageBitmap(tmp);
     }
 
 }
