@@ -1,0 +1,5 @@
+#information in wrong order
+0,0,locA,Location A,GROUND FLOOR
+0,1,locB,Location B,FIRST FLOOR
+1,0,locC,Location C,SECOND FLOOR
+2,4,locD,LocationD, BASEMENT
