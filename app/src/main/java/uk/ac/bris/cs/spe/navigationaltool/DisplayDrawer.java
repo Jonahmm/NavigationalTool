@@ -4,6 +4,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -19,13 +21,19 @@ import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 import uk.ac.bris.cs.spe.navigationaltool.graph.User;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
 import uk.ac.bris.cs.spe.navigationaltool.navigator.BreadthFirstNavigator;
+import uk.ac.bris.cs.spe.navigationaltool.navigator.DijkstraNavigator;
 
 import android.graphics.*;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
 import com.github.chrisbanes.photoview.PhotoView;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class DisplayDrawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -33,10 +41,11 @@ public class DisplayDrawer extends AppCompatActivity
     private Building building;
     private int access;
     private Boolean disabl;
-    Menu options;
     PhotoView mapView;
     Bitmap map;
     Bitmap buf; Canvas canvas; float fct;
+    private boolean srchShown = false;
+    int highlightIntervals[] = {30,90,180};
 
 
     @Override
@@ -49,28 +58,7 @@ public class DisplayDrawer extends AppCompatActivity
         access = getPreferences(MODE_PRIVATE).getInt(getString(R.string.saved_access), R.id.item_ug);
         disabl = getPreferences(MODE_PRIVATE).getBoolean(getString(R.string.saved_disabl), false);
 
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-                //drawPathOnImage(new Point(100,100), new Point(200,400));
-                ArrayList<Path> done = new ArrayList<>();
-                for (Location l : building.getGraph().getAllLocations()) {
-                    for (Path p : building.getGraph().getPathsFromLocation(l)) {
-                        //Log.v("Drawing path", p.locA.getLocationString() + p.locB.getLocationString());
-                        if (!done.contains(p) && p.locA.x != 0 && p.locA.y != 0 && p.locB.x != 0 && p.locB.y != 0) {
-                            drawPathToBuffer(p.locA.getLocation(), p.locB.getLocation());
-                            done.add(p);
-                        }
-                    }
-                    if (!l.getLocation().equals(0,0)) drawTextToBuffer(l.code, l.getLocation());
-                }
-                displayBuffer();
-            }
-        });
+        setListeners();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -93,24 +81,91 @@ public class DisplayDrawer extends AppCompatActivity
         mapView.setImageBitmap(map);
         mapView.setMaximumScale(12);
 
+        loadBuilding();
+    }
+
+    void loadBuilding() {
         try {
             building = new Building("ground", new BreadthFirstNavigator(),
-                getApplicationContext());
-            Snackbar.make(findViewById(R.id.constraint_layout), "Imported " +
-                    building.getGraph().getAllLocations().size()
-                    + " locations.",
-                    Snackbar.LENGTH_LONG)
-                    .show();
+                    getApplicationContext());
+            snackMsg( "Imported " + building.getGraph().getAllLocations().size()
+                            + " locations.");
         } catch (IOException e) {
-            Snackbar.make(findViewById(R.id.constraint_layout), "Error importing building", Snackbar.LENGTH_SHORT)
-                    .show();
+            snackMsg("Error importing building");
         } catch (IllegalArgumentException e) {
-            Snackbar.make(findViewById(R.id.constraint_layout), e.getMessage(), Snackbar.LENGTH_SHORT)
-                    .show();
+            snackMsg(e.getMessage());
         }
-
-
     }
+
+    void setListeners() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+                //drawPathOnImage(new Point(100,100), new Point(200,400));
+                ArrayList<Path> done = new ArrayList<>();
+                for (Location l : building.getGraph().getAllLocations()) {
+                    for (Path p : building.getGraph().getPathsFromLocation(l)) {
+                        //Log.v("Drawing path", p.locA.getLocationString() + p.locB.getLocationString());
+                        if (!done.contains(p) && p.locA.x != 0 && p.locA.y != 0 && p.locB.x != 0 && p.locB.y != 0) {
+                            drawPathToBuffer(p.locA.getLocation(), p.locB.getLocation());
+                            done.add(p);
+                        }
+                    }
+                    if (!l.getLocation().equals(0,0)) drawTextToBuffer(l.code, l.getLocation());
+                }
+                displayBuffer();
+            }
+        });
+
+        ImageButton navBtn = findViewById(R.id.navButton);
+        navBtn.setOnClickListener(view -> {
+            EditText navFrom = findViewById(R.id.navFrom);
+            EditText navTo   = findViewById(R.id.navTo);
+            navTo.clearFocus(); navFrom.clearFocus();
+
+            Location to = building.getGraph().getBestMatchLocation(navTo.getText().toString());
+            if (to == null) {snackMsg("No location \"" + navTo.getText().toString() + "\" found"); return;}
+            navTo.setText(to.code);
+
+            Location from = building.getGraph().getBestMatchLocation(navFrom.getText().toString());
+            if (from == null) {
+                //Just find the navTo on a map
+                snackMsg("No origin specified, highlighting destination.");
+                building.getGraph().getAllLocations().stream()
+                        .filter(l -> l.getCode().startsWith(navTo.getText().toString().toUpperCase())
+                                || (l.hasName() && l.getName().startsWith(navTo.getText().toString().toUpperCase())))
+                        .findFirst().ifPresent(DisplayDrawer.this::highlightLocation);
+            }
+            else {
+                try {
+                    List<Path> paths = building.getNavigator().navigate(from, to, building.getGraph(), getUserFromParams(access, disabl));
+                    refreshBuffer();
+                    for (Path p : paths) {
+                        drawPathToBuffer(p.locA.getLocation(), p.locB.getLocation());
+                    }
+                    displayBuffer();
+                }
+                catch (IllegalArgumentException e) {
+                    snackMsg("No path found for specified access level");
+                }
+
+                navFrom.setText(from.code);
+            }
+
+        });
+    }
+
+    void highlightLocation(Location l) {
+        refreshBuffer();
+        Paint p = new Paint(); p.setAntiAlias(true); p.setColor(Color.CYAN); p.setStrokeWidth(5);
+        p.setStyle(Paint.Style.STROKE);
+        for (int i : highlightIntervals) canvas.drawCircle(l.x * fct, l.y * fct, i, p);
+        displayBuffer();
+    }
+
 
     //Quick and dirty menu -> User implementation
     private User getUserFromParams(Integer access, Boolean disabl) {
@@ -135,7 +190,6 @@ public class DisplayDrawer extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.display_drawer, menu);
-        options = menu;
         return true;
     }
 
@@ -147,9 +201,15 @@ public class DisplayDrawer extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
+        if (id == R.id.show_search) {
+            srchShown = !srchShown;
+
+            LinearLayout searches = (LinearLayout) findViewById(R.id.searches);
+            searches.setVisibility(srchShown ? View.VISIBLE : View.GONE);
+            item.setIcon(srchShown ? R.drawable.ic_collapse : R.drawable.ic_search);
+
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -205,6 +265,11 @@ public class DisplayDrawer extends AppCompatActivity
         Log.d("Map width ", Integer.toString(map.getWidth()));
         fct = (float) map.getWidth() / getResources().getInteger(R.integer.map_width);
         Log.d("Got factor ", Float.toString(fct));
+    }
+
+    private void snackMsg(String s) {
+        Snackbar.make(findViewById(R.id.constraint_layout), s, Snackbar.LENGTH_SHORT)
+                .show();
     }
 
 }

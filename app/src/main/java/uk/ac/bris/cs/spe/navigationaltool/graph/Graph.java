@@ -2,6 +2,7 @@ package uk.ac.bris.cs.spe.navigationaltool.graph;
 
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -51,6 +52,14 @@ public class Graph {
         Location n = graph.keySet().stream().filter(n2 -> n2.code.equals(s) /* Causes error and not required yet || n2.name.equals(s)*/).findFirst().orElse(null);
         if(n == null) throw new IllegalArgumentException("Location does not exist.");
         return n;
+    }
+
+    public Location getBestMatchLocation(String s) {
+        return s.equals("") ? null : getAllLocations().stream().filter(
+                l -> l.getCode().equalsIgnoreCase(s) || (l.hasName() && l.getName().equalsIgnoreCase(s))
+        ).findFirst().orElseGet(() -> getAllLocations().stream().filter(
+                l -> l.getCode().toUpperCase().startsWith(s.toUpperCase()) || (l.hasName() && l.getName().toUpperCase().startsWith(s.toUpperCase()))
+        ).findFirst().orElse(null));
     }
 
     public ArrayList<Path> getPathsFromLocation(Location n){

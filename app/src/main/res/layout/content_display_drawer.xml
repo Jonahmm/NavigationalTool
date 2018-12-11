@@ -12,5 +12,7 @@
     <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/mapviewer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

@@ -65,6 +65,10 @@ public class Location {
         return name;
     }
 
+    public boolean hasName() {
+        return name != null;
+    }
+
     // For Debug purposes only
     public String getLocationString(){
         return "(" + x + ", " + y + ")";

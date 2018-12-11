@@ -40,7 +40,7 @@ public class BreadthFirstNavigator implements Navigator {
             }
 
             if(!newLocationsFound){
-                throw new IllegalArgumentException("Can't find route, graph must be poorly constructed.");
+                throw new IllegalArgumentException("Can't find route, check access levels or graph construction.");
             }
         }
 
