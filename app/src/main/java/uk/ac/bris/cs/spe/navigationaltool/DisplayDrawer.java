@@ -47,6 +47,7 @@ public class DisplayDrawer extends AppCompatActivity
     private boolean srchShown = false;
     int highlightIntervals[] = {30,90,180};
 
+    private Paint pathPaint, highlightPaint, originPaint, destPaint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +83,23 @@ public class DisplayDrawer extends AppCompatActivity
         mapView.setMaximumScale(12);
 
         loadBuilding();
+        initPaints();
     }
+
+    private void initPaints() {
+        pathPaint = new Paint();
+        pathPaint.setColor(Color.RED); pathPaint.setAntiAlias(true); pathPaint.setStrokeWidth(3);
+
+        highlightPaint = new Paint();
+        highlightPaint.setColor(Color.CYAN); highlightPaint.setAntiAlias(true);
+        highlightPaint.setStrokeWidth(4); highlightPaint.setStyle(Paint.Style.STROKE);
+
+        originPaint = new Paint();
+        originPaint.setColor(Color.BLUE); originPaint.setAntiAlias(true);
+
+        destPaint = new Paint(originPaint); destPaint.setColor(Color.GREEN);
+
+     }
 
     void loadBuilding() {
         try {
@@ -143,9 +160,11 @@ public class DisplayDrawer extends AppCompatActivity
                 try {
                     List<Path> paths = building.getNavigator().navigate(from, to, building.getGraph(), getUserFromParams(access, disabl));
                     refreshBuffer();
+                    canvas.drawCircle(from.getX() * fct, from.getY() * fct, 10, originPaint);
                     for (Path p : paths) {
                         drawPathToBuffer(p.locA.getLocation(), p.locB.getLocation());
                     }
+                    canvas.drawCircle(to.getX() * fct, to.getY() * fct, 10, destPaint);
                     displayBuffer();
                 }
                 catch (IllegalArgumentException e) {
@@ -160,9 +179,7 @@ public class DisplayDrawer extends AppCompatActivity
 
     void highlightLocation(Location l) {
         refreshBuffer();
-        Paint p = new Paint(); p.setAntiAlias(true); p.setColor(Color.CYAN); p.setStrokeWidth(5);
-        p.setStyle(Paint.Style.STROKE);
-        for (int i : highlightIntervals) canvas.drawCircle(l.x * fct, l.y * fct, i, p);
+        for (int i : highlightIntervals) canvas.drawCircle(l.x * fct, l.y * fct, i, highlightPaint);
         displayBuffer();
     }
 
@@ -237,14 +254,8 @@ public class DisplayDrawer extends AppCompatActivity
 
 
     private void drawPathToBuffer(Point p1, Point p2) {
-        //Bitmap tmp = Bitmap.createBitmap(map.getWidth(), map.getHeight(), map.getConfig());
-        Paint p = new Paint();
-        //TODO: Should be set globally
-        p.setColor(Color.RED);
-        p.setStrokeWidth(3);
-        //canvas.drawBitmap(map, 0, 0, null);
 
-        canvas.drawLine(p1.x * fct, p1.y * fct, p2.x * fct, p2.y * fct, p);
+        canvas.drawLine(p1.x * fct, p1.y * fct, p2.x * fct, p2.y * fct, pathPaint);
         //mapView.setImageBitmap(tmp);
     }
 
