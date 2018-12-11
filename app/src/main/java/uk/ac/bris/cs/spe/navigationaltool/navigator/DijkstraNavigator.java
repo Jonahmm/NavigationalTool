@@ -28,7 +28,7 @@ public class DijkstraNavigator implements Navigator{
         while(!shortestPathTo.containsKey(end)){
             // TODO: check that this is the best way of finding the shortest one.
             Location closest = shortestDistTo.entrySet().stream()
-                                                                .filter(e -> !exploredLocations.contains(e))
+                                                                .filter(e -> !exploredLocations.contains(e.getKey()))
                                                                 .min((e, e2) -> e.getValue() > e2.getValue() ? 1 : e.getValue() == e2.getValue() ? 0 : -1)
                                                                 .get().getKey(); // If the get fails, it's all rip, no point in an orElse()
 
@@ -62,8 +62,8 @@ public class DijkstraNavigator implements Navigator{
 
             exploredLocations.add(closest);
 
-            if(!exploredLocations.containsAll(shortestDistTo.keySet())){
-                throw new RuntimeException("Can't find route, graph must be poorly constructed.");
+            if(exploredLocations.containsAll(shortestDistTo.keySet())){
+                throw new IllegalArgumentException("Can't find route, graph must be poorly constructed.");
             }
 
         }
