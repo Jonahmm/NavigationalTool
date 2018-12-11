@@ -1,7 +1,9 @@
 package uk.ac.bris.cs.spe.navigationaltool;
 
+
 import org.junit.Test;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +14,7 @@ import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
 import uk.ac.bris.cs.spe.navigationaltool.graph.User;
 import uk.ac.bris.cs.spe.navigationaltool.navigator.BreadthFirstNavigator;
 import uk.ac.bris.cs.spe.navigationaltool.navigator.DijkstraNavigator;
+import uk.ac.bris.cs.spe.navigationaltool.navigator.Navigator;
 
 import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -21,6 +24,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
  *
  * @see uk.ac.bris.cs.spe.navigationaltool.Building;
  */
+
 public class BuildingUnitTest {
 
     private DisplayDrawer d = new DisplayDrawer();
@@ -32,7 +36,7 @@ public class BuildingUnitTest {
 
     @Test
     public void testOnlyAndAllListedLocationsInGraph() throws Exception{
-        Building building = new Building ("test/goodTest", new BreadthFirstNavigator(), d.getApplicationContext());
+        Building building = new Building ("ground", new BreadthFirstNavigator(), d.getApplicationContext());
         Graph g = building.getGraph();
 
         Location locA = new Location(0, 0,"Ground Floor","locA", "Location A");
@@ -70,66 +74,62 @@ public class BuildingUnitTest {
     @Test
     public void testBadArgumentFails() throws Exception{
         assertThatThrownBy(() -> new Building("incorrect file name", new BreadthFirstNavigator(),d.getApplicationContext()))
-                .hasCauseInstanceOf(IllegalArgumentException.class);
-
-        assertThatThrownBy(() -> new Building("goodTest", null, d.getApplicationContext()))
-                .hasCauseInstanceOf(IllegalArgumentException.class);
-
-        assertThatThrownBy(() -> new Building(null, new BreadthFirstNavigator(), d.getApplicationContext()))
-                .hasCauseInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(FileNotFoundException.class);
     }
 
     @Test
     public void testBadFileLayoutFails() throws Exception{
         assertThatThrownBy(() -> new Building("test/badFileLayout", new BreadthFirstNavigator(), d.getApplicationContext()))
-                .hasCauseInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void testDuplicateLocationFails() throws Exception{
         assertThatThrownBy(() -> new Building("test/duplicateLocations", new BreadthFirstNavigator(), d.getApplicationContext()))
-                .hasCauseInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void testDuplicatePathFails() throws Exception{
         assertThatThrownBy(() -> new Building("test/duplicatePaths", new BreadthFirstNavigator(), d.getApplicationContext()))
-                .hasCauseInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test // ie: If you have two 'islands' of locations that do not have connecting paths, then this should fail after loading.
     public void testHavingUnconnectedLocationsFails() throws Exception{
         assertThatThrownBy(() -> new Building("test/unconnectedLocations", new BreadthFirstNavigator(), d.getApplicationContext()))
-                .hasCauseInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     ///// Construction Tests End /////
 
     @Test
     public void testSetNavigatorChangesNavigator() throws Exception{
-        Building building = new Building("test/goodTest", new BreadthFirstNavigator(), d.getApplicationContext());
-        assertThat(building.getNavigator() instanceof BreadthFirstNavigator).isTrue();
+        Navigator bfs = new BreadthFirstNavigator();
+        Building building = new Building("test/goodTest", bfs, d.getApplicationContext());
+        assertThat(building.getNavigator()).isEqualTo(bfs);
 
-        building.setNavigator(new DijkstraNavigator());
-        assertThat(building.getNavigator() instanceof DijkstraNavigator).isTrue();
+        Navigator dijk = new DijkstraNavigator();
+        building.setNavigator(dijk);
+        assertThat(building.getNavigator()).isEqualTo(dijk);
     }
 
     @Test
     public void testGetNameIsCorrect() throws Exception {
         Building building = new Building("test/goodTest", new BreadthFirstNavigator(), d.getApplicationContext());
-        assertThat(building.getName().equals("goodTest")).isTrue();
+        assertThat(building.getName().equals("test/goodTest")).isTrue();
 
     }
 
     @Test
     public void testNullArgs(){
         assertThatThrownBy(() -> new Building("test/goodTest", new BreadthFirstNavigator(), null))
-                .hasCauseInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(NullPointerException.class);
 
         assertThatThrownBy(() -> new Building("test/goodTest", null, null))
-                .hasCauseInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(NullPointerException.class);
 
         assertThatThrownBy(() -> new Building(null, new BreadthFirstNavigator(), null))
-                .hasCauseInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(NullPointerException.class);
     }
 }

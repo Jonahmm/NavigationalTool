@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import static java.util.Objects.requireNonNull;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.Graph;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
@@ -25,9 +26,9 @@ public class Building {
     private Context context;
 
     public Building(String fileName, Navigator nav, Context c) throws IOException {
-        name = fileName;
-        navigator = nav;
-        context = c;
+        name = requireNonNull(fileName);
+        navigator = requireNonNull(nav);
+        context = requireNonNull(c);
         buildGraph();
     }
 
