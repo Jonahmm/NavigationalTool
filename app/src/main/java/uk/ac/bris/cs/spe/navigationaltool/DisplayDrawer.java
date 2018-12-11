@@ -1,10 +1,10 @@
 package uk.ac.bris.cs.spe.navigationaltool;
 
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,20 +14,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
-import android.widget.Switch;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 import uk.ac.bris.cs.spe.navigationaltool.graph.User;
+import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
 import uk.ac.bris.cs.spe.navigationaltool.navigator.BreadthFirstNavigator;
-import uk.ac.bris.cs.spe.navigationaltool.navigator.Navigator;
 
 import android.graphics.*;
 
 import com.github.chrisbanes.photoview.PhotoView;
 
 import java.io.IOException;
-import java.util.function.BinaryOperator;
+import java.util.ArrayList;
 
 public class DisplayDrawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -38,6 +36,7 @@ public class DisplayDrawer extends AppCompatActivity
     Menu options;
     PhotoView mapView;
     Bitmap map;
+    Bitmap buf; Canvas canvas; float fct;
 
 
     @Override
@@ -57,7 +56,19 @@ public class DisplayDrawer extends AppCompatActivity
             public void onClick(View view) {
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
-                drawPathOnImage(new Point(100,100), new Point(200,400));
+                //drawPathOnImage(new Point(100,100), new Point(200,400));
+                ArrayList<Path> done = new ArrayList<>();
+                for (Location l : building.getGraph().getAllLocations()) {
+                    for (Path p : building.getGraph().getPathsFromLocation(l)) {
+                        //Log.v("Drawing path", p.locA.getLocationString() + p.locB.getLocationString());
+                        if (!done.contains(p) && p.locA.x != 0 && p.locA.y != 0 && p.locB.x != 0 && p.locB.y != 0) {
+                            drawPathToBuffer(p.locA.getLocation(), p.locB.getLocation());
+                            done.add(p);
+                        }
+                    }
+                    if (!l.getLocation().equals(0,0)) drawTextToBuffer(l.code, l.getLocation());
+                }
+                displayBuffer();
             }
         });
 
@@ -76,6 +87,8 @@ public class DisplayDrawer extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         map = BitmapFactory.decodeResource(getResources(), R.drawable.mapg);
+        refreshBuffer();
+
         mapView = (PhotoView) findViewById(R.id.mapviewer);
         mapView.setImageBitmap(map);
         mapView.setMaximumScale(12);
@@ -90,6 +103,9 @@ public class DisplayDrawer extends AppCompatActivity
                     .show();
         } catch (IOException e) {
             Snackbar.make(findViewById(R.id.constraint_layout), "Error importing building", Snackbar.LENGTH_SHORT)
+                    .show();
+        } catch (IllegalArgumentException e) {
+            Snackbar.make(findViewById(R.id.constraint_layout), e.getMessage(), Snackbar.LENGTH_SHORT)
                     .show();
         }
 
@@ -159,13 +175,36 @@ public class DisplayDrawer extends AppCompatActivity
         return true;
     }
 
-    private void drawPathOnImage(Point p1, Point p2) {
-        Bitmap tmp = Bitmap.createBitmap(map.getWidth(), map.getHeight(), map.getConfig());
-        Canvas c = new Canvas(tmp);
-        Paint p = new Paint(Color.RED);
-        c.drawBitmap(map, 0, 0, null);
-        c.drawLine(p1.x, p1.y, p2.x, p2.y, p);
-        mapView.setImageBitmap(tmp);
+
+    private void drawPathToBuffer(Point p1, Point p2) {
+        //Bitmap tmp = Bitmap.createBitmap(map.getWidth(), map.getHeight(), map.getConfig());
+        Paint p = new Paint();
+        //TODO: Should be set globally
+        p.setColor(Color.RED);
+        p.setStrokeWidth(3);
+        //canvas.drawBitmap(map, 0, 0, null);
+
+        canvas.drawLine(p1.x * fct, p1.y * fct, p2.x * fct, p2.y * fct, p);
+        //mapView.setImageBitmap(tmp);
+    }
+
+    private void drawTextToBuffer(String text, Point loc) {
+        Paint p = new Paint();
+        p.setColor(Color.BLACK);
+        canvas.drawText(text, (float) (loc.x - (p.getTextSize() * text.length() * 0.4)) * fct, (loc.y - (p.getTextSize() / 2)) * fct, p);
+    }
+
+    private void displayBuffer() {
+        mapView.setImageBitmap(buf);
+    }
+
+    private void refreshBuffer() {
+        buf = Bitmap.createBitmap(map.getWidth(), map.getHeight(), map.getConfig());
+        canvas = new Canvas(buf);
+        canvas.drawBitmap(map,0,0,null);
+        Log.d("Map width ", Integer.toString(map.getWidth()));
+        fct = (float) map.getWidth() / getResources().getInteger(R.integer.map_width);
+        Log.d("Got factor ", Float.toString(fct));
     }
 
 }

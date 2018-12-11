@@ -46,7 +46,8 @@ public class Building {
             if(!ln.startsWith("#")) { //Support comments
                 String[] fields = ln.split(",");
                 //x,y,floor,code,name
-                graph.addLocation(new Location(0, 0, fields[2], fields[0], fields[1]));
+                graph.addLocation(new Location((fields.length > 3 ? Integer.parseInt(fields[3]) : 0),
+                        (fields.length > 4 ? Integer.parseInt(fields[4]) : 0), fields[2], fields[0], fields[1]));
             }
         }
 
@@ -60,7 +61,7 @@ public class Building {
         while ((ln = buffer.readLine()) != null) {
             if(!ln.startsWith("#")) {
                 String[] fields = ln.split(",");
-                Log.d("adding path: ", fields[0] + "<->" + fields[1]);
+                //Log.d("adding path: ", fields[0] + "<->" + fields[1]);
                 graph.addPath(new Path(graph.getLocationByCode(fields[0]), graph.getLocationByCode(fields[1]),
                         Arrays.stream(fields[2].split(" ")).map(this::getUserFromString).
                                 collect(Collectors.toList())));
