@@ -44,9 +44,12 @@ public class BreadthFirstNavigator implements Navigator {
             }
         }
 
+        boolean found = false;
+
         // Once 'end' is in the structure, go through all leafs (end must be a leaf) and find it.
         for(Node<Location> node : routes.getLeafs()){
-            if(node.data.equals(end)){
+            if(node.data.equals(end) && !found){
+                found = true;
                 Node<Location> currentNode = node;
 
                 // If you haven't yet reached the start location

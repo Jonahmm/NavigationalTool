@@ -12,22 +12,20 @@ import uk.ac.bris.cs.spe.navigationaltool.graph.User;
 
 public class DijkstraNavigator implements Navigator{
 
+    // Do not use yet, not fully working, didn't actually mean to push it, but now that I did I might as well leave it up.
+
     // WARNING: this relies on the fact that the images & locations for floors line up, otherwise this will have to be altered.
 
     public List<Path> navigate(Location start, Location end, Graph graph, User user){
         // Standard dijkstra, should be more accurate than breadth first search as it takes distance into account. Is also way more memory efficient bc no trees \(°ㅂ°)/
 
-        HashMap<Location, Integer> shortestDistTo = new HashMap<>();
+        HashMap<Location, Double> shortestDistTo = new HashMap<>();
         HashMap<Location, ArrayList<Path>> shortestPathTo = new HashMap<>();
         ArrayList<Location> exploredLocations = new ArrayList<>();
 
-        shortestDistTo.put(start, 0);
+        shortestDistTo.put(start, 0D);
 
         while(!shortestPathTo.containsKey(end)){
-            if(!exploredLocations.containsAll(shortestDistTo.keySet())){
-          //      throw new RuntimeException("Can't find route, graph must be poorly constructed.");
-            }
-
             // TODO: check that this is the best way of finding the shortest one.
             Location closest = shortestDistTo.entrySet().stream()
                                                                 .filter(e -> !exploredLocations.contains(e))
@@ -37,7 +35,7 @@ public class DijkstraNavigator implements Navigator{
             for(Path p : graph.getPathsFromLocation(closest)){
                 if(p.allowsUser(user)) {
                     Location other = p.getOtherLocation(closest);
-                    int distance = (int) Math.sqrt(Math.pow(other.x - closest.x, 2) + Math.pow(other.y - closest.y, 2)) + shortestDistTo.get(closest);
+                    double distance = Math.sqrt(Math.pow(other.x - closest.x, 2) + Math.pow(other.y - closest.y, 2)) + shortestDistTo.get(closest);
 
                     if (shortestDistTo.containsKey(other)) {
                         if (shortestDistTo.get(other) > distance) {
@@ -63,6 +61,10 @@ public class DijkstraNavigator implements Navigator{
             }
 
             exploredLocations.add(closest);
+
+            if(!exploredLocations.containsAll(shortestDistTo.keySet())){
+                throw new RuntimeException("Can't find route, graph must be poorly constructed.");
+            }
 
         }
 
