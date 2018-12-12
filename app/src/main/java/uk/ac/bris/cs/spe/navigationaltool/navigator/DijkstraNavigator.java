@@ -12,9 +12,7 @@ import uk.ac.bris.cs.spe.navigationaltool.graph.User;
 
 public class DijkstraNavigator implements Navigator{
 
-    // Do not use yet, not fully working, didn't actually mean to push it, but now that I did I might as well leave it up.
-
-    // WARNING: this relies on the fact that the images & locations for floors line up, otherwise this will have to be altered.
+    // WARNING: this relies on the fact that the images & locations for floors line up
 
     public List<Path> navigate(Location start, Location end, Graph graph, User user){
         // Standard dijkstra, should be more accurate than breadth first search as it takes distance into account. Is also way more memory efficient bc no trees \(°ㅂ°)/
@@ -26,7 +24,6 @@ public class DijkstraNavigator implements Navigator{
         shortestDistTo.put(start, 0D);
 
         while(!shortestPathTo.containsKey(end)){
-            // TODO: check that this is the best way of finding the shortest one.
             Location closest = shortestDistTo.entrySet().stream()
                                                                 .filter(e -> !exploredLocations.contains(e.getKey()))
                                                                 .min((e, e2) -> e.getValue() > e2.getValue() ? 1 : e.getValue() == e2.getValue() ? 0 : -1)
