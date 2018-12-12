@@ -36,7 +36,7 @@ public class BuildingUnitTest {
 
     @Test
     public void testOnlyAndAllListedLocationsInGraph() throws Exception{
-        Building building = new Building ("ground", new BreadthFirstNavigator(), d.getApplicationContext());
+        Building building = new Building ("test/goodTest", new BreadthFirstNavigator(), d.getApplicationContext());
         Graph g = building.getGraph();
 
         Location locA = new Location(0, 0,"Ground Floor","locA", "Location A");
