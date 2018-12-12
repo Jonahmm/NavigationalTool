@@ -157,9 +157,9 @@ public class DisplayDrawer extends AppCompatActivity
                         .findFirst().ifPresent(DisplayDrawer.this::highlightLocation);
             }
             else {
+                refreshBuffer();
                 try {
                     List<Path> paths = building.getNavigator().navigate(from, to, building.getGraph(), getUserFromParams(access, disabl));
-                    refreshBuffer();
                     canvas.drawCircle(from.getX() * fct, from.getY() * fct, 10, originPaint);
                     for (Path p : paths) {
                         drawPathToBuffer(p.locA.getLocation(), p.locB.getLocation());
