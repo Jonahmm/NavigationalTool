@@ -74,15 +74,15 @@ public class DisplayDrawer extends AppCompatActivity
         navigationView.getMenu().findItem(R.id.disabled_switch).setChecked(disabl);
 
         navigationView.setNavigationItemSelectedListener(this);
+        loadBuilding();
 
         map = BitmapFactory.decodeResource(getResources(), R.drawable.mapg_nobg);
-        refreshBuffer();
 
         mapView = (PhotoView) findViewById(R.id.mapviewer);
         mapView.setImageBitmap(map);
         mapView.setMaximumScale(12);
 
-        loadBuilding();
+        refreshBuffer();
         initPaints();
     }
 
@@ -103,7 +103,7 @@ public class DisplayDrawer extends AppCompatActivity
 
     void loadBuilding() {
         try {
-            building = new Building("ground", new BreadthFirstNavigator(),
+            building = new Building("ground", new DijkstraNavigator(),
                     getApplicationContext());
             snackMsg( "Imported " + building.getGraph().getAllLocations().size()
                             + " locations.");
@@ -115,27 +115,27 @@ public class DisplayDrawer extends AppCompatActivity
     }
 
     void setListeners() {
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-                //drawPathOnImage(new Point(100,100), new Point(200,400));
-                ArrayList<Path> done = new ArrayList<>();
-                for (Location l : building.getGraph().getAllLocations()) {
-                    for (Path p : building.getGraph().getPathsFromLocation(l)) {
-                        //Log.v("Drawing path", p.locA.getLocationString() + p.locB.getLocationString());
-                        if (!done.contains(p) && p.locA.x != 0 && p.locA.y != 0 && p.locB.x != 0 && p.locB.y != 0) {
-                            drawPathToBuffer(p.locA.getLocation(), p.locB.getLocation());
-                            done.add(p);
-                        }
-                    }
-                    if (!l.getLocation().equals(0,0)) drawTextToBuffer(l.code, l.getLocation());
-                }
-                displayBuffer();
-            }
-        });
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+////                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+////                        .setAction("Action", null).show();
+//                //drawPathOnImage(new Point(100,100), new Point(200,400));
+//                ArrayList<Path> done = new ArrayList<>();
+//                for (Location l : building.getGraph().getAllLocations()) {
+//                    for (Path p : building.getGraph().getPathsFromLocation(l)) {
+//                        //Log.v("Drawing path", p.locA.getLocationString() + p.locB.getLocationString());
+//                        if (!done.contains(p) && p.locA.x != 0 && p.locA.y != 0 && p.locB.x != 0 && p.locB.y != 0) {
+//                            drawPathToBuffer(p.locA.getLocation(), p.locB.getLocation());
+//                            done.add(p);
+//                        }
+//                    }
+//                    if (!l.getLocation().equals(0,0)) drawTextToBuffer(l.code, l.getLocation());
+//                }
+//                displayBuffer();
+//            }
+//        });
 
         ImageButton navBtn = findViewById(R.id.navButton);
         navBtn.setOnClickListener(view -> {
@@ -261,8 +261,12 @@ public class DisplayDrawer extends AppCompatActivity
 
     private void drawTextToBuffer(String text, Point loc) {
         Paint p = new Paint();
-        p.setColor(Color.BLACK);
+        p.setColor(Color.BLACK); p.setTextSize(20);
         canvas.drawText(text, (float) (loc.x - (p.getTextSize() * text.length() * 0.4)) * fct, (loc.y - (p.getTextSize() / 2)) * fct, p);
+    }
+
+    private void drawLocToBuffer(Location l) {
+        drawTextToBuffer(l.hasName() ? l.getCode() + " " + l.getName() : l.getCode(), l.getLocation());
     }
 
     private void displayBuffer() {
@@ -276,6 +280,11 @@ public class DisplayDrawer extends AppCompatActivity
         Log.d("Map width ", Integer.toString(map.getWidth()));
         fct = (float) map.getWidth() / getResources().getInteger(R.integer.map_width);
         Log.d("Got factor ", Float.toString(fct));
+
+        for (Location l : building.getGraph().getAllLocations()) {
+            drawLocToBuffer(l);
+        }
+        displayBuffer();
     }
 
     private void snackMsg(String s) {
