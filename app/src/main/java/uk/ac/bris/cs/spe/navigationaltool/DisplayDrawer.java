@@ -1,29 +1,24 @@
 package uk.ac.bris.cs.spe.navigationaltool;
 
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Point;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-
-import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
-import uk.ac.bris.cs.spe.navigationaltool.graph.User;
-import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
-import uk.ac.bris.cs.spe.navigationaltool.navigator.BreadthFirstNavigator;
-import uk.ac.bris.cs.spe.navigationaltool.navigator.DijkstraNavigator;
-
-import android.graphics.*;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -31,9 +26,12 @@ import android.widget.LinearLayout;
 import com.github.chrisbanes.photoview.PhotoView;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+
+import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
+import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
+import uk.ac.bris.cs.spe.navigationaltool.graph.User;
+import uk.ac.bris.cs.spe.navigationaltool.navigator.DijkstraNavigator;
 
 public class DisplayDrawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -277,9 +275,9 @@ public class DisplayDrawer extends AppCompatActivity
         buf = Bitmap.createBitmap(map.getWidth(), map.getHeight(), map.getConfig());
         canvas = new Canvas(buf);
         canvas.drawBitmap(map,0,0,null);
-        Log.d("Map width ", Integer.toString(map.getWidth()));
+//        Log.d("Map width ", Integer.toString(map.getWidth()));
         fct = (float) map.getWidth() / getResources().getInteger(R.integer.map_width);
-        Log.d("Got factor ", Float.toString(fct));
+//        Log.d("Got factor ", Float.toString(fct));
 
         for (Location l : building.getGraph().getAllLocations()) {
             drawLocToBuffer(l);

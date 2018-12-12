@@ -1,8 +1,7 @@
 package uk.ac.bris.cs.spe.navigationaltool.graph;
 
-import java.util.HashMap;
 import java.util.ArrayList;
-import java.util.Optional;
+import java.util.HashMap;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
