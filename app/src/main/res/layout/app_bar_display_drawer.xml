@@ -32,7 +32,7 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="Navigate From…"
-                android:inputType="text|textCapWords|textNoSuggestions" />
+                android:inputType="textVisiblePassword" />
 
             <EditText
                 android:id="@+id/navTo"
@@ -41,7 +41,7 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="Navigate To…"
-                android:inputType="text|textCapWords|textNoSuggestions"
+                android:inputType="textNoSuggestions|textVisiblePassword"
                 android:singleLine="true" />
 
             <ImageButton

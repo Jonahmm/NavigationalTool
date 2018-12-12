@@ -75,7 +75,7 @@ public class DisplayDrawer extends AppCompatActivity
 
         navigationView.setNavigationItemSelectedListener(this);
 
-        map = BitmapFactory.decodeResource(getResources(), R.drawable.mapg);
+        map = BitmapFactory.decodeResource(getResources(), R.drawable.mapg_nobg);
         refreshBuffer();
 
         mapView = (PhotoView) findViewById(R.id.mapviewer);

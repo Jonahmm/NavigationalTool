@@ -41,58 +41,57 @@ G.44,Frank,Ground Floor,876,2946
 B.G.014,Powell Foyer,Ground Floor,424,3164
 B.G.015,Powell Stairs,Ground Floor,460,3452
 G.42,Powell Lecture Theatre,Ground Floor,720,3452
-#G.42A, Powell Foyer,Ground Floor ##added then removed, not needed
-B.G.016,,Ground Floor
-G.41,,Ground Floor
-G.39,,Ground Floor
-B.G.019,,Ground Floor
-G.36,,Ground Floor
-G.35,Lab,Ground Floor
-B.G.020,,Ground Floor
-G.34A,,Ground Floor
-G.34B,,Ground Floor
-G.32,,Ground Floor
-G.30,Lab,Ground Floor
-B.G.023,,Ground Floor
-G.33,,Ground Floor
-G.31,BATTERY ROOM,Ground Floor
-B.G.025,SWITCH GEAR,Ground Floor
-G.29,,Ground Floor
-G.28,,Ground Floor
-G.27,Lab,Ground Floor
-G.26,,Ground Floor
-B.G.026,,Ground Floor
-G.24,Lab,Ground Floor
-G.25,,Ground Floor
-G.23,,Ground Floor
-G.23A,,Ground Floor
-G.22,Lab,Ground Floor
-G.21,,Ground Floor
-B.G.028,,Ground Floor
-G.20,,Ground Floor
-G.19,Lab,Ground Floor
-B.G.029,,Ground Floor
-G.17,,Ground Floor
-B.G.032,,Ground Floor
-G.18,,Ground Floor
-G.18B,,Ground Floor
-G.18A,,Ground Floor
-G.15,,Ground Floor
-G.15A,Toilet,Ground Floor
-G.15B,Toilet,Ground Floor
-G.16,,Ground Floor
-B.G.034,,Ground Floor
-B.G.035,,Ground Floor
-B.G.033,,Ground Floor
-B.G.036,,Ground Floor
-G.14A,MEZZANINE,Ground Floor
-G.13,,Ground Floor
-B.G.037,,Ground Floor
-G.11,,Ground Floor
-G.12,Mott Lecture Th,Ground Floor
-G.E.01,Entrance,Ground Floor
-G.E.02,Entrance,Ground Floor
-G.E.03,Entrance,Ground Floor
-G.E.04,Entrance,Ground Floor
-B.G.100,Lift,Ground Floor
-B.G.101,Lift,Ground Floor
+B.G.016,,Ground Floor,1446,3650
+G.41,,Ground Floor,1200,2922
+G.39,,Ground Floor,1484,2906
+B.G.019,,Ground Floor,2154,2716
+G.36,,Ground Floor,1800,2760
+G.35,Lab,Ground Floor,1750,2650
+B.G.020,,Ground Floor,2042,2812
+G.34A,,Ground Floor,2046,2914
+G.34B,,Ground Floor,1950,2850
+G.32,,Ground Floor,2254,2820
+G.30,Lab,Ground Floor,2456,2836
+B.G.023,,Ground Floor,2160,2494
+G.33,,Ground Floor,2262,2654
+G.31,BATTERY ROOM,Ground Floor,2390,2654
+B.G.025,SWITCH GEAR,Ground Floor,2638,2654
+G.29,,Ground Floor,2616,2670
+G.28,,Ground Floor,2750,2760
+G.27,Lab,Ground Floor,2992,2654
+G.26,,Ground Floor,2976,2830
+B.G.026,,Ground Floor,3170,2716
+G.24,Lab,Ground Floor,3220,2564
+G.25,,Ground Floor,3094,2822
+G.23,,Ground Floor,3220,2784
+G.23A,,Ground Floor,3278,2966
+G.22,Lab,Ground Floor,3466,2654
+G.21,,Ground Floor,3556,2770
+B.G.028,,Ground Floor,3856,2716
+G.20,,Ground Floor,3670,2656
+G.19,Lab,Ground Floor,3784,2580
+B.G.029,,Ground Floor,4024,2648
+G.17,,Ground Floor,3720,2936
+B.G.032,,Ground Floor,3404,2960
+G.18,,Ground Floor,4036,2818
+G.18B,,Ground Floor,4040,2732
+G.18A,,Ground Floor,4040,2964
+G.15,,Ground Floor,3648,3172
+G.15A,Toilet,Ground Floor,3640,3060
+G.15B,Toilet,Ground Floor,3434,3166
+G.16,,Ground Floor,3844,3130
+B.G.034,,Ground Floor,3846,3240
+B.G.035,,Ground Floor,3880,3324
+B.G.033,,Ground Floor,3778,3426
+B.G.036,,Ground Floor,3722,3484
+G.14A,Mezzanine,Ground Floor,3668,3322
+G.13,,Ground Floor,3814,3546
+B.G.037,,Ground Floor,3984,3482
+G.11,,Ground Floor,3932,4136
+G.12,Mott Lecture Theatre,Ground Floor,3892,3758
+G.E.01,Front of Building,Ground Floor,200,1100
+G.E.02,Rear of Building (E),Ground Floor,4270,2670
+G.E.03,Rear of Building (W),Ground Floor,4240,3524
+G.E.04,Side of Building,Ground Floor,1488,3924
+B.G.100,Lift,Ground Floor,1118,1586
+B.G.101,Lift,Ground Floor,3656,2820
