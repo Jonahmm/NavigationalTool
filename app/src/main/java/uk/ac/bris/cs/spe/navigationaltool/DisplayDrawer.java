@@ -1,5 +1,6 @@
 package uk.ac.bris.cs.spe.navigationaltool;
 
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +14,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -142,7 +144,7 @@ public class DisplayDrawer extends AppCompatActivity
             navTo.clearFocus(); navFrom.clearFocus();
 
             Location to = building.getGraph().getBestMatchLocation(navTo.getText().toString());
-            if (to == null) {snackMsg("No location \"" + navTo.getText().toString() + "\" found"); return;}
+            if (to == null) {alertMsg("No location \"" + navTo.getText().toString() + "\" found"); return;}
             navTo.setText(to.code);
 
             Location from = building.getGraph().getBestMatchLocation(navFrom.getText().toString());
@@ -166,11 +168,12 @@ public class DisplayDrawer extends AppCompatActivity
                     displayBuffer();
                 }
                 catch (IllegalArgumentException e) {
-                    snackMsg("No path found for specified access level");
+                    alertMsg("No path found for specified access level");
                 }
 
                 navFrom.setText(from.code);
             }
+            findViewById(R.id.mapviewer).requestFocus();
 
         });
     }
@@ -259,12 +262,12 @@ public class DisplayDrawer extends AppCompatActivity
 
     private void drawTextToBuffer(String text, Point loc) {
         Paint p = new Paint();
-        p.setColor(Color.BLACK); p.setTextSize(20);
+        p.setColor(Color.BLACK); p.setTextSize(20); p.setAntiAlias(true);
         canvas.drawText(text, (float) (loc.x - (p.getTextSize() * text.length() * 0.4)) * fct, (loc.y - (p.getTextSize() / 2)) * fct, p);
     }
 
     private void drawLocToBuffer(Location l) {
-        drawTextToBuffer(l.hasName() ? l.getCode() + " " + l.getName() : l.getCode(), l.getLocation());
+        drawTextToBuffer(l.hasName() ? l.getCode() + ", " + l.getName() : l.getCode(), l.getLocation());
     }
 
     private void displayBuffer() {
@@ -288,6 +291,15 @@ public class DisplayDrawer extends AppCompatActivity
     private void snackMsg(String s) {
         Snackbar.make(findViewById(R.id.constraint_layout), s, Snackbar.LENGTH_SHORT)
                 .show();
+    }
+
+    private void alertMsg(String s) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(s)
+                .setCancelable(false)
+                .setPositiveButton("OK", null);
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
 }
