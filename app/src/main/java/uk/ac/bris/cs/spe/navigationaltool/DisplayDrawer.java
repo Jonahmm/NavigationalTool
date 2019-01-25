@@ -22,10 +22,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 
 import com.github.chrisbanes.photoview.OnPhotoTapListener;
 import com.github.chrisbanes.photoview.PhotoView;
@@ -33,6 +35,7 @@ import com.github.chrisbanes.photoview.PhotoView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
@@ -53,10 +56,12 @@ public class DisplayDrawer extends AppCompatActivity
     private boolean srchShown = false;
     int highlightIntervals[] = {30,90,180};
 
+    private Location selectedLocation = null;
+
     private static final int NEAR_DISTANCE = 300;
     private static final int MAP_SIDE_LENGTH = 4320;
 
-    private Paint pathPaint, highlightPaint, originPaint, destPaint;
+    private Paint pathPaint, highlightPaint, originPaint, destPaint, selectPaint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +83,10 @@ public class DisplayDrawer extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 
         //Set menu items to be checked depending on saved values
-        navigationView.getMenu().findItem(access).setChecked(true);
-        navigationView.getMenu().findItem(R.id.disabled_switch).setChecked(disabl);
+        navigationView.getMenu().findItem(intToId(access)).setChecked(true);
+        Switch s = navigationView.getMenu().findItem(R.id.disabled_item)
+                .getActionView().findViewById(R.id.disabled_switch);
+        s.setChecked(disabl);
 
         navigationView.setNavigationItemSelectedListener(this);
         loadBuilding();
@@ -108,6 +115,7 @@ public class DisplayDrawer extends AppCompatActivity
         originPaint.setColor(Color.BLUE); originPaint.setAntiAlias(true);
 
         destPaint = new Paint(originPaint); destPaint.setColor(Color.GREEN);
+        selectPaint = new Paint(originPaint); selectPaint.setColor(Color.RED);
 
      }
 
@@ -203,6 +211,17 @@ public class DisplayDrawer extends AppCompatActivity
         });
 
         mapView.setOnPhotoTapListener(this);
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        Switch s = navigationView.getMenu().findItem(R.id.disabled_item).getActionView()
+                .findViewById(R.id.disabled_switch);
+        s.setOnCheckedChangeListener((compoundButton, b) -> {
+            disabl = b;
+            SharedPreferences.Editor e = getPreferences(MODE_PRIVATE).edit();
+            e.putBoolean(getString(R.string.saved_disabl), disabl);
+            e.apply();
+
+        });
     }
 
     private int weight(List<Path> p) {
@@ -219,7 +238,7 @@ public class DisplayDrawer extends AppCompatActivity
 
     //Quick and dirty menu -> User implementation
     private User getUserFromParams(Integer access, Boolean disabl) {
-        switch (access) {
+        switch (intToId(access)) {
             case R.id.item_ug: return disabl ? User.DISABLED_STUDENT : User.STUDENT;
             case R.id.item_staff: return disabl ? User.DISABLED_STAFF : User.STAFF;
             default: return User.STUDENT;
@@ -268,20 +287,17 @@ public class DisplayDrawer extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        SharedPreferences.Editor e = getPreferences(MODE_PRIVATE).edit();
         int id = item.getItemId();
 
-        if (id == R.id.disabled_switch) {
-            e.putBoolean(getString(R.string.saved_disabl), item.isChecked());
-            disabl = item.isChecked();
-        } else {
-            e.putInt(getString(R.string.saved_access), id);
-            access = id;
+        if (id != R.id.disabled_item) {
+            SharedPreferences.Editor e = getPreferences(MODE_PRIVATE).edit();
+            access = idToInt(id);
+            e.putInt(getString(R.string.saved_access), access);
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
+            e.apply();
         }
-        e.apply();
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
@@ -303,13 +319,12 @@ public class DisplayDrawer extends AppCompatActivity
     }
 
     private void displayBuffer() {
-        mapView.setImageBitmap(buf);
+        mapView.setImageBitmap(buf.copy(buf.getConfig(), false));
     }
 
     private void refreshBuffer() {
-        buf = Bitmap.createBitmap(map.getWidth(), map.getHeight(), map.getConfig());
+        buf = map.copy(map.getConfig(), true);
         canvas = new Canvas(buf);
-        canvas.drawBitmap(map,0,0,null);
 //        Log.d("Map width ", Integer.toString(map.getWidth()));
         fct = (float) map.getWidth() / getResources().getInteger(R.integer.map_width);
 //        Log.d("Got factor ", Float.toString(fct));
@@ -317,7 +332,7 @@ public class DisplayDrawer extends AppCompatActivity
 //        for (Location l : building.getGraph().getAllLocations()) {
 //            drawLocToBuffer(l);
 //        }
-        displayBuffer();
+        //displayBuffer();
     }
 
     private void snackMsg(String s) {
@@ -339,12 +354,23 @@ public class DisplayDrawer extends AppCompatActivity
         final float xx = x * MAP_SIDE_LENGTH;
         final float yy = y * MAP_SIDE_LENGTH;
 
-        building.getGraph().getAllLocations().stream().filter(
+        Optional<Location> ol = building.getGraph().getAllLocations().stream().filter(
                 l -> absDist(l, xx, yy) < NEAR_DISTANCE
-        ).reduce((a,b) -> (absDist(a,xx,yy) < absDist(b,xx,yy)) ? a : b)
-                .ifPresent(this::selectLocation);
+        ).reduce((a,b) -> (absDist(a,xx,yy) < absDist(b,xx,yy)) ? a : b);
+
+        if (ol.isPresent()) {
+            selectLocation(ol.get());
+            return;
+        }
+        deselect();
 
         //snackMsg("Nothing here: " + x +"," + y);
+    }
+
+    private void deselect() {
+        selectedLocation = null;
+        refreshBuffer();
+        displayBuffer();
     }
 
     private double absDist(Location l, float x, float y) {
@@ -352,7 +378,57 @@ public class DisplayDrawer extends AppCompatActivity
     }
 
     private void selectLocation(Location l) {
-        snackMsg(l.hasName() ? l.getCode() + " " + l.getName() : l.getCode());
+        if (selectedLocation != null) navigate(selectedLocation, l);
+        else {
+            refreshBuffer();
+            dotLocation(l, selectPaint);
+            drawLocToBuffer(l);
+            displayBuffer();
+            snackMsg(l.hasName() ? l.getCode() + " " + l.getName() : l.getCode());
+        }
+        selectedLocation = l;
     }
 
+    private void navigate(Location from, Location to) {
+        try {
+            refreshBuffer();
+            drawPathListToBuffer(
+            building.getNavigator().navigate(from, to, building.getGraph(), getUserFromParams(access, disabl))
+            );
+            dotLocation(from, originPaint);
+            dotLocation(to, destPaint);
+            displayBuffer();
+        } catch (IllegalArgumentException e) {
+            snackMsg("No path found for specified access level");
+        }
+    }
+
+    private void dotLocation(Location l, Paint paint) {
+        canvas.drawCircle(l.getX() * fct, l.getY() * fct, 20, paint);
+    }
+
+    private void drawPathListToBuffer(List<Path> paths) {
+        for (Path p : paths) {
+            drawPathToBuffer(p.getLocA().getLocation(), p.getLocB().getLocation());
+        }
+    }
+
+    private int idToInt(int id) {
+        switch (id) {
+            case R.id.item_ug:    return 1;
+            case R.id.item_pg:    return 2;
+            case R.id.item_phd:   return 3;
+            case R.id.item_staff: return 4;
+            default: return 1;
+        }
+    }
+    private int intToId(int in) {
+        switch (in) {
+            case 1: return R.id.item_ug;
+            case 2: return R.id.item_pg;
+            case 3: return R.id.item_phd;
+            case 4: return R.id.item_staff;
+            default: return R.id.item_ug;
+        }
+    }
 }

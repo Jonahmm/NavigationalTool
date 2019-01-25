@@ -4,10 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <item
-        android:enabled="false"
-        android:title="@string/i_am_a" />
-    <group android:checkableBehavior="single">
+    <group
+        android:id="@+id/access_picker"
+        android:checkableBehavior="single">
+        <item
+            android:enabled="false"
+            android:title="@string/i_am_a" />
         <item
             android:id="@+id/item_ug"
             android:title="@string/undergrad_student" />
@@ -22,9 +24,10 @@
             android:title="@string/staff_member" />
     </group>
     <item
-        android:id="@+id/disabled_switch"
+        android:id="@+id/disabled_item"
+        android:checkable="false"
         android:title="@string/disabled_access"
         app:actionLayout="@layout/switch_item"
-        app:showAsAction="always" />
+        app:showAsAction="always" ></item>
 
 </menu>
