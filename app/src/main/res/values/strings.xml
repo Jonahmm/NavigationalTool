@@ -16,4 +16,5 @@
     <string name="saved_access">ACCESS</string>
     <string name="saved_disabl">SAVEDDISAB</string>
     <string name="search_title">Search for a location</string>
+    <string name="nothing_selected">Nothing Selected</string>
 </resources>

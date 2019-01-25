@@ -1,6 +1,5 @@
 package uk.ac.bris.cs.spe.navigationaltool;
 
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -22,12 +22,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.github.chrisbanes.photoview.OnPhotoTapListener;
 import com.github.chrisbanes.photoview.PhotoView;
@@ -105,7 +105,8 @@ public class DisplayDrawer extends AppCompatActivity
 
     private void initPaints() {
         pathPaint = new Paint();
-        pathPaint.setColor(Color.RED); pathPaint.setAntiAlias(true); pathPaint.setStrokeWidth(3);
+        pathPaint.setColor(Color.RED); pathPaint.setAntiAlias(true); pathPaint.setStrokeWidth(10);
+        pathPaint.setStrokeCap(Paint.Cap.ROUND);
 
         highlightPaint = new Paint();
         highlightPaint.setColor(Color.CYAN); highlightPaint.setAntiAlias(true);
@@ -222,6 +223,9 @@ public class DisplayDrawer extends AppCompatActivity
             e.apply();
 
         });
+
+        ImageButton closeSelected = findViewById(R.id.close_selection);
+        closeSelected.setOnClickListener(view -> deselect());
     }
 
     private int weight(List<Path> p) {
@@ -251,7 +255,8 @@ public class DisplayDrawer extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if(selectedLocation != null) deselect();
+            else super.onBackPressed();
         }
     }
 
@@ -371,6 +376,10 @@ public class DisplayDrawer extends AppCompatActivity
         selectedLocation = null;
         refreshBuffer();
         displayBuffer();
+        ConstraintLayout selBox = findViewById(R.id.selected_box);
+        selBox.findViewById(R.id.selected_details).setVisibility(View.GONE);
+        selBox.findViewById(R.id.selected_tip).setVisibility(View.VISIBLE);
+        selBox.findViewById(R.id.close_selection).setVisibility(View.INVISIBLE);
     }
 
     private double absDist(Location l, float x, float y) {
@@ -380,12 +389,28 @@ public class DisplayDrawer extends AppCompatActivity
     private void selectLocation(Location l) {
         if (selectedLocation != null) navigate(selectedLocation, l);
         else {
+
             refreshBuffer();
             dotLocation(l, selectPaint);
             drawLocToBuffer(l);
             displayBuffer();
-            snackMsg(l.hasName() ? l.getCode() + " " + l.getName() : l.getCode());
+            //snackMsg(l.hasName() ? l.getCode() + " " + l.getName() : l.getCode());
         }
+
+        ConstraintLayout selBox = findViewById(R.id.selected_box);
+        selBox.findViewById(R.id.selected_tip).setVisibility(View.GONE);
+        selBox.findViewById(R.id.selected_details).setVisibility(View.VISIBLE);
+        selBox.findViewById(R.id.close_selection).setVisibility(View.VISIBLE);
+
+        TextView tv = selBox.findViewById(R.id.selected_title);
+        tv.setText(l.hasName() ? l.getName() : l.getCode());
+        tv = selBox.findViewById(R.id.selected_subtitle);
+        if (!l.hasName()) tv.setVisibility(View.GONE);
+        else {
+            tv.setText(l.getCode());
+            tv.setVisibility(View.VISIBLE);
+        }
+
         selectedLocation = l;
     }
 
