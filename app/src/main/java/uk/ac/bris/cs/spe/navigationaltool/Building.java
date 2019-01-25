@@ -1,6 +1,7 @@
 package uk.ac.bris.cs.spe.navigationaltool;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,8 +45,9 @@ public class Building {
             if(!ln.startsWith("#")) { //Support comments
                 String[] fields = ln.split(",");
                 //x,y,floor,code,name
-                graph.addLocation(new Location((fields.length > 3 ? Integer.parseInt(fields[3]) : 0),
-                        (fields.length > 4 ? Integer.parseInt(fields[4]) : 0), fields[2], fields[0], fields[1]));
+                Log.d("Adding ", ln);
+                graph.addLocation(new Location(Integer.parseInt(fields[0]), (fields.length > 4 ? Integer.parseInt(fields[4]) : 0),
+                        (fields.length > 5 ? Integer.parseInt(fields[5]) : 0), fields[3], fields[1], fields[2]));
             }
         }
 
@@ -60,7 +62,9 @@ public class Building {
             if(!ln.startsWith("#")) {
                 String[] fields = ln.split(",");
                 //Log.d("adding path: ", fields[0] + "<->" + fields[1]);
-                graph.addPath(new Path(graph.getLocationByCode(fields[0]), graph.getLocationByCode(fields[1]),
+                graph.addPath(
+                        new Path(graph.getLocationById(Integer.parseInt(fields[0])),
+                                 graph.getLocationById(Integer.parseInt(fields[1])),
                         Arrays.stream(fields[2].split(" ")).map(this::getUserFromString).
                                 collect(Collectors.toList())));
             }

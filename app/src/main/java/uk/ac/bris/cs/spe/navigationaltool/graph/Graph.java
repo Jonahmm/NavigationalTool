@@ -3,6 +3,7 @@ package uk.ac.bris.cs.spe.navigationaltool.graph;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -14,7 +15,7 @@ public class Graph {
         requireNonNull(n);
         if(graph.containsKey(n)) throw new IllegalArgumentException("Cannot add node that is already in the graph");
 
-        if(graph.keySet().stream().anyMatch(n2 -> n2.code.equals(n.code)))
+        if(graph.keySet().stream().anyMatch(n2 -> n2.getId() == n.getId()))
             throw new IllegalArgumentException("Another node with the same code already exists in the graph");
 
         //Commented for testing before we have x, y recorded
@@ -28,8 +29,8 @@ public class Graph {
         requireNonNull(n);
         if(graph.containsKey(n)) throw new IllegalArgumentException("Cannot add node that is already in the graph");
 
-        if(graph.keySet().stream().anyMatch(n2 -> n2.code.equals(n.code)))
-            throw new IllegalArgumentException("Another node with the same code already exists in the graph");
+        if(graph.keySet().stream().anyMatch(n2 -> n2.getId() == n.getId()))
+            throw new IllegalArgumentException("Another node with the same ID already exists in the graph");
 
         if(graph.keySet().stream().anyMatch(n2 -> n2.x == n.x && n2.y == n.y))
             throw new IllegalArgumentException("Another node at the same point already exists in the graph");
@@ -51,6 +52,14 @@ public class Graph {
         Location n = graph.keySet().stream().filter(n2 -> n2.code.equals(s) /* Causes error and not required yet || n2.name.equals(s)*/).findFirst().orElse(null);
         if(n == null) throw new IllegalArgumentException("Location does not exist.");
         return n;
+    }
+
+    public Set<Location> getLocationsByCode(String s) {
+        return graph.keySet().stream().filter(l -> l.code.equals(s)).collect(Collectors.toSet());
+    }
+
+    public Location getLocationById(int id) {
+        return graph.keySet().stream().filter(l -> l.getId() == id).findFirst().orElse(null);
     }
 
     public Location getBestMatchLocation(String s) {

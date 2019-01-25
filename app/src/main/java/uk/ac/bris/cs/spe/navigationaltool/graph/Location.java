@@ -7,6 +7,7 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 
 public class Location {
+    final int id;
 
     public final int x, y;
     public final String floor;
@@ -14,7 +15,8 @@ public class Location {
     public final String code;
     public String name;
 
-    public Location(int x, int y, String floor, String code){
+    public Location(int id, int x, int y, String floor, String code){
+        this.id = id;
         requireNonNull(code);
         if (code.equals("")) throw new IllegalArgumentException("Location cannot have empty code");
         this.x = x;
@@ -25,25 +27,27 @@ public class Location {
     }
 
     //Edited to ensure "" goes to null name
-    public Location(int x, int y, String floor, String code, String name){
-        this(x,y,floor,code);
+    public Location(int id, int x, int y, String floor, String code, String name){
+        this(id,x,y,floor,code);
         requireNonNull(name);
         if (!name.equals("")) this.name = name;
     }
 
 
-    public Location(Point loc, String floor, String code){
-        this(loc.x, loc.y, floor, code);
+    public Location(int id, Point loc, String floor, String code){
+        this(id, loc.x, loc.y, floor, code);
     }
 
-    public Location(Point loc, String floor, String code, String name){
-        this(loc.x, loc.y, floor, code);
+    public Location(int id, Point loc, String floor, String code, String name){
+        this(id, loc.x, loc.y, floor, code);
         this.name = name;
     }
 
     public Point getLocation() {
         return new Point(x,y);
     }
+
+    public int getId() { return id; }
 
     public int getX(){
         return x;

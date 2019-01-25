@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
@@ -23,12 +24,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.github.chrisbanes.photoview.OnPhotoTapListener;
 import com.github.chrisbanes.photoview.PhotoView;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
@@ -36,7 +41,8 @@ import uk.ac.bris.cs.spe.navigationaltool.graph.User;
 import uk.ac.bris.cs.spe.navigationaltool.navigator.DijkstraNavigator;
 
 public class DisplayDrawer extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        OnPhotoTapListener{
 
     private Building building;
     private int access;
@@ -46,6 +52,9 @@ public class DisplayDrawer extends AppCompatActivity
     Bitmap buf; Canvas canvas; float fct;
     private boolean srchShown = false;
     int highlightIntervals[] = {30,90,180};
+
+    private static final int NEAR_DISTANCE = 300;
+    private static final int MAP_SIDE_LENGTH = 4320;
 
     private Paint pathPaint, highlightPaint, originPaint, destPaint;
 
@@ -59,7 +68,6 @@ public class DisplayDrawer extends AppCompatActivity
         access = getPreferences(MODE_PRIVATE).getInt(getString(R.string.saved_access), R.id.item_ug);
         disabl = getPreferences(MODE_PRIVATE).getBoolean(getString(R.string.saved_disabl), false);
 
-        setListeners();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -76,12 +84,14 @@ public class DisplayDrawer extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         loadBuilding();
 
-        map = BitmapFactory.decodeResource(getResources(), R.drawable.mapg_nobg);
+        map = BitmapFactory.decodeResource(getResources(), R.drawable.map0);
 
         mapView = (PhotoView) findViewById(R.id.mapviewer);
         mapView.setImageBitmap(map);
         mapView.setMaximumScale(12);
 
+
+        setListeners();
         refreshBuffer();
         initPaints();
     }
@@ -103,7 +113,7 @@ public class DisplayDrawer extends AppCompatActivity
 
     void loadBuilding() {
         try {
-            building = new Building("ground", new DijkstraNavigator(),
+            building = new Building("0", new DijkstraNavigator(),
                     getApplicationContext());
             snackMsg( "Imported " + building.getGraph().getAllLocations().size()
                             + " locations.");
@@ -115,27 +125,27 @@ public class DisplayDrawer extends AppCompatActivity
     }
 
     void setListeners() {
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-////                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-////                        .setAction("Action", null).show();
-//                //drawPathOnImage(new Point(100,100), new Point(200,400));
-//                ArrayList<Path> done = new ArrayList<>();
-//                for (Location l : building.getGraph().getAllLocations()) {
-//                    for (Path p : building.getGraph().getPathsFromLocation(l)) {
-//                        //Log.v("Drawing path", p.locA.getLocationString() + p.locB.getLocationString());
-//                        if (!done.contains(p) && p.locA.x != 0 && p.locA.y != 0 && p.locB.x != 0 && p.locB.y != 0) {
-//                            drawPathToBuffer(p.locA.getLocation(), p.locB.getLocation());
-//                            done.add(p);
-//                        }
-//                    }
-//                    if (!l.getLocation().equals(0,0)) drawTextToBuffer(l.code, l.getLocation());
-//                }
-//                displayBuffer();
-//            }
-//        });
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+                //drawPathOnImage(new Point(100,100), new Point(200,400));
+                ArrayList<Path> done = new ArrayList<>();
+                for (Location l : building.getGraph().getAllLocations()) {
+                    for (Path p : building.getGraph().getPathsFromLocation(l)) {
+                        //Log.v("Drawing path", p.locA.getLocationString() + p.locB.getLocationString());
+                        if (!done.contains(p) && p.locA.x != 0 && p.locA.y != 0 && p.locB.x != 0 && p.locB.y != 0) {
+                            drawPathToBuffer(p.locA.getLocation(), p.locB.getLocation());
+                            done.add(p);
+                        }
+                    }
+                    if (!l.getLocation().equals(0,0)) drawTextToBuffer(l.code, l.getLocation());
+                }
+                displayBuffer();
+            }
+        });
 
         ImageButton navBtn = findViewById(R.id.navButton);
         navBtn.setOnClickListener(view -> {
@@ -144,11 +154,14 @@ public class DisplayDrawer extends AppCompatActivity
             navTo.clearFocus(); navFrom.clearFocus();
 
             Location to = building.getGraph().getBestMatchLocation(navTo.getText().toString());
-            if (to == null) {alertMsg("No location \"" + navTo.getText().toString() + "\" found"); return;}
+            Set<Location> tos = building.getGraph().getLocationsByCode(to==null?null:to.getCode());
+
+            if (tos.isEmpty()) {alertMsg("No location(s) \"" + navTo.getText().toString() + "\" found"); return;}
             navTo.setText(to.code);
 
             Location from = building.getGraph().getBestMatchLocation(navFrom.getText().toString());
-            if (from == null) {
+            Set<Location> froms = building.getGraph().getLocationsByCode(from==null?null:from.getCode());
+            if (froms.isEmpty()) {
                 //Just find the navTo on a map
                 snackMsg("No origin specified, highlighting destination.");
                 building.getGraph().getAllLocations().stream()
@@ -159,7 +172,19 @@ public class DisplayDrawer extends AppCompatActivity
             else {
                 refreshBuffer();
                 try {
-                    List<Path> paths = building.getNavigator().navigate(from, to, building.getGraph(), getUserFromParams(access, disabl));
+                    List<Path> paths = new ArrayList<>();
+                    for (Location src : froms) {
+                        for (Location dst : tos) {
+                            List<Path> p = building.getNavigator().navigate(src, dst, building.getGraph(), getUserFromParams(access, disabl));
+                            if (weight(p) < weight(paths)) {
+                                paths = p;
+                                from = src;
+                                to = dst;
+                            }
+                        }
+                    }
+
+
                     canvas.drawCircle(from.getX() * fct, from.getY() * fct, 10, originPaint);
                     for (Path p : paths) {
                         drawPathToBuffer(p.locA.getLocation(), p.locB.getLocation());
@@ -176,6 +201,13 @@ public class DisplayDrawer extends AppCompatActivity
             findViewById(R.id.mapviewer).requestFocus();
 
         });
+
+        mapView.setOnPhotoTapListener(this);
+    }
+
+    private int weight(List<Path> p) {
+        if (p.isEmpty()) return Integer.MAX_VALUE;
+        return p.stream().reduce(0, (d,e) -> d + e.length, Integer::sum);
     }
 
     void highlightLocation(Location l) {
@@ -282,9 +314,9 @@ public class DisplayDrawer extends AppCompatActivity
         fct = (float) map.getWidth() / getResources().getInteger(R.integer.map_width);
 //        Log.d("Got factor ", Float.toString(fct));
 
-        for (Location l : building.getGraph().getAllLocations()) {
-            drawLocToBuffer(l);
-        }
+//        for (Location l : building.getGraph().getAllLocations()) {
+//            drawLocToBuffer(l);
+//        }
         displayBuffer();
     }
 
@@ -300,6 +332,27 @@ public class DisplayDrawer extends AppCompatActivity
                 .setPositiveButton("OK", null);
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    @Override
+    public void onPhotoTap(ImageView view, float x, float y) {
+        final float xx = x * MAP_SIDE_LENGTH;
+        final float yy = y * MAP_SIDE_LENGTH;
+
+        building.getGraph().getAllLocations().stream().filter(
+                l -> absDist(l, xx, yy) < NEAR_DISTANCE
+        ).reduce((a,b) -> (absDist(a,xx,yy) < absDist(b,xx,yy)) ? a : b)
+                .ifPresent(this::selectLocation);
+
+        //snackMsg("Nothing here: " + x +"," + y);
+    }
+
+    private double absDist(Location l, float x, float y) {
+        return Math.sqrt(Math.pow(l.getX() - x, 2) + Math.pow(l.getY() - y, 2));
+    }
+
+    private void selectLocation(Location l) {
+        snackMsg(l.hasName() ? l.getCode() + " " + l.getName() : l.getCode());
     }
 
 }
