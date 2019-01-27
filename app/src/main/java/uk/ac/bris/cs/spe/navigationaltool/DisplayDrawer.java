@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -18,7 +19,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,7 +34,9 @@ import com.github.chrisbanes.photoview.PhotoView;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -95,7 +97,8 @@ public class DisplayDrawer extends AppCompatActivity
 
         mapView = (PhotoView) findViewById(R.id.mapviewer);
         mapView.setImageBitmap(map);
-        mapView.setMaximumScale(12);
+        mapView.setMaximumScale(12f);
+        mapView.setMinimumScale(0.5f);
 
 
         setListeners();
@@ -117,6 +120,7 @@ public class DisplayDrawer extends AppCompatActivity
 
         destPaint = new Paint(originPaint); destPaint.setColor(Color.GREEN);
         selectPaint = new Paint(originPaint); selectPaint.setColor(Color.RED);
+        selectPaint.setAlpha(192);
 
      }
 
@@ -224,8 +228,6 @@ public class DisplayDrawer extends AppCompatActivity
 
         });
 
-        ImageButton closeSelected = findViewById(R.id.close_selection);
-        closeSelected.setOnClickListener(view -> deselect());
     }
 
     private int weight(List<Path> p) {
@@ -251,7 +253,7 @@ public class DisplayDrawer extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -278,7 +280,7 @@ public class DisplayDrawer extends AppCompatActivity
         if (id == R.id.show_search) {
             srchShown = !srchShown;
 
-            LinearLayout searches = (LinearLayout) findViewById(R.id.searches);
+            LinearLayout searches = findViewById(R.id.searches);
             searches.setVisibility(srchShown ? View.VISIBLE : View.GONE);
             item.setIcon(srchShown ? R.drawable.ic_collapse : R.drawable.ic_search);
 
@@ -325,6 +327,7 @@ public class DisplayDrawer extends AppCompatActivity
 
     private void displayBuffer() {
         mapView.setImageBitmap(buf.copy(buf.getConfig(), false));
+
     }
 
     private void refreshBuffer() {
@@ -359,10 +362,13 @@ public class DisplayDrawer extends AppCompatActivity
         final float xx = x * MAP_SIDE_LENGTH;
         final float yy = y * MAP_SIDE_LENGTH;
 
-        Optional<Location> ol = building.getGraph().getAllLocations().stream().filter(
-                l -> absDist(l, xx, yy) < NEAR_DISTANCE
-        ).reduce((a,b) -> (absDist(a,xx,yy) < absDist(b,xx,yy)) ? a : b);
-
+        Map<Location, Double> memo = new HashMap<>();
+        building.getGraph().getAllLocations().forEach(l -> memo.put(l,absDist(l,xx,yy)));
+//        Optional<Location> ol = building.getGraph().getAllLocations().parallelStream().filter(
+//                l -> absDist(l, xx, yy) < NEAR_DISTANCE
+//        ).reduce((a,b) -> (absDist(a,xx,yy) < absDist(b,xx,yy)) ? a : b);
+        Optional<Location> ol = memo.keySet().parallelStream().filter(l -> memo.get(l) < NEAR_DISTANCE)
+                .reduce((a,b) -> memo.get(a) < memo.get(b) ? a : b);
         if (ol.isPresent()) {
             selectLocation(ol.get());
             return;
@@ -372,35 +378,23 @@ public class DisplayDrawer extends AppCompatActivity
         //snackMsg("Nothing here: " + x +"," + y);
     }
 
+
     private void deselect() {
         selectedLocation = null;
         refreshBuffer();
+        bottomBarHide();
         displayBuffer();
-        ConstraintLayout selBox = findViewById(R.id.selected_box);
-        selBox.findViewById(R.id.selected_details).setVisibility(View.GONE);
-        selBox.findViewById(R.id.selected_tip).setVisibility(View.VISIBLE);
-        selBox.findViewById(R.id.close_selection).setVisibility(View.INVISIBLE);
     }
 
     private double absDist(Location l, float x, float y) {
+        //return Math.abs(l.getX() - x + l.getY() - y);
         return Math.sqrt(Math.pow(l.getX() - x, 2) + Math.pow(l.getY() - y, 2));
     }
 
     private void selectLocation(Location l) {
-        if (selectedLocation != null) navigate(selectedLocation, l);
-        else {
 
-            refreshBuffer();
-            dotLocation(l, selectPaint);
-            drawLocToBuffer(l);
-            displayBuffer();
-            //snackMsg(l.hasName() ? l.getCode() + " " + l.getName() : l.getCode());
-        }
-
-        ConstraintLayout selBox = findViewById(R.id.selected_box);
-        selBox.findViewById(R.id.selected_tip).setVisibility(View.GONE);
-        selBox.findViewById(R.id.selected_details).setVisibility(View.VISIBLE);
-        selBox.findViewById(R.id.close_selection).setVisibility(View.VISIBLE);
+        ConstraintLayout selBox = findViewById(R.id.bottom_box);
+        bottomBarShowSelection();
 
         TextView tv = selBox.findViewById(R.id.selected_title);
         tv.setText(l.hasName() ? l.getName() : l.getCode());
@@ -411,7 +405,41 @@ public class DisplayDrawer extends AppCompatActivity
             tv.setVisibility(View.VISIBLE);
         }
 
+        if (selectedLocation != null) navigate(selectedLocation, l);
+        else {
+
+            refreshBuffer();
+            dotLocation(l, selectPaint);
+            drawLocToBuffer(l);
+            displayBuffer();
+
+            Matrix m = new Matrix();
+            mapView.getDisplayMatrix(m);
+            float[] pts = {l.getX(), l.getY()};
+            m.mapPoints(pts);
+            mapView.setScale(4, pts[0] -200, pts[1]-200, true);
+            //snackMsg(l.hasName() ? l.getCode() + " " + l.getName() : l.getCode());
+        }
         selectedLocation = l;
+    }
+
+    private void bottomBarShowSelection() {
+        ConstraintLayout botBox = findViewById(R.id.bottom_box);
+        botBox.setVisibility(View.VISIBLE);
+        botBox.findViewById(R.id.selected_details).setVisibility(View.VISIBLE);
+        botBox.findViewById(R.id.navigation_panel).setVisibility(View.GONE);
+
+    }
+
+    private void bottomBarShowNavigation() {
+        ConstraintLayout botBox = findViewById(R.id.bottom_box);
+        botBox.setVisibility(View.VISIBLE);
+        botBox.findViewById(R.id.navigation_panel).setVisibility(View.VISIBLE);
+        botBox.findViewById(R.id.selected_details).setVisibility(View.GONE);
+    }
+
+    private void bottomBarHide() {
+        findViewById(R.id.bottom_box).setVisibility(View.GONE);
     }
 
     private void navigate(Location from, Location to) {

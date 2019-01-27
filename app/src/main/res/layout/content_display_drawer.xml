@@ -13,73 +13,89 @@
         android:id="@+id/mapviewer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/selected_box"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/bottom_bar"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:background="?attr/colorPrimary"
-        android:gravity="bottom"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/selected_box"
+        android:id="@+id/bottom_box"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
+        android:layout_margin="8dp"
+        android:background="@drawable/rounded_rect"
         android:padding="8dp"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
 
-        <TextView
-            android:id="@+id/selected_tip"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/nothing_selected"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageButton
-            android:id="@+id/close_selection"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:visibility="invisible"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_close" />
-
-        <LinearLayout
+        <android.support.constraint.ConstraintLayout
             android:id="@+id/selected_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/selected_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:paddingRight="8dp"
                 android:text="Room Name"
                 android:textColor="@android:color/white"
-                android:textSize="24sp" />
+                android:textSize="24sp"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/selected_subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="CODE" />
-        </LinearLayout>
+                android:text="CODE"
+                app:layout_constraintBaseline_toBaselineOf="@+id/selected_title"
+                app:layout_constraintLeft_toRightOf="@+id/selected_title" />
+
+            <Button
+                android:id="@+id/selected_get_directions"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/rounded_rect_btn"
+                android:drawableLeft="@drawable/ic_navigate"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:text=" Directions"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/selected_title" />
+
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/navigation_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/selected_details">
+
+
+            <Button
+                android:id="@+id/navigation_src_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:background="@drawable/rounded_rect_btn"
+                android:drawableLeft="@drawable/ic_navigate"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:text=" Directions"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                app:layout_constraintLeft_toLeftOf="parent" />
+        </android.support.constraint.ConstraintLayout>
+
     </android.support.constraint.ConstraintLayout>
 
     <android.support.design.widget.FloatingActionButton
@@ -91,8 +107,8 @@
         android:clickable="true"
         android:paddingRight="8dp"
         android:paddingBottom="8dp"
-        app:fabSize="normal"
-        app:layout_constraintBottom_toTopOf="@+id/selected_box"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_box"
         app:layout_constraintRight_toRightOf="parent"
         app:srcCompat="@drawable/ic_floor_vector" />
 
