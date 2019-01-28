@@ -22,6 +22,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -59,30 +60,31 @@ public class DisplayDrawer extends AppCompatActivity
     int highlightIntervals[] = {30,90,180};
 
     private Location selectedLocation = null;
+    private Location navigationSrc = null;
+    private Location navigationDst = null;
 
     private static final int NEAR_DISTANCE = 300;
     private static final int MAP_SIDE_LENGTH = 4320;
-
-    private Paint pathPaint, highlightPaint, originPaint, destPaint, selectPaint;
+        private Selecting selecting = Selecting.SELECTION;;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_drawer);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         access = getPreferences(MODE_PRIVATE).getInt(getString(R.string.saved_access), R.id.item_ug);
         disabl = getPreferences(MODE_PRIVATE).getBoolean(getString(R.string.saved_disabl), false);
 
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
 
         //Set menu items to be checked depending on saved values
         navigationView.getMenu().findItem(intToId(access)).setChecked(true);
@@ -95,10 +97,9 @@ public class DisplayDrawer extends AppCompatActivity
 
         map = BitmapFactory.decodeResource(getResources(), R.drawable.map0);
 
-        mapView = (PhotoView) findViewById(R.id.mapviewer);
+        mapView = findViewById(R.id.mapviewer);
         mapView.setImageBitmap(map);
         mapView.setMaximumScale(12f);
-        mapView.setMinimumScale(0.5f);
 
 
         setListeners();
@@ -106,58 +107,22 @@ public class DisplayDrawer extends AppCompatActivity
         initPaints();
     }
 
-    private void initPaints() {
-        pathPaint = new Paint();
-        pathPaint.setColor(Color.RED); pathPaint.setAntiAlias(true); pathPaint.setStrokeWidth(10);
-        pathPaint.setStrokeCap(Paint.Cap.ROUND);
-
-        highlightPaint = new Paint();
-        highlightPaint.setColor(Color.CYAN); highlightPaint.setAntiAlias(true);
-        highlightPaint.setStrokeWidth(4); highlightPaint.setStyle(Paint.Style.STROKE);
-
-        originPaint = new Paint();
-        originPaint.setColor(Color.BLUE); originPaint.setAntiAlias(true);
-
-        destPaint = new Paint(originPaint); destPaint.setColor(Color.GREEN);
-        selectPaint = new Paint(originPaint); selectPaint.setColor(Color.RED);
-        selectPaint.setAlpha(192);
-
-     }
-
-    void loadBuilding() {
-        try {
-            building = new Building("0", new DijkstraNavigator(),
-                    getApplicationContext());
-            snackMsg( "Imported " + building.getGraph().getAllLocations().size()
-                            + " locations.");
-        } catch (IOException e) {
-            snackMsg("Error importing building");
-        } catch (IllegalArgumentException e) {
-            snackMsg(e.getMessage());
-        }
-    }
+    private Paint pathPaint, highlightPaint, originPaint, destPaint, selectPaint;
 
     void setListeners() {
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-                //drawPathOnImage(new Point(100,100), new Point(200,400));
-                ArrayList<Path> done = new ArrayList<>();
-                for (Location l : building.getGraph().getAllLocations()) {
-                    for (Path p : building.getGraph().getPathsFromLocation(l)) {
-                        //Log.v("Drawing path", p.locA.getLocationString() + p.locB.getLocationString());
-                        if (!done.contains(p) && p.locA.x != 0 && p.locA.y != 0 && p.locB.x != 0 && p.locB.y != 0) {
-                            drawPathToBuffer(p.locA.getLocation(), p.locB.getLocation());
-                            done.add(p);
-                        }
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(view -> {
+            ArrayList<Path> done = new ArrayList<>();
+            for (Location l : building.getGraph().getAllLocations()) {
+                for (Path p : building.getGraph().getPathsFromLocation(l)) {
+                    if (!done.contains(p) && p.locA.x != 0 && p.locA.y != 0 && p.locB.x != 0 && p.locB.y != 0) {
+                        drawPathToBuffer(p.locA.getLocation(), p.locB.getLocation());
+                        done.add(p);
                     }
-                    if (!l.getLocation().equals(0,0)) drawTextToBuffer(l.code, l.getLocation());
                 }
-                displayBuffer();
+                if (!l.getLocation().equals(0,0)) drawTextToBuffer(l.code, l.getLocation());
             }
+            displayBuffer();
         });
 
         ImageButton navBtn = findViewById(R.id.navButton);
@@ -228,6 +193,94 @@ public class DisplayDrawer extends AppCompatActivity
 
         });
 
+        Button navgo = findViewById(R.id.selected_get_directions);
+        navgo.setOnClickListener(e -> {
+            startNavigationTo(selectedLocation);
+        });
+
+        Button navs = findViewById(R.id.navigation_src_btn);
+        navs.setOnClickListener(e -> startNavSelect(navs));
+        Button navd = findViewById(R.id.navigation_dst_btn);
+        navd.setOnClickListener(e -> startNavSelect(navd));
+    }
+
+    private void initPaints() {
+        pathPaint = new Paint();
+        pathPaint.setColor(Color.RED); pathPaint.setAntiAlias(true); pathPaint.setStrokeWidth(10);
+        pathPaint.setStrokeCap(Paint.Cap.ROUND);
+
+        highlightPaint = new Paint();
+        highlightPaint.setColor(Color.CYAN); highlightPaint.setAntiAlias(true);
+        highlightPaint.setStrokeWidth(4); highlightPaint.setStyle(Paint.Style.STROKE);
+
+        originPaint = new Paint();
+        originPaint.setColor(Color.BLUE); originPaint.setAntiAlias(true);
+
+        destPaint = new Paint(originPaint); destPaint.setColor(Color.GREEN);
+        selectPaint = new Paint(originPaint); selectPaint.setColor(Color.RED);
+        selectPaint.setAlpha(192);
+
+     }
+
+    void loadBuilding() {
+        try {
+            building = new Building("0", new DijkstraNavigator(),
+                    getApplicationContext());
+            snackMsg( "Imported " + building.getGraph().getAllLocations().size()
+                            + " locations.");
+        } catch (IOException e) {
+            snackMsg("Error importing building");
+        } catch (IllegalArgumentException e) {
+            snackMsg(e.getMessage());
+        }
+    }
+
+    private void startNavSelect(Button btn) {
+        cancelNavSelect(findViewById(btn.getId() == R.id.navigation_src_btn ? R.id.navigation_dst_btn
+            : R.id.navigation_src_btn));
+        selecting = btn.getId() == R.id.navigation_src_btn ? Selecting.NAVSRC : Selecting.NAVDST;
+        btn.setText(R.string.selecting_text);
+        btn.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,R.drawable.ic_close,0);
+        btn.refreshDrawableState();
+        btn.setOnClickListener(e -> cancelNavSelect(btn));
+    }
+
+    private void cancelNavSelect(Button btn) {
+        selecting = Selecting.SELECTION;
+        Location l = btn.getId() == R.id.navigation_src_btn ? navigationSrc : navigationDst;
+
+        btn.setText(l != null ? (l.hasName() ? l.getName() : l.getCode()) : getString(R.string.click_to_edit));
+        btn.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,R.drawable.ic_edit,0);
+        btn.setOnClickListener(e -> startNavSelect(btn));
+
+    }
+
+    private void startNavigationTo(Location l) {
+        navigationSrc = null;
+        resetNavButtons();
+        setNavigationDst(l);
+        bottomBarShowNavigation();
+    }
+
+    private void resetNavButtons() {
+        Button btn = findViewById(R.id.navigation_src_btn);
+        btn.setText(R.string.click_to_edit);
+        btn = findViewById(R.id.navigation_dst_btn);
+        btn.setText(R.string.click_to_edit);
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            if (selectedLocation != null) {
+                if (navigationDst != null || navigationSrc != null) exitNavigation();
+                else deselect();
+            }
+            else super.onBackPressed();
+        }
     }
 
     private int weight(List<Path> p) {
@@ -251,15 +304,22 @@ public class DisplayDrawer extends AppCompatActivity
         }
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id != R.id.disabled_item) {
+            SharedPreferences.Editor e = getPreferences(MODE_PRIVATE).edit();
+            access = idToInt(id);
+            e.putInt(getString(R.string.saved_access), access);
+            DrawerLayout drawer = findViewById(R.id.drawer_layout);
             drawer.closeDrawer(GravityCompat.START);
-        } else {
-            if(selectedLocation != null) deselect();
-            else super.onBackPressed();
+            e.apply();
         }
+
+        return true;
     }
 
     @Override
@@ -290,29 +350,27 @@ public class DisplayDrawer extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
+    public void onPhotoTap(ImageView view, float x, float y) {
+        final float xx = x * MAP_SIDE_LENGTH;
+        final float yy = y * MAP_SIDE_LENGTH;
 
-        if (id != R.id.disabled_item) {
-            SharedPreferences.Editor e = getPreferences(MODE_PRIVATE).edit();
-            access = idToInt(id);
-            e.putInt(getString(R.string.saved_access), access);
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            drawer.closeDrawer(GravityCompat.START);
-            e.apply();
+        Map<Location, Double> memo = new HashMap<>();
+        building.getGraph().getAllLocations().forEach(l -> memo.put(l,absDist(l,xx,yy)));
+        Optional<Location> ol = memo.keySet().parallelStream().filter(l -> memo.get(l) < NEAR_DISTANCE)
+                .reduce((a,b) -> memo.get(a) < memo.get(b) ? a : b);
+        if (ol.isPresent()) {
+            select(ol.get());
+            return;
         }
+        deselect();
 
-        return true;
+        //snackMsg("Nothing here: " + x +"," + y);
     }
 
 
     private void drawPathToBuffer(Point p1, Point p2) {
-
         canvas.drawLine(p1.x * fct, p1.y * fct, p2.x * fct, p2.y * fct, pathPaint);
-        //mapView.setImageBitmap(tmp);
     }
 
     private void drawTextToBuffer(String text, Point loc) {
@@ -327,20 +385,12 @@ public class DisplayDrawer extends AppCompatActivity
 
     private void displayBuffer() {
         mapView.setImageBitmap(buf.copy(buf.getConfig(), false));
-
     }
 
     private void refreshBuffer() {
         buf = map.copy(map.getConfig(), true);
         canvas = new Canvas(buf);
-//        Log.d("Map width ", Integer.toString(map.getWidth()));
         fct = (float) map.getWidth() / getResources().getInteger(R.integer.map_width);
-//        Log.d("Got factor ", Float.toString(fct));
-
-//        for (Location l : building.getGraph().getAllLocations()) {
-//            drawLocToBuffer(l);
-//        }
-        //displayBuffer();
     }
 
     private void snackMsg(String s) {
@@ -357,41 +407,63 @@ public class DisplayDrawer extends AppCompatActivity
         alert.show();
     }
 
-    @Override
-    public void onPhotoTap(ImageView view, float x, float y) {
-        final float xx = x * MAP_SIDE_LENGTH;
-        final float yy = y * MAP_SIDE_LENGTH;
-
-        Map<Location, Double> memo = new HashMap<>();
-        building.getGraph().getAllLocations().forEach(l -> memo.put(l,absDist(l,xx,yy)));
-//        Optional<Location> ol = building.getGraph().getAllLocations().parallelStream().filter(
-//                l -> absDist(l, xx, yy) < NEAR_DISTANCE
-//        ).reduce((a,b) -> (absDist(a,xx,yy) < absDist(b,xx,yy)) ? a : b);
-        Optional<Location> ol = memo.keySet().parallelStream().filter(l -> memo.get(l) < NEAR_DISTANCE)
-                .reduce((a,b) -> memo.get(a) < memo.get(b) ? a : b);
-        if (ol.isPresent()) {
-            selectLocation(ol.get());
-            return;
+    private void select(Location l) {
+        switch (selecting) {
+            case NAVDST:
+                setNavigationDst(l);
+                break;
+            case NAVSRC:
+                setNavigationSrc(l);
+                break;
+            case SELECTION:
+                showLocation(l);
+                break;
+            default:
+                break;
         }
-        deselect();
-
-        //snackMsg("Nothing here: " + x +"," + y);
     }
 
+    private void setNavigationSrc(Location l) {
+        navigationSrc = l;
+        Button btn = findViewById(R.id.navigation_src_btn);
+        cancelNavSelect(btn);
+        if (navigationDst != null) navigate(navigationSrc, navigationDst);
+        selecting = Selecting.SELECTION;
+    }
+
+    private void setNavigationDst(Location l) {
+        navigationDst = l;
+        Button btn = findViewById(R.id.navigation_dst_btn);
+        cancelNavSelect(btn);
+        if (navigationSrc != null) navigate(navigationSrc, navigationDst);
+        selecting = Selecting.SELECTION;
+    }
 
     private void deselect() {
         selectedLocation = null;
+        navigationSrc = null;
+        navigationDst = null;
+        selecting = Selecting.SELECTION;
         refreshBuffer();
         bottomBarHide();
         displayBuffer();
     }
 
-    private double absDist(Location l, float x, float y) {
-        //return Math.abs(l.getX() - x + l.getY() - y);
-        return Math.sqrt(Math.pow(l.getX() - x, 2) + Math.pow(l.getY() - y, 2));
+    private void exitNavigation() {
+        navigationSrc = null;
+        navigationDst = null;
+        if (selectedLocation != null) {
+            showLocation(selectedLocation);
+        }
+        else {
+            bottomBarHide();
+        }
+
     }
 
-    private void selectLocation(Location l) {
+    private void showLocation(Location l) {
+        navigationSrc = null;
+        navigationDst = null;
 
         ConstraintLayout selBox = findViewById(R.id.bottom_box);
         bottomBarShowSelection();
@@ -405,22 +477,38 @@ public class DisplayDrawer extends AppCompatActivity
             tv.setVisibility(View.VISIBLE);
         }
 
-        if (selectedLocation != null) navigate(selectedLocation, l);
-        else {
 
-            refreshBuffer();
-            dotLocation(l, selectPaint);
-            drawLocToBuffer(l);
-            displayBuffer();
+        refreshBuffer();
+        dotLocation(l, selectPaint);
+        drawLocToBuffer(l);
+        displayBuffer();
 
-            Matrix m = new Matrix();
-            mapView.getDisplayMatrix(m);
-            float[] pts = {l.getX(), l.getY()};
-            m.mapPoints(pts);
-            mapView.setScale(4, pts[0] -200, pts[1]-200, true);
-            //snackMsg(l.hasName() ? l.getCode() + " " + l.getName() : l.getCode());
-        }
+        Matrix m = new Matrix();
+        mapView.getDisplayMatrix(m);
+        float[] pts = {l.getX(), l.getY()};
+        m.mapPoints(pts);
+        mapView.setScale(4, pts[0] -200, pts[1]-200, true);
+        //snackMsg(l.hasName() ? l.getCode() + " " + l.getName() : l.getCode());
+
         selectedLocation = l;
+    }
+
+    private double absDist(Location l, float x, float y) {
+        //return Math.abs(l.getX() - x + l.getY() - y);
+        return Math.sqrt(Math.pow(l.getX() - x, 2) + Math.pow(l.getY() - y, 2));
+    }
+
+    private void navigate(Location from, Location to) {
+        try {
+            refreshBuffer();
+            drawPathListToBuffer(
+            building.getNavigator().navigate(from, to, building.getGraph(), getUserFromParams(access, disabl)));
+            dotLocation(from, originPaint);
+            dotLocation(to, destPaint);
+            displayBuffer();
+        } catch (IllegalArgumentException e) {
+            alertMsg("No path found for specified access level");
+        }
     }
 
     private void bottomBarShowSelection() {
@@ -442,19 +530,7 @@ public class DisplayDrawer extends AppCompatActivity
         findViewById(R.id.bottom_box).setVisibility(View.GONE);
     }
 
-    private void navigate(Location from, Location to) {
-        try {
-            refreshBuffer();
-            drawPathListToBuffer(
-            building.getNavigator().navigate(from, to, building.getGraph(), getUserFromParams(access, disabl))
-            );
-            dotLocation(from, originPaint);
-            dotLocation(to, destPaint);
-            displayBuffer();
-        } catch (IllegalArgumentException e) {
-            snackMsg("No path found for specified access level");
-        }
-    }
+private enum Selecting {SELECTION, NAVSRC, NAVDST}
 
     private void dotLocation(Location l, Paint paint) {
         canvas.drawCircle(l.getX() * fct, l.getY() * fct, 20, paint);

@@ -32,6 +32,7 @@
             android:id="@+id/selected_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -40,7 +41,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:paddingRight="8dp"
                 android:text="Room Name"
                 android:textColor="@android:color/white"
                 android:textSize="24sp"
@@ -51,6 +51,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
                 android:text="CODE"
                 app:layout_constraintBaseline_toBaselineOf="@+id/selected_title"
                 app:layout_constraintLeft_toRightOf="@+id/selected_title" />
@@ -61,7 +63,7 @@
                 android:layout_height="32dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/rounded_rect_btn"
-                android:drawableLeft="@drawable/ic_navigate"
+                android:drawableStart="@drawable/ic_navigate"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:text=" Directions"
@@ -76,24 +78,69 @@
             android:id="@+id/navigation_panel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/selected_details">
 
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
+                android:text="Route from" />
 
             <Button
                 android:id="@+id/navigation_src_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
                 android:background="@drawable/rounded_rect_btn"
-                android:drawableLeft="@drawable/ic_navigate"
+                android:drawableEnd="@drawable/ic_edit"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
-                android:text=" Directions"
+                android:text="@string/click_to_edit"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                app:layout_constraintLeft_toLeftOf="parent" />
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="to"
+                app:layout_constraintBaseline_toBaselineOf="@+id/navigation_src_btn"
+                app:layout_constraintLeft_toRightOf="@+id/navigation_src_btn" />
+
+            <Button
+                android:id="@+id/navigation_dst_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/rounded_rect_btn"
+                android:drawableEnd="@drawable/ic_edit"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:text="@string/click_to_edit"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                app:layout_constraintBaseline_toBaselineOf="@+id/navigation_src_btn"
+                app:layout_constraintLeft_toRightOf="@+id/textView3"
+                app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+            <ImageButton
+                android:id="@+id/navigation_swap_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/rounded_rect_btn"
+                android:padding="4dp"
+                app:layout_constraintLeft_toRightOf="@+id/navigation_dst_btn"
+                app:layout_constraintTop_toTopOf="@+id/navigation_dst_btn"
+                app:srcCompat="@drawable/ic_swap" />
+
         </android.support.constraint.ConstraintLayout>
 
     </android.support.constraint.ConstraintLayout>
@@ -105,8 +152,6 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:clickable="true"
-        android:paddingRight="8dp"
-        android:paddingBottom="8dp"
         app:fabSize="mini"
         app:layout_constraintBottom_toTopOf="@+id/bottom_box"
         app:layout_constraintRight_toRightOf="parent"

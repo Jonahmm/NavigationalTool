@@ -17,4 +17,6 @@
     <string name="saved_disabl">SAVEDDISAB</string>
     <string name="search_title">Search for a location</string>
     <string name="nothing_selected">Nothing Selected</string>
+    <string name="selecting_text">Tap to cancel </string>
+    <string name="click_to_edit">Tap to edit </string>
 </resources>
