@@ -19,4 +19,5 @@
     <string name="nothing_selected">Nothing Selected</string>
     <string name="selecting_text">Tap to cancel </string>
     <string name="click_to_edit">Tap to edit </string>
+    <string name="navigation_failure">No path found for specified access level</string>
 </resources>
