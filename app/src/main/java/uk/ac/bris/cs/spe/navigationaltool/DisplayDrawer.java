@@ -8,8 +8,10 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -19,6 +21,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,17 +58,18 @@ public class DisplayDrawer extends AppCompatActivity
     private Boolean disabl;
     PhotoView mapView;
     Bitmap map;
-    Bitmap buf; Canvas canvas; float fct;
+        private static final float MAP_MIN_SCALE = 1.25f; Bitmap buf;
+    Canvas canvas; float fctX;
     private boolean srchShown = false;
     int highlightIntervals[] = {30,90,180};
 
     private Location selectedLocation = null;
     private Location navigationSrc = null;
     private Location navigationDst = null;
+float scale;
 
     private static final int NEAR_DISTANCE = 300;
-    private static final int MAP_SIDE_LENGTH = 4320;
-        private Selecting selecting = Selecting.SELECTION;;
+    private Selecting selecting = Selecting.SELECTION;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +109,8 @@ public class DisplayDrawer extends AppCompatActivity
         setListeners();
         refreshBuffer();
         initPaints();
+        mapView.setScale(MAP_MIN_SCALE);
+        mapView.setMinimumScale(MAP_MIN_SCALE);
     }
 
     private Paint pathPaint, highlightPaint, originPaint, destPaint, selectPaint;
@@ -163,11 +169,11 @@ public class DisplayDrawer extends AppCompatActivity
                     }
 
 
-                    canvas.drawCircle(from.getX() * fct, from.getY() * fct, 10, originPaint);
+                    canvas.drawCircle(from.getX() * fctX, from.getY() * fctX, 10, originPaint);
                     for (Path p : paths) {
                         drawPathToBuffer(p.locA.getLocation(), p.locB.getLocation());
                     }
-                    canvas.drawCircle(to.getX() * fct, to.getY() * fct, 10, destPaint);
+                    canvas.drawCircle(to.getX() * fctX, to.getY() * fctX, 10, destPaint);
                     displayBuffer();
                 }
                 catch (IllegalArgumentException e) {
@@ -265,8 +271,11 @@ public class DisplayDrawer extends AppCompatActivity
     private void resetNavButtons() {
         Button btn = findViewById(R.id.navigation_src_btn);
         btn.setText(R.string.click_to_edit);
+        btn.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,R.drawable.ic_edit,0);
         btn = findViewById(R.id.navigation_dst_btn);
         btn.setText(R.string.click_to_edit);
+        btn.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,R.drawable.ic_edit,0);
+
     }
 
     @Override
@@ -290,7 +299,7 @@ public class DisplayDrawer extends AppCompatActivity
 
     void highlightLocation(Location l) {
         refreshBuffer();
-        for (int i : highlightIntervals) canvas.drawCircle(l.x * fct, l.y * fct, i, highlightPaint);
+        for (int i : highlightIntervals) canvas.drawCircle(l.x * fctX, l.y * fctX, i, highlightPaint);
         displayBuffer();
     }
 
@@ -352,8 +361,8 @@ public class DisplayDrawer extends AppCompatActivity
 
     @Override
     public void onPhotoTap(ImageView view, float x, float y) {
-        final float xx = x * MAP_SIDE_LENGTH;
-        final float yy = y * MAP_SIDE_LENGTH;
+        final float xx = x * getResources().getInteger(R.integer.map_width);
+        final float yy = y * getResources().getInteger(R.integer.map_height);
 
         Map<Location, Double> memo = new HashMap<>();
         building.getGraph().getAllLocations().forEach(l -> memo.put(l,absDist(l,xx,yy)));
@@ -370,13 +379,13 @@ public class DisplayDrawer extends AppCompatActivity
 
 
     private void drawPathToBuffer(Point p1, Point p2) {
-        canvas.drawLine(p1.x * fct, p1.y * fct, p2.x * fct, p2.y * fct, pathPaint);
+        canvas.drawLine(p1.x * fctX, p1.y * fctX, p2.x * fctX, p2.y * fctX, pathPaint);
     }
 
     private void drawTextToBuffer(String text, Point loc) {
         Paint p = new Paint();
         p.setColor(Color.BLACK); p.setTextSize(20); p.setAntiAlias(true);
-        canvas.drawText(text, (float) (loc.x - (p.getTextSize() * text.length() * 0.4)) * fct, (loc.y - (p.getTextSize() / 2)) * fct, p);
+        canvas.drawText(text, (float) (loc.x - (p.getTextSize() * text.length() * 0.4)) * fctX, (loc.y - (p.getTextSize() / 2)) * fctX, p);
     }
 
     private void drawLocToBuffer(Location l) {
@@ -385,12 +394,14 @@ public class DisplayDrawer extends AppCompatActivity
 
     private void displayBuffer() {
         mapView.setImageBitmap(buf.copy(buf.getConfig(), false));
+        mapView.setScale(MAP_MIN_SCALE);
+
     }
 
     private void refreshBuffer() {
         buf = map.copy(map.getConfig(), true);
         canvas = new Canvas(buf);
-        fct = (float) map.getWidth() / getResources().getInteger(R.integer.map_width);
+        fctX = (float) map.getWidth() / getResources().getInteger(R.integer.map_width);
     }
 
     private void snackMsg(String s) {
@@ -427,26 +438,49 @@ public class DisplayDrawer extends AppCompatActivity
         navigationSrc = l;
         Button btn = findViewById(R.id.navigation_src_btn);
         cancelNavSelect(btn);
-        if (navigationDst != null) navigate(navigationSrc, navigationDst);
+        if (navigationDst != null) doNavigation();
         selecting = Selecting.SELECTION;
+        formatNav();
     }
 
     private void setNavigationDst(Location l) {
         navigationDst = l;
         Button btn = findViewById(R.id.navigation_dst_btn);
         cancelNavSelect(btn);
-        if (navigationSrc != null) navigate(navigationSrc, navigationDst);
+        if (navigationSrc != null) doNavigation();
         selecting = Selecting.SELECTION;
+        formatNav();
+    }
+
+    private void formatNav() {
+        ImageButton sp = findViewById(R.id.navigation_swap_btn);
+        ConstraintLayout nv = findViewById(R.id.navigation_panel);
+        Log.d("Right bounds", sp.getRight() + " " + nv.getRight());
+        ConstraintSet c = new ConstraintSet();
+        c.clone(nv);
+        if(sp.getRight() > nv.getRight()) {
+            c.clear(R.id.navigation_dst_btn, ConstraintSet.TOP);
+            c.connect(R.id.navigation_dst_btn, ConstraintSet.TOP, R.id.navigation_src_btn, ConstraintSet.BOTTOM);
+            c.clear(R.id.navigation_dst_btn, ConstraintSet.LEFT);
+        } else {
+            c.connect(R.id.navigation_dst_btn, ConstraintSet.LEFT, R.id.navigation_src_btn, ConstraintSet.RIGHT);
+            c.clear(R.id.navigation_dst_btn, ConstraintSet.TOP);
+            c.connect(R.id.navigation_dst_btn, ConstraintSet.TOP, R.id.navigation_title, ConstraintSet.BOTTOM);
+        }
+        c.applyTo(nv);
     }
 
     private void deselect() {
-        selectedLocation = null;
-        navigationSrc = null;
-        navigationDst = null;
-        selecting = Selecting.SELECTION;
-        refreshBuffer();
-        bottomBarHide();
-        displayBuffer();
+        if (selectedLocation != null || navigationSrc != null || navigationDst != null) {
+            selectedLocation = null;
+            navigationSrc = null;
+            navigationDst = null;
+            selecting = Selecting.SELECTION;
+            refreshBuffer();
+            bottomBarHide();
+            displayBuffer();
+        }
+
     }
 
     private void exitNavigation() {
@@ -458,7 +492,6 @@ public class DisplayDrawer extends AppCompatActivity
         else {
             bottomBarHide();
         }
-
     }
 
     private void showLocation(Location l) {
@@ -487,7 +520,7 @@ public class DisplayDrawer extends AppCompatActivity
         mapView.getDisplayMatrix(m);
         float[] pts = {l.getX(), l.getY()};
         m.mapPoints(pts);
-        mapView.setScale(4, pts[0] -200, pts[1]-200, true);
+        mapView.setScale(4, pts[0] -200, pts[1]-250, false);
         //snackMsg(l.hasName() ? l.getCode() + " " + l.getName() : l.getCode());
 
         selectedLocation = l;
@@ -496,6 +529,30 @@ public class DisplayDrawer extends AppCompatActivity
     private double absDist(Location l, float x, float y) {
         //return Math.abs(l.getX() - x + l.getY() - y);
         return Math.sqrt(Math.pow(l.getX() - x, 2) + Math.pow(l.getY() - y, 2));
+    }
+
+    private void doNavigation() {
+        User user = getUserFromParams(access, disabl);
+        List<Path> paths = new ArrayList<>();
+        Location from = null, to = null;
+        for (Location l : building.getGraph().getLocationsByCode(navigationSrc.getCode())) {
+            for (Location m : building.getGraph().getLocationsByCode(navigationDst.getCode())) {
+                try {
+                    List<Path> p = building.getNavigator().navigate(l,m,building.getGraph(),user);
+                    if (weight(p) < weight(paths)) {
+                        paths = p;
+                        from = l; to = m;
+                    }
+                } catch (IllegalArgumentException ignored) {}
+            }
+        }
+        if(from != null) {
+            refreshBuffer();
+            drawPathListToBuffer(paths);
+            dotLocation(from, originPaint);
+            dotLocation(to, destPaint);
+            displayBuffer();
+        } else alertMsg(getString(R.string.navigation_failure));
     }
 
     private void navigate(Location from, Location to) {
@@ -533,7 +590,7 @@ public class DisplayDrawer extends AppCompatActivity
 private enum Selecting {SELECTION, NAVSRC, NAVDST}
 
     private void dotLocation(Location l, Paint paint) {
-        canvas.drawCircle(l.getX() * fct, l.getY() * fct, 20, paint);
+        canvas.drawCircle(l.getX() * fctX, l.getY() * fctX, 20, paint);
     }
 
     private void drawPathListToBuffer(List<Path> paths) {

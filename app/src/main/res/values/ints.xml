@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="map_width">4320</integer>
+    <integer name="map_height">7680</integer>
 </resources>
