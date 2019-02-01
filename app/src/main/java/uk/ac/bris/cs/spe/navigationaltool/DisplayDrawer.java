@@ -66,7 +66,6 @@ public class DisplayDrawer extends AppCompatActivity
     private Location selectedLocation = null;
     private Location navigationSrc = null;
     private Location navigationDst = null;
-float scale;
 
     private static final int NEAR_DISTANCE = 300;
     private Selecting selecting = Selecting.SELECTION;
