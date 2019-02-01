@@ -345,6 +345,10 @@ public class DisplayDrawer extends AppCompatActivity
         }
     }
 
+    /*--------------*
+     * PROGRAM FLOW *
+     *--------------*/
+
     /**
      * Handles the back button: uses {@link #exitNavigation()} or {@link #deselect()} when nav or
      * selection are active respectively
@@ -362,10 +366,6 @@ public class DisplayDrawer extends AppCompatActivity
             else super.onBackPressed();
         }
     }
-
-    /*--------------*
-     * PROGRAM FLOW *
-     *--------------*/
 
     /**
      * Handles options item events; currently only used by old system
@@ -414,6 +414,10 @@ public class DisplayDrawer extends AppCompatActivity
         return true;
     }
 
+    /*------------*
+     * NAVIGATION *
+     *------------*/
+
     /**
      * Changes the app state st when you select a location, it is used for navigation.
      * Sets the text, icon and listener of the button it came from
@@ -429,10 +433,6 @@ public class DisplayDrawer extends AppCompatActivity
         btn.refreshDrawableState();
         btn.setOnClickListener(e -> cancelNavSelect(btn));
     }
-
-    /*------------*
-     * NAVIGATION *
-     *------------*/
 
     /**
      * The navigation-specific counterpart to {@link #deselect()}. If a location was selected before
@@ -551,6 +551,10 @@ public class DisplayDrawer extends AppCompatActivity
         } else alertMsg(getString(R.string.navigation_failure));
     }
 
+    /*-----------*
+     * SELECTION *
+     *-----------*/
+
     /**
      * Selection by search. Note that it calls {@link #select(Location)} not
      * {@link #showLocation(Location)} as selection may be used for navigation not just display
@@ -576,10 +580,6 @@ public class DisplayDrawer extends AppCompatActivity
         //snackMsg("Nothing here: " + x +"," + y);
     }
 
-    /*-----------*
-     * SELECTION *
-     *-----------*/
-
     /**
      * Shows or sets navigation parameters based on the current state
      * @param l The selected {@link Location}
@@ -598,6 +598,22 @@ public class DisplayDrawer extends AppCompatActivity
             default:
                 break;
         }
+    }
+
+    /**
+     * Resets selection parameters. The check is used to avoid unnecessary graphics operations
+     */
+    private void deselect() {
+        if (selectedLocation != null || navigationSrc != null || navigationDst != null) {
+            selectedLocation = null;
+            navigationSrc = null;
+            navigationDst = null;
+            selecting = Selecting.SELECTION;
+            refreshBuffer();
+            bottomBarHide();
+            displayBuffer();
+        }
+
     }
 
     /**
@@ -635,21 +651,9 @@ public class DisplayDrawer extends AppCompatActivity
         selectedLocation = l;
     }
 
-    /**
-     * Resets selection parameters. The check is used to avoid unnecessary graphics operations
-     */
-    private void deselect() {
-        if (selectedLocation != null || navigationSrc != null || navigationDst != null) {
-            selectedLocation = null;
-            navigationSrc = null;
-            navigationDst = null;
-            selecting = Selecting.SELECTION;
-            refreshBuffer();
-            bottomBarHide();
-            displayBuffer();
-        }
-
-    }
+    /*---------------------------------------------------*
+     * UI (Specifically, methods that deal only with UI) *
+     *---------------------------------------------------*/
 
     /**
      * Hides the navigation element of the layout and shows the one for selection
@@ -661,10 +665,6 @@ public class DisplayDrawer extends AppCompatActivity
         botBox.findViewById(R.id.navigation_panel).setVisibility(View.GONE);
 
     }
-
-    /*---------------------------------------------------*
-     * UI (Specifically, methods that deal only with UI) *
-     *---------------------------------------------------*/
 
     /**
      * Inverse of {@link #bottomBarShowNavigation()}
@@ -728,6 +728,10 @@ public class DisplayDrawer extends AppCompatActivity
         c.applyTo(nv);
     }
 
+    /*----------*
+     * GRAPHICS *
+     *----------*/
+
     /**
      * Draws a 40px-diameter dot on the buffer at the given Location
      * @param l The Location giving the point to draw at
@@ -736,10 +740,6 @@ public class DisplayDrawer extends AppCompatActivity
     private void dotLocation(Location l, Paint paint) {
         canvas.drawCircle(l.getX() * fct, l.getY() * fct, 20, paint);
     }
-
-    /*----------*
-     * GRAPHICS *
-     *----------*/
 
     /**
      * Highlights a location on the map using concentric circles
@@ -812,6 +812,10 @@ public class DisplayDrawer extends AppCompatActivity
         fct = (float) map.getWidth() / getResources().getInteger(R.integer.map_width);
     }
 
+    /*---------*
+     * HELPERS *
+     *---------*/
+
     /**
      * Used by @link doNavigation() to find the best route
      * @param p A list of paths
@@ -821,10 +825,6 @@ public class DisplayDrawer extends AppCompatActivity
         if (p.isEmpty()) return Integer.MAX_VALUE;
         return p.stream().reduce(0, (d,e) -> d + e.length, Integer::sum);
     }
-
-    /*---------*
-     * HELPERS *
-     *---------*/
 
     /**
      * Gets a User object from access requirements
