@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
@@ -52,24 +51,77 @@ import uk.ac.bris.cs.spe.navigationaltool.navigator.DijkstraNavigator;
 public class DisplayDrawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         OnPhotoTapListener{
-
-    private Building building;
-    private int access;
-    private Boolean disabl;
-    PhotoView mapView;
-    Bitmap map;
-        private static final float MAP_MIN_SCALE = 1.25f; Bitmap buf;
-    Canvas canvas; float fctX;
-    private boolean srchShown = false;
-    int highlightIntervals[] = {30,90,180};
-
-    private Location selectedLocation = null;
-    private Location navigationSrc = null;
-    private Location navigationDst = null;
-
+    /**
+     * The scale st the map's width == screen width (should be set depending on AR, but this works for 16:9)
+     */
+    private static final float MAP_MIN_SCALE = 1.25f;
+    /**
+     * The distance (in px) that locations should be < to a screen tap in order to be selected
+     */
     private static final int NEAR_DISTANCE = 300;
+    /**
+     * The map on screen. Kept global to avoid a lot of {@link #findViewById(int)} calls
+     */
+    PhotoView mapView;
+    /**
+     * The original image of the map. Doesn't change once set.
+     */
+    Bitmap map;
+    /**
+     * The buffer image kept in memory that we draw onto
+     */
+    Bitmap buf;
+    /**
+     * For drawing onto the buffer
+     */
+    Canvas canvas;
+    /**
+     * The value st x * fct = y where x is a location and y is that of its representation on the map
+     */
+    float fct;
+    /**
+     * Used for old system.
+     * @see #highlightLocation(Location)
+     */
+    int highlightIntervals[] = {30,90,180};
+    /**
+     * The building object to be worked on. Loaded using {@link #loadBuilding()}
+     */
+    private Building building;
+    /**
+     * Because we can't store User objects primitively, it makes sense to convert them into types
+     * that can denote access rights and ability.
+     */
+    private int access;
+    /**
+     * True if user requires accessible route
+     */
+    private Boolean disabl;
+    /**
+     * Used for old system
+     */
+    private boolean srchShown = false;
+    /**
+     * Stores the selected location
+     */
+    private Location selectedLocation = null;
+    /**
+     * Stores the navigation source location
+     */
+    private Location navigationSrc = null;
+    /**
+     * Stores the navigation destination location
+     */
+    private Location navigationDst = null;
+    /**
+     * Defines the current state of the program
+     */
     private Selecting selecting = Selecting.SELECTION;
 
+    /**
+     * Initialise and populate the activity. Further details are in code comments
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,10 +129,11 @@ public class DisplayDrawer extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        access = getPreferences(MODE_PRIVATE).getInt(getString(R.string.saved_access), R.id.item_ug);
+        //Load access requirements from saved preferences (if set, otherwise assume able UG)
+        access = getPreferences(MODE_PRIVATE).getInt(getString(R.string.saved_access), 1);
         disabl = getPreferences(MODE_PRIVATE).getBoolean(getString(R.string.saved_disabl), false);
 
-
+        //Makes the drawer behave
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -95,11 +148,13 @@ public class DisplayDrawer extends AppCompatActivity
                 .getActionView().findViewById(R.id.disabled_switch);
         s.setChecked(disabl);
 
+        //Allows updating access requirements from menu
         navigationView.setNavigationItemSelectedListener(this);
+
         loadBuilding();
 
+        //Initialise image
         map = BitmapFactory.decodeResource(getResources(), R.drawable.map0);
-
         mapView = findViewById(R.id.mapviewer);
         mapView.setImageBitmap(map);
         mapView.setMaximumScale(12f);
@@ -110,11 +165,16 @@ public class DisplayDrawer extends AppCompatActivity
         initPaints();
         mapView.setScale(MAP_MIN_SCALE);
         mapView.setMinimumScale(MAP_MIN_SCALE);
+        /* The above doesn't seem to actually update the view, it waits until you interact with it,
+           which is *really* annoying */
     }
 
-    private Paint pathPaint, highlightPaint, originPaint, destPaint, selectPaint;
-
+    /**
+     * Where the magic happens. This one sets all the listeners (classes (but basically just methods)
+     * that respond to events)
+     */
     void setListeners() {
+        //For testing, draws all paths on screen
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
             ArrayList<Path> done = new ArrayList<>();
@@ -130,7 +190,9 @@ public class DisplayDrawer extends AppCompatActivity
             displayBuffer();
         });
 
+        //Used by old system. BAD.
         ImageButton navBtn = findViewById(R.id.navButton);
+        //Recommend hiding this atrocity with the [-] button on the left
         navBtn.setOnClickListener(view -> {
             EditText navFrom = findViewById(R.id.navFrom);
             EditText navTo   = findViewById(R.id.navTo);
@@ -168,11 +230,11 @@ public class DisplayDrawer extends AppCompatActivity
                     }
 
 
-                    canvas.drawCircle(from.getX() * fctX, from.getY() * fctX, 10, originPaint);
+                    canvas.drawCircle(from.getX() * fct, from.getY() * fct, 10, originPaint);
                     for (Path p : paths) {
                         drawPathToBuffer(p.locA.getLocation(), p.locB.getLocation());
                     }
-                    canvas.drawCircle(to.getX() * fctX, to.getY() * fctX, 10, destPaint);
+                    canvas.drawCircle(to.getX() * fct, to.getY() * fct, 10, destPaint);
                     displayBuffer();
                 }
                 catch (IllegalArgumentException e) {
@@ -185,8 +247,10 @@ public class DisplayDrawer extends AppCompatActivity
 
         });
 
+        //Sets up selection by tap
         mapView.setOnPhotoTapListener(this);
 
+        //Sets up disabled switch
         NavigationView navigationView = findViewById(R.id.nav_view);
         Switch s = navigationView.getMenu().findItem(R.id.disabled_item).getActionView()
                 .findViewById(R.id.disabled_switch);
@@ -198,17 +262,25 @@ public class DisplayDrawer extends AppCompatActivity
 
         });
 
+        //Button to start nav
         Button navgo = findViewById(R.id.selected_get_directions);
         navgo.setOnClickListener(e -> {
             startNavigationTo(selectedLocation);
         });
 
+        //Navigation buttons
         Button navs = findViewById(R.id.navigation_src_btn);
         navs.setOnClickListener(e -> startNavSelect(navs));
         Button navd = findViewById(R.id.navigation_dst_btn);
         navd.setOnClickListener(e -> startNavSelect(navd));
     }
 
+    private Paint pathPaint, highlightPaint, originPaint, destPaint, selectPaint;
+
+    /**
+     * Loads the paints (used by the canvas) that draw various graphics to the screen, done here to
+     * avoid creating a new Paint every time we draw something
+     */
     private void initPaints() {
         pathPaint = new Paint();
         pathPaint.setColor(Color.RED); pathPaint.setAntiAlias(true); pathPaint.setStrokeWidth(10);
@@ -225,8 +297,12 @@ public class DisplayDrawer extends AppCompatActivity
         selectPaint = new Paint(originPaint); selectPaint.setColor(Color.RED);
         selectPaint.setAlpha(192);
 
-     }
+    }
 
+    /**
+     * Attempts to load the building from assets. Should never fail on a working build as the assets
+     * don't change, but handles errors because java doesn't like it if it doesn't
+     */
     void loadBuilding() {
         try {
             building = new Building("0", new DijkstraNavigator(),
@@ -240,6 +316,12 @@ public class DisplayDrawer extends AppCompatActivity
         }
     }
 
+    /**
+     * Changes the app state st when you select a location, it is used for navigation.
+     * Sets the text, icon and listener of the button it came from
+     * @param btn The Button object that this came from, one of navigation_src_btn or
+     *            navigation_dst_btn
+     */
     private void startNavSelect(Button btn) {
         cancelNavSelect(findViewById(btn.getId() == R.id.navigation_src_btn ? R.id.navigation_dst_btn
             : R.id.navigation_src_btn));
@@ -250,6 +332,11 @@ public class DisplayDrawer extends AppCompatActivity
         btn.setOnClickListener(e -> cancelNavSelect(btn));
     }
 
+    /**
+     * Reverses the effects of {@link #startNavSelect}
+     * @param btn The Button object that this came from, one of navigation_src_btn or
+     *            navigation_dst_btn
+     */
     private void cancelNavSelect(Button btn) {
         selecting = Selecting.SELECTION;
         Location l = btn.getId() == R.id.navigation_src_btn ? navigationSrc : navigationDst;
@@ -260,6 +347,11 @@ public class DisplayDrawer extends AppCompatActivity
 
     }
 
+    /**
+     * Brings up the navigation interface with the given location as the destination
+     * @param l The location to nav to. Currently this is always == selectedLocation, but once
+     *          we have a new search interface this may be called separately
+     */
     private void startNavigationTo(Location l) {
         navigationSrc = null;
         resetNavButtons();
@@ -267,6 +359,9 @@ public class DisplayDrawer extends AppCompatActivity
         bottomBarShowNavigation();
     }
 
+    /**
+     * Sets the navigation buttons back to their original state.
+     */
     private void resetNavButtons() {
         Button btn = findViewById(R.id.navigation_src_btn);
         btn.setText(R.string.click_to_edit);
@@ -277,33 +372,48 @@ public class DisplayDrawer extends AppCompatActivity
 
     }
 
+    /**
+     * Handles the back button: uses {@link #exitNavigation()} or {@link #deselect()} when nav or
+     * selection are active respectively
+     */
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            if (selectedLocation != null) {
-                if (navigationDst != null || navigationSrc != null) exitNavigation();
-                else deselect();
+            if (navigationDst != null || navigationSrc != null) exitNavigation();
+            else if (selectedLocation != null) {
+                deselect();
             }
             else super.onBackPressed();
         }
     }
 
+    /**
+     * Used by @link doNavigation() to find the best route
+     * @param p A list of paths
+     * @return The sum of the weights of all paths in p
+     */
     private int weight(List<Path> p) {
         if (p.isEmpty()) return Integer.MAX_VALUE;
         return p.stream().reduce(0, (d,e) -> d + e.length, Integer::sum);
     }
 
+    /**
+     * Highlights a location on the map using concentric circles
+     * @deprecated since introduction of selection system
+     * @param l
+     */
     void highlightLocation(Location l) {
         refreshBuffer();
-        for (int i : highlightIntervals) canvas.drawCircle(l.x * fctX, l.y * fctX, i, highlightPaint);
+        for (int i : highlightIntervals) canvas.drawCircle(l.x * fct, l.y * fct, i, highlightPaint);
         displayBuffer();
     }
 
-
-    //Quick and dirty menu -> User implementation
+    /**
+     * Gets a User object from access requirements
+     */
     private User getUserFromParams(Integer access, Boolean disabl) {
         switch (intToId(access)) {
             case R.id.item_ug: return disabl ? User.DISABLED_STUDENT : User.STUDENT;
@@ -312,7 +422,10 @@ public class DisplayDrawer extends AppCompatActivity
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
+    /**
+     * Handles the changing of access requirements (staff/stu/etc) Note that using the disabled
+     * switch is not handled here as its use doesn't count as 'Selecting' a menu item
+     */
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -330,6 +443,11 @@ public class DisplayDrawer extends AppCompatActivity
         return true;
     }
 
+    /**
+     * Initialises the options menu
+     * @param menu The menu to inflate
+     * @return idk, see {@link android.support.v7.app.AppCompatActivity#onCreateOptionsMenu(Menu)}
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -337,6 +455,11 @@ public class DisplayDrawer extends AppCompatActivity
         return true;
     }
 
+    /**
+     * Handles options item events; currently only used by old system
+     * @param item The MenuItem that was selected
+     * @return idk, see {@link android.support.v7.app.AppCompatActivity#onOptionsItemSelected(MenuItem)}
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -358,6 +481,13 @@ public class DisplayDrawer extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Selection by search. Note that it calls {@link #select(Location)} not
+     * {@link #showLocation(Location)} as selection may be used for navigation not just display
+     * @param view The origin of the event. In our case always == mapView
+     * @param x The 0-1 value denoting the x on the image of the tap
+     * @param y The 0-1 value denoting the y on the image of the tap
+     */
     @Override
     public void onPhotoTap(ImageView view, float x, float y) {
         final float xx = x * getResources().getInteger(R.integer.map_width);
@@ -376,38 +506,70 @@ public class DisplayDrawer extends AppCompatActivity
         //snackMsg("Nothing here: " + x +"," + y);
     }
 
-
+    /**
+     * Draws a path between two Points on the buffer. Uses the value of fct to scale the given
+     * points to their counterparts on the map
+     * @param p1
+     * @param p2
+     */
     private void drawPathToBuffer(Point p1, Point p2) {
-        canvas.drawLine(p1.x * fctX, p1.y * fctX, p2.x * fctX, p2.y * fctX, pathPaint);
+        canvas.drawLine(p1.x * fct, p1.y * fct, p2.x * fct, p2.y * fct, pathPaint);
     }
 
+    /**
+     * guess
+     * @param text
+     * @param loc
+     */
     private void drawTextToBuffer(String text, Point loc) {
         Paint p = new Paint();
         p.setColor(Color.BLACK); p.setTextSize(20); p.setAntiAlias(true);
-        canvas.drawText(text, (float) (loc.x - (p.getTextSize() * text.length() * 0.4)) * fctX, (loc.y - (p.getTextSize() / 2)) * fctX, p);
+        canvas.drawText(text, (float) (loc.x - (p.getTextSize() * text.length() * 0.4)) * fct,
+                (loc.y - (p.getTextSize() / 2)) * fct, p);
     }
 
+    /**
+     * what it says on the tin
+     * @param l
+     */
     private void drawLocToBuffer(Location l) {
         drawTextToBuffer(l.hasName() ? l.getCode() + ", " + l.getName() : l.getCode(), l.getLocation());
     }
 
+    /**
+     * Replaces the map on screen with the buffer from memory
+     */
     private void displayBuffer() {
         mapView.setImageBitmap(buf.copy(buf.getConfig(), false));
         mapView.setScale(MAP_MIN_SCALE);
 
     }
 
+    /**
+     * Resets the image buffer to be identical to map. Recalculates fct because… not sure. That
+     * could probably be done only once in onCreate tbh but it's not the expensive part of this
+     * method.
+     */
     private void refreshBuffer() {
         buf = map.copy(map.getConfig(), true);
         canvas = new Canvas(buf);
-        fctX = (float) map.getWidth() / getResources().getInteger(R.integer.map_width);
+        fct = (float) map.getWidth() / getResources().getInteger(R.integer.map_width);
     }
 
+    /**
+     * Helper method used to display a message to the user in the form of a SnackBar
+     * @param s The string to be displayed
+     * @see android.support.design.widget.Snackbar
+     */
     private void snackMsg(String s) {
         Snackbar.make(findViewById(R.id.constraint_layout), s, Snackbar.LENGTH_SHORT)
                 .show();
     }
 
+    /**
+     * Same purpose as {@link #snackMsg(String)} but uses an alert to be more prominent
+     * @param s The string to be displayed
+     */
     private void alertMsg(String s) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(s)
@@ -417,6 +579,10 @@ public class DisplayDrawer extends AppCompatActivity
         alert.show();
     }
 
+    /**
+     * Shows or sets navigation parameters based on the current state
+     * @param l The selected {@link Location}
+     */
     private void select(Location l) {
         switch (selecting) {
             case NAVDST:
@@ -433,6 +599,11 @@ public class DisplayDrawer extends AppCompatActivity
         }
     }
 
+    /**
+     * Sets the source of the current navigation route to the given {@link Location}, including
+     * setting button text and performing the navigation if appropriate
+     * @param l The {@link Location} to be the new source
+     */
     private void setNavigationSrc(Location l) {
         navigationSrc = l;
         Button btn = findViewById(R.id.navigation_src_btn);
@@ -442,6 +613,12 @@ public class DisplayDrawer extends AppCompatActivity
         formatNav();
     }
 
+    /**
+     * Basically identical to {@link #setNavigationSrc(Location)}. The two could be combined but
+     * that would require more parameters
+     * @see #setNavigationSrc(Location)
+     * @param l The {@link Location} to be the new destination
+     */
     private void setNavigationDst(Location l) {
         navigationDst = l;
         Button btn = findViewById(R.id.navigation_dst_btn);
@@ -451,6 +628,10 @@ public class DisplayDrawer extends AppCompatActivity
         formatNav();
     }
 
+    /**
+     * Place the destination and swap buttons below the source button if there is not enough space.
+     * Not working very well currently
+     */
     private void formatNav() {
         ImageButton sp = findViewById(R.id.navigation_swap_btn);
         ConstraintLayout nv = findViewById(R.id.navigation_panel);
@@ -469,6 +650,9 @@ public class DisplayDrawer extends AppCompatActivity
         c.applyTo(nv);
     }
 
+    /**
+     * Resets selection parameters. The check is used to avoid unnecessary graphics operations
+     */
     private void deselect() {
         if (selectedLocation != null || navigationSrc != null || navigationDst != null) {
             selectedLocation = null;
@@ -482,6 +666,10 @@ public class DisplayDrawer extends AppCompatActivity
 
     }
 
+    /**
+     * The navigation-specific counterpart to {@link #deselect()}. If a location was selected before
+     * we started navigation, go back to showing it. Otherwise just hides the nav UI
+     */
     private void exitNavigation() {
         navigationSrc = null;
         navigationDst = null;
@@ -493,6 +681,10 @@ public class DisplayDrawer extends AppCompatActivity
         }
     }
 
+    /**
+     * Marks and zooms in on a location on the map
+     * @param l The location to be shown
+     */
     private void showLocation(Location l) {
         navigationSrc = null;
         navigationDst = null;
@@ -520,16 +712,29 @@ public class DisplayDrawer extends AppCompatActivity
         float[] pts = {l.getX(), l.getY()};
         m.mapPoints(pts);
         mapView.setScale(4, pts[0] -200, pts[1]-250, false);
-        //snackMsg(l.hasName() ? l.getCode() + " " + l.getName() : l.getCode());
 
         selectedLocation = l;
     }
 
+    /**
+     * @param l A location
+     * @param x X-value of a point
+     * @param y Y-value of a point
+     * @return the Euclidean distance (in px) of a Location l from the point x,y
+     */
     private double absDist(Location l, float x, float y) {
-        //return Math.abs(l.getX() - x + l.getY() - y);
         return Math.sqrt(Math.pow(l.getX() - x, 2) + Math.pow(l.getY() - y, 2));
     }
 
+    /**
+     * The big one, the one we've all been waiting for, The actual point of our app.
+     *
+     * Uses the Navigator to compute the path between all pairs of nodes x,y, where the codes of x
+     * and y match those of navigationSrc and navigationDst respectively, then selects the path with the lowest
+     * total weight using {@link #weight(List)}. It draws this route to the buffer using
+     * {@link #drawPathListToBuffer(List)}, places dots at the start and end of the route, then
+     * shows the buffer.
+     */
     private void doNavigation() {
         User user = getUserFromParams(access, disabl);
         List<Path> paths = new ArrayList<>();
@@ -554,6 +759,11 @@ public class DisplayDrawer extends AppCompatActivity
         } else alertMsg(getString(R.string.navigation_failure));
     }
 
+    /**
+     * @deprecated used by old system
+     * @param from The source location
+     * @param to The destination location
+     */
     private void navigate(Location from, Location to) {
         try {
             refreshBuffer();
@@ -567,6 +777,9 @@ public class DisplayDrawer extends AppCompatActivity
         }
     }
 
+    /**
+     * Hides the navigation element of the layout and shows the one for selection
+     */
     private void bottomBarShowSelection() {
         ConstraintLayout botBox = findViewById(R.id.bottom_box);
         botBox.setVisibility(View.VISIBLE);
@@ -575,6 +788,9 @@ public class DisplayDrawer extends AppCompatActivity
 
     }
 
+    /**
+     * Inverse of {@link #bottomBarShowNavigation()}
+     */
     private void bottomBarShowNavigation() {
         ConstraintLayout botBox = findViewById(R.id.bottom_box);
         botBox.setVisibility(View.VISIBLE);
@@ -582,22 +798,43 @@ public class DisplayDrawer extends AppCompatActivity
         botBox.findViewById(R.id.selected_details).setVisibility(View.GONE);
     }
 
+    /**
+     * Hides the box that shows selection or nav info
+     */
     private void bottomBarHide() {
         findViewById(R.id.bottom_box).setVisibility(View.GONE);
     }
 
-private enum Selecting {SELECTION, NAVSRC, NAVDST}
-
+    /**
+     * Draws a 40px-diameter dot on the buffer at the given Location
+     * @param l The Location giving the point to draw at
+     * @param paint The paint to use for the dot
+     */
     private void dotLocation(Location l, Paint paint) {
-        canvas.drawCircle(l.getX() * fctX, l.getY() * fctX, 20, paint);
+        canvas.drawCircle(l.getX() * fct, l.getY() * fct, 20, paint);
     }
 
+    /**
+     * Like {@link #drawPathToBuffer(Point, Point)} but lots
+     * @param paths The list of paths to draw
+     */
     private void drawPathListToBuffer(List<Path> paths) {
         for (Path p : paths) {
             drawPathToBuffer(p.getLocA().getLocation(), p.getLocB().getLocation());
         }
     }
 
+    /**
+     * Because we can't store User objects primitively, it makes sense to convert them into types
+     * that can denote access rights and ability. This function converts the ID of a MenuItem
+     * (specifically, those in the drawer) to an int which we can store using SharedPreferences. We
+     * can't just use the int ID of the MenuItem because its value can change between builds.
+     * This value corresponds to that of the {@link #access} variable that stores the current access
+     * rights.
+     * @param id The ID of the MenuItem that has been selected
+     * @return The integer value representing the access level corresponding to the MenuItem
+     * @see #onCreate(Bundle) for an example of usage
+     */
     private int idToInt(int id) {
         switch (id) {
             case R.id.item_ug:    return 1;
@@ -607,6 +844,12 @@ private enum Selecting {SELECTION, NAVSRC, NAVDST}
             default: return 1;
         }
     }
+
+    /**
+     * Inverse of {@link #idToInt(int)}
+     * @param in The value to convert to the ID
+     * @return The ID of the MenuItem corresponding the the access level represented by {@code in}
+     */
     private int intToId(int in) {
         switch (in) {
             case 1: return R.id.item_ug;
@@ -616,4 +859,9 @@ private enum Selecting {SELECTION, NAVSRC, NAVDST}
             default: return R.id.item_ug;
         }
     }
+
+    /**
+     * Keeps track of what a selection (either by tap or search) is for
+     */
+    private enum Selecting {SELECTION, NAVSRC, NAVDST}
 }
