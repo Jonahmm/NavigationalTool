@@ -122,6 +122,23 @@ public class DisplayDrawer extends AppCompatActivity
     private Location navigationDst = null;
 
     /**
+     * Keeps track of what a selection (either by tap or search) is for
+     */
+    private enum Selecting {SELECTION, NAVSRC, NAVDST}
+
+    /**
+     * Defines the current state of the program
+     */
+    private Selecting selecting = Selecting.SELECTION;
+
+    private Paint pathPaint, highlightPaint, originPaint, destPaint, selectPaint;
+
+    /*----------------*
+     * INITIALISATION *
+     *----------------*/
+
+
+    /**
      * Initialises the options menu
      * @param menu The menu to inflate
      * @return idk, see {@link android.support.v7.app.AppCompatActivity#onCreateOptionsMenu(Menu)}
@@ -132,14 +149,6 @@ public class DisplayDrawer extends AppCompatActivity
         getMenuInflater().inflate(R.menu.display_drawer, menu);
         return true;
     }
-
-    /**
-     * Defines the current state of the program
-     */
-    private Selecting selecting = Selecting.SELECTION;
-    /*----------------*
-     * INITIALISATION *
-     *----------------*/
 
     /**
      * Initialise and populate the activity. Further details are in code comments
@@ -296,8 +305,6 @@ public class DisplayDrawer extends AppCompatActivity
         Button navd = findViewById(R.id.navigation_dst_btn);
         navd.setOnClickListener(e -> startNavSelect(navd));
     }
-
-    private Paint pathPaint, highlightPaint, originPaint, destPaint, selectPaint;
 
     /**
      * Loads the paints (used by the canvas) that draw various graphics to the screen, done here to
@@ -829,11 +836,6 @@ public class DisplayDrawer extends AppCompatActivity
             default: return User.STUDENT;
         }
     }
-
-    /**
-     * Keeps track of what a selection (either by tap or search) is for
-     */
-    private enum Selecting {SELECTION, NAVSRC, NAVDST}
 
     /**
      * @param l A location
