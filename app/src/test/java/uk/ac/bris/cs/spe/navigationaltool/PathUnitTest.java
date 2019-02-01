@@ -23,8 +23,8 @@ public class PathUnitTest {
 
     @Test
     public void testNullArgumentInConstructorFails() throws Exception{
-        Location loc1 = new Location (0,0, "1", "loc1");
-        Location loc2 = new Location (1,0, "2", "loc2");
+        Location loc1 = new Location (0, 0,0, "1", "loc1");
+        Location loc2 = new Location (1, 1,0, "2", "loc2");
 
         assertThatThrownBy(() -> {
             Path p1 = new Path (null, loc1, new ArrayList<>());
@@ -41,8 +41,8 @@ public class PathUnitTest {
 
     @Test
     public void testBadUserFails() throws Exception{
-        Location locA = new Location(0,0, "0", "locA");
-        Location locB = new Location(0,1, "1", "locB");
+        Location locA = new Location(0, 0,0, "0", "locA");
+        Location locB = new Location(1, 0,1, "1", "locB");
         List<User> users = new ArrayList<>();
 
         users.add(null);
@@ -55,8 +55,8 @@ public class PathUnitTest {
 
     @Test
     public void testNoUserFails() throws Exception{
-        Location locA = new Location(0,0, "0", "locA");
-        Location locB = new Location(0,1, "1", "locB");
+        Location locA = new Location(0, 0,0, "0", "locA");
+        Location locB = new Location(1, 0,1, "1", "locB");
         List<User> users = new ArrayList<>();
 
         assertThatThrownBy(() -> {
@@ -66,9 +66,9 @@ public class PathUnitTest {
 
     @Test
     public void testEqualsAndHashCode(){
-        Location a = new Location(0,0,"0","0");
-        Location b = new Location(0,1,"0","1");
-        Location c = new Location(1,0,"0","2");
+        Location a = new Location(0, 0,0,"0","0");
+        Location b = new Location(1, 0,1,"0","1");
+        Location c = new Location(2, 1,0,"0","2");
 
         List<User> allUsers = new ArrayList<>(Arrays.asList(User.STUDENT, User.DISABLED_STUDENT, User.STAFF, User.DISABLED_STAFF));
         List<User> onlyStaff = new ArrayList<>(Arrays.asList(User.DISABLED_STAFF, User.STAFF));

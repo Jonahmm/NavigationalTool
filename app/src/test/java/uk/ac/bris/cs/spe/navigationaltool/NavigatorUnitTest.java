@@ -31,9 +31,9 @@ public class NavigatorUnitTest {
         List<User> allUsers = new ArrayList<>(Arrays.asList(User.STUDENT, User.DISABLED_STUDENT, User.STAFF, User.DISABLED_STAFF));
         Navigator nav = new DijkstraNavigator();
 
-        Location a = new Location(0,0, "0", "a");
-        Location b = new Location(0,1, "0", "b");
-        Location c = new Location(1,0, "0", "c");
+        Location a = new Location(0, 0,0, "0", "a");
+        Location b = new Location(1, 0,1, "0", "b");
+        Location c = new Location(2, 1,0, "0", "c");
 
         Path p1 = new Path (a, b, allUsers);
         Path p2 = new Path (b, c, allUsers);
@@ -54,10 +54,10 @@ public class NavigatorUnitTest {
         List<User> notDisabled = new ArrayList<>(Arrays.asList(User.STUDENT, User.STAFF));
         Navigator nav = new DijkstraNavigator();
 
-        Location a = new Location(0,0, "0", "a");
-        Location b = new Location(0,1, "0", "b");
-        Location c = new Location(1,0, "0", "c");
-        Location d = new Location(2,0, "0", "d");
+        Location a = new Location(0, 0,0, "0", "a");
+        Location b = new Location(1, 0,1, "0", "b");
+        Location c = new Location(2, 1,0, "0", "c");
+        Location d = new Location(3, 2,0, "0", "d");
 
         Path p1 = new Path (a, b, notDisabled); // disabled not allowed
         Path p2 = new Path (b, c, notDisabled); // disabled not allowed
@@ -80,9 +80,9 @@ public class NavigatorUnitTest {
         Graph graph = new Graph();
         Navigator nav = new DijkstraNavigator();
 
-        Location a = new Location(0,0, "0", "a");
-        Location b = new Location(0,1, "0", "b");
-        Location c = new Location(1,0, "0", "c");
+        Location a = new Location(0, 0,0, "0", "a");
+        Location b = new Location(1, 0,1, "0", "b");
+        Location c = new Location(2, 1,0, "0", "c");
 
         Path p1 = new Path(a, b, new ArrayList<>(Arrays.asList(User.STAFF,User.DISABLED_STAFF)));
         Path p2 = new Path(b, c, new ArrayList<>(Arrays.asList(User.STAFF)));

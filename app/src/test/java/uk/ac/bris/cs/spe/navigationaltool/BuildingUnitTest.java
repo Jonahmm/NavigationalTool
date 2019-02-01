@@ -39,10 +39,10 @@ public class BuildingUnitTest {
         Building building = new Building ("test/goodTest", new BreadthFirstNavigator(), d.getApplicationContext());
         Graph g = building.getGraph();
 
-        Location locA = new Location(0, 0,"Ground Floor","locA", "Location A");
-        Location locB = new Location(0,1,"First Floor","locB", "Location B");
-        Location locC = new Location(2, 3,"Second Floor","locC", "Location C");
-        Location locD = new Location(4, 1,"Basement","locD", "Location D");
+        Location locA = new Location(0, 0, 0,"Ground Floor","locA", "Location A");
+        Location locB = new Location(1, 0,1,"First Floor","locB", "Location B");
+        Location locC = new Location(2, 2, 3,"Second Floor","locC", "Location C");
+        Location locD = new Location(3, 4, 1,"Basement","locD", "Location D");
 
         assertThat(g.getLocationByCode("locA").equals(locA)).isTrue();
         assertThat(g.getLocationByCode("locB").equals(locB)).isTrue();
@@ -55,10 +55,10 @@ public class BuildingUnitTest {
         Building building = new Building ("test/goodTest", new BreadthFirstNavigator(), d.getApplicationContext());
         Graph g = building.getGraph();
 
-        Location locA = new Location(0, 0,"Ground Floor","locA", "Location A");
-        Location locB = new Location(0,1,"First Floor","locB", "Location B");
-        Location locC = new Location(2, 3,"Second Floor","locC", "Location C");
-        Location locD = new Location(4, 1,"Basement","locD", "Location D");
+        Location locA = new Location(0, 0, 0,"Ground Floor","locA", "Location A");
+        Location locB = new Location(1, 0,1,"First Floor","locB", "Location B");
+        Location locC = new Location(2, 2, 3,"Second Floor","locC", "Location C");
+        Location locD = new Location(3, 4, 1,"Basement","locD", "Location D");
 
         Path p1 = new Path (locA, locB, notDisabled);
         Path p2 = new Path (locB, locC, onlyStaff);
