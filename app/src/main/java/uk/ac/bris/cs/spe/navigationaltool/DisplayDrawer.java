@@ -644,9 +644,9 @@ public class DisplayDrawer extends AppCompatActivity
 
         Matrix m = new Matrix();
         mapView.getDisplayMatrix(m);
-        float[] pts = {l.getX(), l.getY()};
+        float[] pts = {l.getX() * fct, l.getY() * fct};
         m.mapPoints(pts);
-        mapView.setScale(4, pts[0] -200, pts[1]-250, false);
+        mapView.setScale(4, pts[0], pts[1], false);
 
         selectedLocation = l;
     }
