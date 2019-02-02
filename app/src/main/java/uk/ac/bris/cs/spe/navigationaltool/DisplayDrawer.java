@@ -139,18 +139,6 @@ public class DisplayDrawer extends AppCompatActivity
 
 
     /**
-     * Initialises the options menu
-     * @param menu The menu to inflate
-     * @return idk, see {@link android.support.v7.app.AppCompatActivity#onCreateOptionsMenu(Menu)}
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.display_drawer, menu);
-        return true;
-    }
-
-    /**
      * Initialise and populate the activity. Further details are in code comments
      */
     @Override
@@ -198,6 +186,18 @@ public class DisplayDrawer extends AppCompatActivity
         mapView.setMinimumScale(MAP_MIN_SCALE);
         /* The above doesn't seem to actually update the view, it waits until you interact with it,
            which is *really* annoying */
+    }
+
+    /**
+     * Initialises the options menu
+     * @param menu The menu to inflate
+     * @return idk, see {@link android.support.v7.app.AppCompatActivity#onCreateOptionsMenu(Menu)}
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.display_drawer, menu);
+        return true;
     }
 
     /**
@@ -617,7 +617,7 @@ public class DisplayDrawer extends AppCompatActivity
     }
 
     /**
-     * Marks and zooms in on a location on the map
+     * Marks and zooms in on a location on the map, and sets it to be the selected location
      * @param l The location to be shown
      */
     private void showLocation(Location l) {
@@ -817,7 +817,7 @@ public class DisplayDrawer extends AppCompatActivity
      *---------*/
 
     /**
-     * Used by @link doNavigation() to find the best route
+     * Used by {@link #doNavigation()} to find the best route
      * @param p A list of paths
      * @return The sum of the weights of all paths in p
      */
