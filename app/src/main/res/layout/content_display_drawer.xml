@@ -142,7 +142,6 @@
                 android:text="@string/click_to_edit"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                app:layout_constraintBaseline_toBaselineOf="@+id/navigation_src_btn"
                 app:layout_constraintLeft_toRightOf="@+id/textView3"
                 app:layout_constraintTop_toBottomOf="@+id/navigation_title" />
 
