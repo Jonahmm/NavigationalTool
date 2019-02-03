@@ -67,24 +67,23 @@ public class DisplayDrawer extends AppCompatActivity
      * The map on screen. Kept global to avoid a lot of {@link #findViewById(int)} calls
      */
     PhotoView mapView;
-    /**
-     * The original image of the map. Doesn't change once set.
-     */
-    Bitmap map;
 
+    /**
+     * The original bitmaps for each floor
+     */
     Map<String, Bitmap> maps = new ArrayMap<>();
+    /**
+     * Editable bitmaps for each floor
+     */
     Map<String, Bitmap> bufs = new ArrayMap<>();
+    /**
+     * Canvas for drawing to each floor
+     */
     Map<String, Canvas> canv = new ArrayMap<>();
+    /**
+     * Keeps track of which floor is displayed
+     */
     String currentFloor;
-
-    /**
-     * The buffer image kept in memory that we draw onto
-     */
-    Bitmap buf;
-    /**
-     * For drawing onto the buffer
-     */
-    Canvas canvas;
 
     /**
      * The value st x * fct = y where x is a location and y is that of its representation on the map
@@ -281,11 +280,11 @@ public class DisplayDrawer extends AppCompatActivity
                     }
 
 
-                    canvas.drawCircle(from.getX() * fct, from.getY() * fct, 10, originPaint);
+                    canv.get(currentFloor).drawCircle(from.getX() * fct, from.getY() * fct, 10, originPaint);
                     for (Path p : paths) {
                         drawPathToBuffer(p.locA.getLocation(), p.locB.getLocation());
                     }
-                    canvas.drawCircle(to.getX() * fct, to.getY() * fct, 10, destPaint);
+                    canv.get(currentFloor).drawCircle(to.getX() * fct, to.getY() * fct, 10, destPaint);
                     showFloorBuffer(currentFloor);
                 }
                 catch (IllegalArgumentException e) {
