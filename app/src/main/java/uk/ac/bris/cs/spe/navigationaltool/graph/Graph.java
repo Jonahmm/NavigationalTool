@@ -1,5 +1,7 @@
 package uk.ac.bris.cs.spe.navigationaltool.graph;
 
+import android.util.ArraySet;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -16,7 +18,7 @@ public class Graph {
         if(graph.containsKey(n)) throw new IllegalArgumentException("Cannot add node that is already in the graph");
 
         if(graph.keySet().stream().anyMatch(n2 -> n2.getId() == n.getId()))
-            throw new IllegalArgumentException("Another node with the same code already exists in the graph");
+            throw new IllegalArgumentException("Another node with the same ID already exists in the graph");
 
         //Commented for testing before we have x, y recorded
         if(graph.keySet().stream().anyMatch(n2 -> (n2.x == n.x) && (n2.y == n.y)))
@@ -83,4 +85,9 @@ public class Graph {
         return graph.keySet();
     }
 
+    public Set<Path> getAllPaths() {
+        Set<Path> paths = new ArraySet<>();
+        graph.values().forEach(paths::addAll);
+        return paths.stream().distinct().collect(Collectors.toSet());
+    }
 }
