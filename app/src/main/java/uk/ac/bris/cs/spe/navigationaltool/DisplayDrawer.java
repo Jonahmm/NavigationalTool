@@ -59,7 +59,7 @@ public class DisplayDrawer extends AppCompatActivity
     /**
      * The scale st the map's width == screen width (should be set depending on AR, but this works for 16:9)
      */
-    private static final float MAP_MIN_SCALE = 1.25f;
+    protected static final float MAP_MIN_SCALE = 1.25f;
     /**
      * The distance (in px) that locations should be < to a screen tap in order to be selected
      */
@@ -68,29 +68,7 @@ public class DisplayDrawer extends AppCompatActivity
     /**
      * The map on screen. Kept global to avoid a lot of {@link #findViewById(int)} calls
      */
-    PhotoView mapView;
-
-    /**
-     * The original bitmaps for each floor
-     */
-    Map<String, Bitmap> maps = new ArrayMap<>();
-    /**
-     * Editable bitmaps for each floor
-     */
-    Map<String, Bitmap> bufs = new ArrayMap<>();
-    /**
-     * Canvas for drawing to each floor
-     */
-    Map<String, Canvas> canv = new ArrayMap<>();
-    /**
-     * Keeps track of which floor is displayed
-     */
-    String currentFloor;
-
-    /**
-     * The value st x * fct = y where x is a location and y is that of its representation on the map
-     */
-    float fct;
+    MapView mapView;
 
     /**
      * Used for old system.
@@ -194,10 +172,9 @@ public class DisplayDrawer extends AppCompatActivity
         loadMaps();
 
         setListeners();
-        fct = (float) maps.get(currentFloor).getWidth() / getResources().getInteger(R.integer.map_width);
         initPaints();
 
-        showFloorBuffer(currentFloor);
+        mapView.showFloorBuffer(mapView.currentFloor);
 
     }
 
@@ -208,20 +185,21 @@ public class DisplayDrawer extends AppCompatActivity
      * {@link #getImageResourceFromCode(String)} makes this easily swappable.
      */
     private void loadMaps() {
+        mapView = findViewById(R.id.mapviewer);
+
         Resources r = getResources();
         for (String s : building.getFloorMap().keySet()) {
             Bitmap m = BitmapFactory.decodeResource(r, getImageResourceFromCode(s));
-            maps.put(s, m);
+            mapView.maps.put(s, m);
             m = m.copy(m.getConfig(), true);
-            bufs.put(s, m);
-            canv.put(s, new Canvas(m));
+            mapView.bufs.put(s, m);
+            mapView.canv.put(s, new Canvas(m));
         }
 
-        currentFloor = building.getDefaultFloor();
         //Initialise image
 
-        mapView = findViewById(R.id.mapviewer);
-        mapView.setImageBitmap(maps.get(currentFloor));
+        mapView.setFloor(building.getDefaultFloor());
+        mapView.updateFCT();
         mapView.setMaximumScale(12f);
 
         mapView.setMinimumScale(MAP_MIN_SCALE);
@@ -249,7 +227,7 @@ public class DisplayDrawer extends AppCompatActivity
     void setListeners() {
         //For testing, draws all paths on screen
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> showFloorBuffer(currentFloor.equals("0") ? "b" : "0"));
+        fab.setOnClickListener(view -> mapView.showFloorBuffer(mapView.currentFloor.equals("0") ? "b" : "0"));
 
         //Used by old system. BAD.
         ImageButton navBtn = findViewById(R.id.navButton);
@@ -524,11 +502,11 @@ public class DisplayDrawer extends AppCompatActivity
             }
         }
         if(from != null) {
-            getFloors(paths).forEach(this::refreshBuffer);
-            drawPathListToBuffer(paths);
-            dotLocation(from, originPaint);
-            dotLocation(to, destPaint);
-            showFloorBuffer(from.getFloor());
+            getFloors(paths).forEach(mapView::refreshBuffer);
+            mapView.drawPathListToBuffer(paths, pathPaint);
+            mapView.dotLocation(from, originPaint);
+            mapView.dotLocation(to, destPaint);
+            mapView.showFloorBuffer(from.getFloor());
         } else alertMsg(getString(R.string.navigation_failure));
     }
 
@@ -549,7 +527,7 @@ public class DisplayDrawer extends AppCompatActivity
         final float yy = y * getResources().getInteger(R.integer.map_height);
 
         Map<Location, Double> memo = new ArrayMap<>();
-        building.getGraph().getAllLocations().stream().filter(l -> l.floor.equals(currentFloor))
+        building.getGraph().getAllLocations().stream().filter(l -> l.floor.equals(mapView.currentFloor))
                 .forEach(l -> memo.put(l,absDist(l,xx,yy)));
         Optional<Location> ol = memo.keySet().parallelStream().filter(l -> memo.get(l) < NEAR_DISTANCE)
                 .reduce((a,b) -> memo.get(a) < memo.get(b) ? a : b);
@@ -591,9 +569,9 @@ public class DisplayDrawer extends AppCompatActivity
             navigationSrc = null;
             navigationDst = null;
             selecting = Selecting.SELECTION;
-            refreshBuffer(currentFloor);
+            mapView.refreshBuffer(mapView.currentFloor);
             bottomBarHide();
-            showFloorBuffer(currentFloor);
+            mapView.showFloorBuffer(mapView.currentFloor);
         }
 
     }
@@ -619,14 +597,14 @@ public class DisplayDrawer extends AppCompatActivity
         }
 
 
-        refreshBuffer(l.getFloor());
-        dotLocation(l, selectPaint);
-        drawLocToBuffer(l);
-        showFloorBuffer(l.getFloor());
+        mapView.refreshBuffer(l.getFloor());
+        mapView.dotLocation(l, selectPaint);
+        mapView.drawLocToBuffer(l);
+        mapView.showFloorBuffer(l.getFloor());
 
         Matrix m = new Matrix();
         mapView.getDisplayMatrix(m);
-        float[] pts = {l.getX() * fct, l.getY() * fct};
+        float[] pts = {l.getX() * mapView.fct, l.getY() * mapView.fct};
         m.mapPoints(pts);
         mapView.setScale(4, pts[0], pts[1], false);
 
@@ -710,103 +688,6 @@ public class DisplayDrawer extends AppCompatActivity
         c.applyTo(nv);
     }
 
-    /*----------*
-     * GRAPHICS *
-     *----------*/
-
-    /**
-     * Draws a 40px-diameter dot on the buffer at the given Location
-     * @param l The Location giving the point to draw at
-     * @param paint The paint to use for the dot
-     */
-    private void dotLocation(Location l, Paint paint) {
-        canv.get(l.getFloor()).drawCircle(l.getX() * fct, l.getY() * fct, 20, paint);
-    }
-
-    /**
-     * Highlights a location on the map using concentric circles
-     * @deprecated since introduction of selection system
-     * @param l
-     */
-    void highlightLocation(Location l) {
-        refreshBuffer(l.getFloor());
-        for (int i : highlightIntervals) canv.get(l.getFloor()).drawCircle(l.x * fct, l.y * fct, i, highlightPaint);
-        showFloorBuffer(l.getFloor());
-    }
-
-    /**
-     * Draws a path between two Points on the buffer. Uses the value of fct to scale the given
-     * points to their counterparts on the map
-     * @param p1
-     * @param p2
-     */
-    private void drawPathToBuffer(Point p1, Point p2) {
-        canv.get(currentFloor).drawLine(p1.x * fct, p1.y * fct, p2.x * fct, p2.y * fct, pathPaint);
-    }
-
-    private void drawPathToBuffer(Path p) {
-        canv.get(p.getLocA().getFloor()).drawLine(p.getLocA().getX() * fct, p.getLocA().getY() * fct,
-                p.getLocB().getX() * fct, p.getLocB().getY() * fct, pathPaint);
-        if (p.isTransFloor()) {
-            //Draw it to the floor of B too
-            canv.get(p.getLocB().getFloor()).drawLine(p.getLocA().getX() * fct, p.getLocA().getY() * fct,
-                    p.getLocB().getX() * fct, p.getLocB().getY() * fct, pathPaint);
-        }
-    }
-
-    /**
-     * guess
-     * @param text
-     * @param loc
-     */
-    private void drawTextToBuffer(String floor, String text, Point loc) {
-        //TODO Extract this paint
-        Paint p = new Paint();
-        p.setColor(Color.BLACK); p.setTextSize(20); p.setAntiAlias(true);
-        canv.get(floor).drawText(text, (float) (loc.x - (p.getTextSize() * text.length() * 0.4)) * fct,
-                (loc.y - (p.getTextSize() / 2)) * fct, p);
-    }
-
-    /**
-     * Uses {@link #drawTextToBuffer(String, String, Point)} to write either code + name or just code
-     * @param l
-     */
-    private void drawLocToBuffer(Location l) {
-        drawTextToBuffer(l.getFloor(), l.hasName() ? l.getCode() + ", " + l.getName() : l.getCode(), l.getLocation());
-    }
-
-    /**
-     * Like {@link #drawPathToBuffer(Point, Point)} but lots
-     * @param paths The list of paths to draw
-     */
-    private void drawPathListToBuffer(List<Path> paths) {
-        for (Path p : paths) {
-            drawPathToBuffer(p);
-        }
-    }
-
-    /**
-     * Replaces the map on screen with the buffer from memory
-     */
-    private void showFloorBuffer(String floor) {
-        mapView.setImageBitmap(bufs.get(floor).copy(bufs.get(floor).getConfig(), false));
-        mapView.setScale(MAP_MIN_SCALE);
-        currentFloor = floor;
-        TextView tv = findViewById(R.id.floor_name);
-        tv.setText(building.getFloorMap().getOrDefault(currentFloor, "ERROR"));
-    }
-
-    /**
-     * Resets the image buffer to be identical to map. Recalculates fct because… not sure. That
-     * could probably be done only once in onCreate tbh but it's not the expensive part of this
-     * method.
-     */
-    private void refreshBuffer(String floor) {
-        bufs.replace(floor, maps.get(floor).copy(maps.get(floor).getConfig(), true));
-        canv.replace(floor, new Canvas(bufs.get(floor)));
-        fct = (float) maps.get(floor).getWidth() / getResources().getInteger(R.integer.map_width);
-    }
-
     /*---------*
      * HELPERS *
      *---------*/
@@ -859,12 +740,11 @@ public class DisplayDrawer extends AppCompatActivity
      */
     private void navigate(Location from, Location to) {
         try {
-            refreshBuffer(from.getFloor());
-            drawPathListToBuffer(
-            building.getNavigator().navigate(from, to, building.getGraph(), getUserFromParams(access, disabl)));
-            dotLocation(from, originPaint);
-            dotLocation(to, destPaint);
-            showFloorBuffer(from.getFloor());
+            mapView.refreshBuffer(from.getFloor());
+            mapView.drawPathListToBuffer(building.getNavigator().navigate(from, to, building.getGraph(), getUserFromParams(access, disabl)), pathPaint);
+            mapView.dotLocation(from, originPaint);
+            mapView.dotLocation(to, destPaint);
+            mapView.showFloorBuffer(from.getFloor());
         } catch (IllegalArgumentException e) {
             alertMsg("No path found for specified access level");
         }

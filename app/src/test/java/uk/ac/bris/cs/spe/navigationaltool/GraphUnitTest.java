@@ -95,7 +95,7 @@ public class GraphUnitTest {
     public void testNoDuplicateLocationCodes() throws Exception{
         Graph g = new Graph();
         Location locA1 = new Location (0, 0, 0, "0", "locA");
-        Location locA2 = new Location (1, 0, 1, "0", "locA");
+        Location locA2 = new Location (0, 0, 1, "0", "locA");
 
         assertThatThrownBy(() -> {
             g.addLocation(locA1);
