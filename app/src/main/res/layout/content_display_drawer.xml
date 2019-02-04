@@ -9,6 +9,15 @@
     tools:context=".DisplayDrawer"
     tools:showIn="@layout/app_bar_display_drawer">
 
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_search"
+        android:text="search"
+        tools:layout_editor_absoluteX="282dp"
+        tools:layout_editor_absoluteY="0dp" />
+
     <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/mapviewer"
         android:layout_width="match_parent"
@@ -27,6 +36,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent">
+
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/selected_details"

@@ -1,5 +1,6 @@
 package uk.ac.bris.cs.spe.navigationaltool;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -133,6 +134,8 @@ public class DisplayDrawer extends AppCompatActivity
 
     private Paint pathPaint, highlightPaint, originPaint, destPaint, selectPaint;
 
+    private Button search_button;
+
     /*----------------*
      * INITIALISATION *
      *----------------*/
@@ -181,6 +184,14 @@ public class DisplayDrawer extends AppCompatActivity
 
         //Allows updating access requirements from menu
         navigationView.setNavigationItemSelectedListener(this);
+
+        search_button = findViewById(R.id.button);
+        search_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openSearchScreen();
+            }
+        });
 
         loadBuilding();
 
@@ -899,5 +910,10 @@ public class DisplayDrawer extends AppCompatActivity
             case 4: return R.id.item_staff;
             default: return R.id.item_ug;
         }
+    }
+
+    public void openSearchScreen(){
+        Intent intent = new Intent(this,Search.class);
+        startActivity(intent);
     }
 }
