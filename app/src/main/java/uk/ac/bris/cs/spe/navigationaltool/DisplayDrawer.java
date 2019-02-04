@@ -925,9 +925,7 @@ public class DisplayDrawer extends AppCompatActivity
     private int idToInt(int id) {
         switch (id) {
             case R.id.item_ug:    return 1;
-            case R.id.item_pg:    return 2;
-            case R.id.item_phd:   return 3;
-            case R.id.item_staff: return 4;
+            case R.id.item_staff: return 2;
             default: return 1;
         }
     }
@@ -940,9 +938,7 @@ public class DisplayDrawer extends AppCompatActivity
     private int intToId(int in) {
         switch (in) {
             case 1: return R.id.item_ug;
-            case 2: return R.id.item_pg;
-            case 3: return R.id.item_phd;
-            case 4: return R.id.item_staff;
+            case 2: return R.id.item_staff;
             default: return R.id.item_ug;
         }
     }
