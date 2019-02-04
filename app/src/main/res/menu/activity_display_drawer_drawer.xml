@@ -14,12 +14,6 @@
             android:id="@+id/item_ug"
             android:title="@string/undergrad_student" />
         <item
-            android:id="@+id/item_pg"
-            android:title="@string/postgrad_student" />
-        <item
-            android:id="@+id/item_phd"
-            android:title="@string/phd_student" />
-        <item
             android:id="@+id/item_staff"
             android:title="@string/staff_member" />
     </group>

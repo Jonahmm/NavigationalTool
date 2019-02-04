@@ -10,6 +10,7 @@ import static java.util.Objects.requireNonNull;
 
 public class Path {
 
+    private static final int TRANS_FLOOR_DIST = 10000;
     public final Location locA;
     public final Location locB;
 
@@ -53,7 +54,14 @@ public class Path {
         return users.contains(user);
     }
 
+    public boolean isTransFloor() { return !locA.getFloor().equals(locB.getFloor());}
+
+    public boolean isOnFloor(String s) {
+        return s.equals(locA.getFloor()) || s.equals(locB.getFloor());
+    }
+
     public int getLength(){
+        if (isTransFloor()) return TRANS_FLOOR_DIST;
         return length;
     }
 

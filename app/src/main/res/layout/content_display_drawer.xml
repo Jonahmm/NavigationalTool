@@ -25,6 +25,21 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/floor_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="@drawable/rounded_rect"
+        android:paddingStart="8dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="2dp"
+        android:text="Floor"
+        android:textColor="@android:color/white"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <android.support.constraint.ConstraintLayout
         android:id="@+id/bottom_box"
         android:layout_width="match_parent"
@@ -137,7 +152,6 @@
                 android:text="@string/click_to_edit"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                app:layout_constraintBaseline_toBaselineOf="@+id/navigation_src_btn"
                 app:layout_constraintLeft_toRightOf="@+id/textView3"
                 app:layout_constraintTop_toBottomOf="@+id/navigation_title" />
 

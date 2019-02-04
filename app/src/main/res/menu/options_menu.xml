@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+
+
+        <item android:id="@+id/search_origin"
+            android:title="@string/search_title"
+            android:icon="@drawable/ic_search"
+            app:showAsAction="collapseActionView|ifRoom"
+            app:actionViewClass="android.widget.SearchView" />
+
+        <!--
+        <SearchView android:id="@+id/search_destination"
+            android:title="@string/search_title"
+            android:icon="@drawable/ic_search"
+            app:showAsAction="collapseActionView|ifRoom"
+            app:actionViewClass="android.widget.SearchView" />
+        -->
+
+        <ImageButton
+            android:id="@+id/navButton"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="@color/colorPrimary"
+            app:srcCompat="@drawable/ic_navigate" />
+
+
+
+</menu>

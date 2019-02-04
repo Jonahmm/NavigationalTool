@@ -1,0 +1,10 @@
+#Name
+H.H. Wills Physics Laboratory
+#Floor definitions. * denotes default.
+b,Basement
+*0,Ground Floor
+#1,First Floor
+#M,Mezzanine
+#2,Second Floor
+#3,Third Floor
+#4,Fourth Floor
