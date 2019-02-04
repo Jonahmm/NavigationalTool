@@ -71,12 +71,6 @@ public class DisplayDrawer extends AppCompatActivity
     MapView mapView;
 
     /**
-     * Used for old system.
-     * @see #highlightLocation(Location)
-     */
-    int highlightIntervals[] = {30,90,180};
-
-    /**
      * The building object to be worked on. Loaded using {@link #loadBuilding()}
      */
     private Building building;
@@ -118,8 +112,6 @@ public class DisplayDrawer extends AppCompatActivity
      * Defines the current state of the program
      */
     private Selecting selecting = Selecting.SELECTION;
-
-    private Paint pathPaint, highlightPaint, originPaint, destPaint, selectPaint;
 
     private Button search_button;
 
@@ -172,9 +164,8 @@ public class DisplayDrawer extends AppCompatActivity
         loadMaps();
 
         setListeners();
-        initPaints();
 
-        mapView.showFloorBuffer(mapView.currentFloor);
+       // mapView.showFloorBuffer(mapView.currentFloor);
 
     }
 
@@ -198,7 +189,7 @@ public class DisplayDrawer extends AppCompatActivity
 
         //Initialise image
 
-        mapView.setFloor(building.getDefaultFloor());
+        mapView.setFloor(building.getDefaultFloor(), false);
         mapView.updateFCT();
         mapView.setMaximumScale(12f);
 
@@ -225,9 +216,9 @@ public class DisplayDrawer extends AppCompatActivity
      * that respond to events)
      */
     void setListeners() {
-        //For testing, draws all paths on screen
+        //For testing, swaps between ground floor and basement.
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> mapView.showFloorBuffer(mapView.currentFloor.equals("0") ? "b" : "0"));
+        fab.setOnClickListener(view -> mapView.setFloor(mapView.currentFloor.equals("0") ? "b" : "0",false));
 
         //Used by old system. BAD.
         ImageButton navBtn = findViewById(R.id.navButton);
@@ -260,28 +251,6 @@ public class DisplayDrawer extends AppCompatActivity
         navs.setOnClickListener(e -> startNavSelect(navs));
         Button navd = findViewById(R.id.navigation_dst_btn);
         navd.setOnClickListener(e -> startNavSelect(navd));
-    }
-
-    /**
-     * Loads the paints (used by the canvas) that draw various graphics to the screen, done here to
-     * avoid creating a new Paint every time we draw something
-     */
-    private void initPaints() {
-        pathPaint = new Paint();
-        pathPaint.setColor(Color.RED); pathPaint.setAntiAlias(true); pathPaint.setStrokeWidth(10);
-        pathPaint.setStrokeCap(Paint.Cap.ROUND);
-
-        highlightPaint = new Paint();
-        highlightPaint.setColor(Color.CYAN); highlightPaint.setAntiAlias(true);
-        highlightPaint.setStrokeWidth(4); highlightPaint.setStyle(Paint.Style.STROKE);
-
-        originPaint = new Paint();
-        originPaint.setColor(Color.BLUE); originPaint.setAntiAlias(true);
-
-        destPaint = new Paint(originPaint); destPaint.setColor(Color.GREEN);
-        selectPaint = new Paint(originPaint); selectPaint.setColor(Color.RED);
-        selectPaint.setAlpha(192);
-
     }
 
     /**
@@ -483,7 +452,7 @@ public class DisplayDrawer extends AppCompatActivity
      * Uses the Navigator to compute the path between all pairs of nodes x,y, where the codes of x
      * and y match those of navigationSrc and navigationDst respectively, then selects the path with the lowest
      * total weight using {@link #weight(List)}. It draws this route to the buffer using
-     * {@link #drawPathListToBuffer(List)}, places dots at the start and end of the route, then
+     * {@link MapView#drawPathListToBuffer(List, Paint)}, places dots at the start and end of the route, then
      * shows the buffer.
      */
     private void doNavigation() {
@@ -502,11 +471,7 @@ public class DisplayDrawer extends AppCompatActivity
             }
         }
         if(from != null) {
-            getFloors(paths).forEach(mapView::refreshBuffer);
-            mapView.drawPathListToBuffer(paths, pathPaint);
-            mapView.dotLocation(from, originPaint);
-            mapView.dotLocation(to, destPaint);
-            mapView.showFloorBuffer(from.getFloor());
+            mapView.drawRoute(from, to, paths);
         } else alertMsg(getString(R.string.navigation_failure));
     }
 
@@ -569,9 +534,10 @@ public class DisplayDrawer extends AppCompatActivity
             navigationSrc = null;
             navigationDst = null;
             selecting = Selecting.SELECTION;
-            mapView.refreshBuffer(mapView.currentFloor);
+      //      mapView.refreshBuffer(mapView.currentFloor);
             bottomBarHide();
-            mapView.showFloorBuffer(mapView.currentFloor);
+      //      mapView.showFloorBuffer(mapView.currentFloor);
+            mapView.setFloor(mapView.currentFloor, true);
         }
 
     }
@@ -596,11 +562,7 @@ public class DisplayDrawer extends AppCompatActivity
             tv.setVisibility(View.VISIBLE);
         }
 
-
-        mapView.refreshBuffer(l.getFloor());
-        mapView.dotLocation(l, selectPaint);
-        mapView.drawLocToBuffer(l);
-        mapView.showFloorBuffer(l.getFloor());
+        mapView.drawLocation(l);
 
         Matrix m = new Matrix();
         mapView.getDisplayMatrix(m);
@@ -702,16 +664,6 @@ public class DisplayDrawer extends AppCompatActivity
         return p.stream().reduce(0, (d,e) -> d + e.getLength(), Integer::sum);
     }
 
-    private Set<String> getFloors(List<Path> paths) {
-        Set<String> fs = new ArraySet<String>();
-
-        paths.forEach(p -> {
-            fs.add(p.getLocA().getFloor());
-            fs.add(p.getLocB().getFloor());
-        });
-        return fs.stream().distinct().collect(Collectors.toSet());
-    }
-
     /**
      * Gets a User object from access requirements
      */
@@ -731,23 +683,6 @@ public class DisplayDrawer extends AppCompatActivity
      */
     private double absDist(Location l, float x, float y) {
         return Math.sqrt(Math.pow(l.getX() - x, 2) + Math.pow(l.getY() - y, 2));
-    }
-
-    /**
-     * @deprecated used by old system
-     * @param from The source location
-     * @param to The destination location
-     */
-    private void navigate(Location from, Location to) {
-        try {
-            mapView.refreshBuffer(from.getFloor());
-            mapView.drawPathListToBuffer(building.getNavigator().navigate(from, to, building.getGraph(), getUserFromParams(access, disabl)), pathPaint);
-            mapView.dotLocation(from, originPaint);
-            mapView.dotLocation(to, destPaint);
-            mapView.showFloorBuffer(from.getFloor());
-        } catch (IllegalArgumentException e) {
-            alertMsg("No path found for specified access level");
-        }
     }
 
     /**
