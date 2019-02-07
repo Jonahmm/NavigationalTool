@@ -113,7 +113,6 @@ public class DisplayDrawer extends AppCompatActivity
      */
     private Selecting selecting = Selecting.SELECTION;
 
-    private Button search_button;
 
     /*----------------*
      * INITIALISATION *
@@ -152,13 +151,7 @@ public class DisplayDrawer extends AppCompatActivity
         //Allows updating access requirements from menu
         navigationView.setNavigationItemSelectedListener(this);
 
-        search_button = findViewById(R.id.button);
-        search_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openSearchScreen();
-            }
-        });
+
 
         loadBuilding();
         loadMaps();
@@ -307,14 +300,8 @@ public class DisplayDrawer extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.show_search) {
-            srchShown = !srchShown;
-
-//            LinearLayout searches = findViewById(R.id.searches);
-//            searches.setVisibility(srchShown ? View.VISIBLE : View.GONE);
-//            item.setIcon(srchShown ? R.drawable.ic_collapse : R.drawable.ic_search);
-
+            openSearchScreen();
             return true;
         }
 

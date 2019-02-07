@@ -3,13 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-
-
-        <item android:id="@+id/search_origin"
-            android:title="@string/search_title"
+        <item
+            android:id="@+id/search_origin"
             android:icon="@drawable/ic_search"
-            app:showAsAction="collapseActionView|ifRoom"
-            app:actionViewClass="android.widget.SearchView" />
+            android:title="@string/search_title"
+            app:actionViewClass="android.widget.SearchView"
+            app:showAsAction="never|ifRoom" />
 
         <!--
         <SearchView android:id="@+id/search_destination"

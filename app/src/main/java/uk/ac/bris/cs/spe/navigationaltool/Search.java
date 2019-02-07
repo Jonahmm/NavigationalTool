@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.View;
 import android.widget.SearchView;
 
 public class Search extends AppCompatActivity {
@@ -22,6 +23,7 @@ public class Search extends AppCompatActivity {
             String query = intent.getStringExtra(SearchManager.QUERY);
             doMySearch(query);
         }
+
     }
 
     public void doMySearch(String query){
@@ -40,9 +42,10 @@ public class Search extends AppCompatActivity {
         //SearchView searchViewDest = (SearchView) menu.findItem(R.id.search_destination).getActionView();
         // Assumes current activity is the searchable activity
         searchViewOrigin.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchViewOrigin.setIconifiedByDefault(true); // Do not iconify the widget; expand it by default
+        searchViewOrigin.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
         //searchViewDest.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
        // searchViewDest.setIconifiedByDefault(true);
+        searchViewOrigin.requestFocus();
 
         return true;
     }

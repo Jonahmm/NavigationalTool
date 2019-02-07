@@ -9,19 +9,6 @@
     tools:context=".DisplayDrawer"
     tools:showIn="@layout/app_bar_display_drawer">
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="32dp"
-        android:layout_margin="8dp"
-        android:background="@drawable/rounded_rect_btn"
-        android:drawableLeft="@drawable/ic_search"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="search"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <uk.ac.bris.cs.spe.navigationaltool.MapView
         android:id="@+id/mapviewer"
         android:layout_width="match_parent"
