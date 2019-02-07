@@ -12,10 +12,10 @@
     <string name="phd_student">PhD Student</string>
     <string name="staff_member">Staff Member</string>
     <string name="disabled_access">Disabled Access?</string>
-    <string name="i_am_a">I am a...</string>
+    <string name="i_am_a">I am a…</string>
     <string name="saved_access">ACCESS</string>
     <string name="saved_disabl">SAVEDDISAB</string>
-    <string name="search_title">Search for a location</string>
+    <string name="search_title">Search locations…</string>
     <string name="nothing_selected">Nothing Selected</string>
     <string name="selecting_text">Tap to cancel </string>
     <string name="click_to_edit">Tap to edit </string>
