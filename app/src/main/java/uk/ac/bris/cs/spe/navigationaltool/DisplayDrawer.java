@@ -6,11 +6,10 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.design.widget.FloatingActionButton;
@@ -23,30 +22,23 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.ArrayMap;
-import android.util.ArraySet;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.github.chrisbanes.photoview.OnPhotoTapListener;
-import com.github.chrisbanes.photoview.PhotoView;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
@@ -84,11 +76,6 @@ public class DisplayDrawer extends AppCompatActivity
      * True if user requires accessible route
      */
     private Boolean disabl;
-
-    /**
-     * Used for old system
-     */
-    private boolean srchShown = false;
 
     /**
      * Stores the selected location
@@ -235,9 +222,7 @@ public class DisplayDrawer extends AppCompatActivity
 
         //Button to start nav
         Button navgo = findViewById(R.id.selected_get_directions);
-        navgo.setOnClickListener(e -> {
-            startNavigationTo(selectedLocation);
-        });
+        navgo.setOnClickListener(e -> startNavigationTo(selectedLocation));
 
         //Navigation buttons
         Button navs = findViewById(R.id.navigation_src_btn);
@@ -313,7 +298,7 @@ public class DisplayDrawer extends AppCompatActivity
      * switch is not handled here as its use doesn't count as 'Selecting' a menu item
      */
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -576,7 +561,7 @@ public class DisplayDrawer extends AppCompatActivity
     }
 
     /**
-     * Inverse of {@link #bottomBarShowNavigation()}
+     * Inverse of {@link #bottomBarShowSelection()}
      */
     private void bottomBarShowNavigation() {
         ConstraintLayout botBox = findViewById(R.id.bottom_box);
