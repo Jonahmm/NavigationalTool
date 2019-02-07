@@ -18,14 +18,5 @@
             app:actionViewClass="android.widget.SearchView" />
         -->
 
-        <ImageButton
-            android:id="@+id/navButton"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            app:srcCompat="@drawable/ic_navigate" />
-
-
 
 </menu>

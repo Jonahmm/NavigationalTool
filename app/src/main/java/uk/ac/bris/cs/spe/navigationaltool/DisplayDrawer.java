@@ -211,11 +211,11 @@ public class DisplayDrawer extends AppCompatActivity
     void setListeners() {
         //For testing, swaps between ground floor and basement.
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> mapView.setFloor(mapView.currentFloor.equals("0") ? "b" : "0",false));
-
-        //Used by old system. BAD.
-        ImageButton navBtn = findViewById(R.id.navButton);
-        //Recommend hiding this atrocity with the [-] button on the left
+        fab.setOnClickListener(view -> {
+            mapView.setFloor(mapView.currentFloor.equals("0") ? "b" : "0",false);
+            TextView tv = findViewById(R.id.floor_name);
+            tv.setText(building.getFloorMap().get(mapView.currentFloor));
+        });
 
 
         //Sets up selection by tap
