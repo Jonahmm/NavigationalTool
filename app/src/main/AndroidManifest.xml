@@ -33,6 +33,11 @@
             <meta-data android:name="android.app.searchable"
                 android:resource="@xml/searchable"/>
         </activity>
+
+        <provider
+            android:name=".LocationContentProvider"
+            android:authorities="uk.ac.bris.cs.spe.navigationaltool.LocationContentProvider"
+            android:exported="false" />
     </application>
 
 </manifest>
