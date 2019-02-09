@@ -4,7 +4,7 @@
 
 
         <item
-            android:id="@+id/search_origin"
+            android:id="@+id/search"
             android:icon="@drawable/ic_search"
             android:title="@string/search_title"
             app:actionViewClass="android.widget.SearchView"

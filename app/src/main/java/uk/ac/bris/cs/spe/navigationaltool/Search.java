@@ -38,13 +38,12 @@ public class Search extends AppCompatActivity {
 
         // Get the SearchView and set the searchable configuration
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchViewOrigin = (SearchView) menu.findItem(R.id.search_origin).getActionView();
-        //SearchView searchViewDest = (SearchView) menu.findItem(R.id.search_destination).getActionView();
+        SearchView searchViewOrigin = (SearchView) menu.findItem(R.id.search).getActionView();
+
         // Assumes current activity is the searchable activity
         searchViewOrigin.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchViewOrigin.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
-        //searchViewDest.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-       // searchViewDest.setIconifiedByDefault(true);
+
         searchViewOrigin.requestFocus();
 
         return true;
