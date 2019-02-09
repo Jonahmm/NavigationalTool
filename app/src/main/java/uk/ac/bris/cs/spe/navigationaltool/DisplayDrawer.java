@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
@@ -26,9 +27,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -142,10 +145,10 @@ public class DisplayDrawer extends AppCompatActivity
 
         loadBuilding();
         loadMaps();
-
+        populateFloorsList();
         setListeners();
 
-       // mapView.showFloorBuffer(mapView.currentFloor);
+        // mapView.showFloorBuffer(mapView.currentFloor);
 
     }
 
@@ -197,11 +200,10 @@ public class DisplayDrawer extends AppCompatActivity
      */
     void setListeners() {
         //For testing, swaps between ground floor and basement.
-        FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.floor_select);
         fab.setOnClickListener(view -> {
-            mapView.setFloor(mapView.currentFloor.equals("0") ? "b" : "0",false);
-            TextView tv = findViewById(R.id.floor_name);
-            tv.setText(building.getFloorMap().get(mapView.currentFloor));
+            LinearLayout fl = findViewById(R.id.floors_box);
+            fl.setVisibility(fl.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
         });
 
 
@@ -248,6 +250,26 @@ public class DisplayDrawer extends AppCompatActivity
             Log.d("IOException: ", e.getMessage());
         } catch (IllegalArgumentException e) {
             Log.d("IllegalArgumentException: ", e.getMessage());
+        }
+    }
+
+    private void populateFloorsList() {
+        LinearLayout fl = findViewById(R.id.floors_box);
+        FloatingActionButton b;
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(0,8,0,8);
+        for (String f : building.getFloorMap().keySet()) {
+            b = new FloatingActionButton(this);
+            b.setLayoutParams(lp);
+            b.setImageDrawable(new FabTextDrawable(f.toUpperCase(), Color.WHITE));
+            b.setOnClickListener(v -> {
+                mapView.setFloor(f, false);
+                updateFloorIndicator();
+                fl.setVisibility(View.GONE);
+            });
+            b.setSize(FloatingActionButton.SIZE_MINI);
+            fl.addView(b);
         }
     }
 
@@ -372,8 +394,8 @@ public class DisplayDrawer extends AppCompatActivity
     private void startNavigationTo(Location l) {
         navigationSrc = null;
         resetNavButtons();
-        setNavigationDst(l);
         bottomBarShowNavigation();
+        setNavigationDst(l);
     }
 
     /**
@@ -615,11 +637,16 @@ public class DisplayDrawer extends AppCompatActivity
             c.connect(R.id.navigation_dst_btn, ConstraintSet.TOP, R.id.navigation_src_btn, ConstraintSet.BOTTOM);
             c.clear(R.id.navigation_dst_btn, ConstraintSet.LEFT);
         } else {
-            c.connect(R.id.navigation_dst_btn, ConstraintSet.LEFT, R.id.navigation_src_btn, ConstraintSet.RIGHT);
+            c.connect(R.id.navigation_dst_btn, ConstraintSet.LEFT, R.id.nav_txt_to, ConstraintSet.RIGHT);
             c.clear(R.id.navigation_dst_btn, ConstraintSet.TOP);
             c.connect(R.id.navigation_dst_btn, ConstraintSet.TOP, R.id.navigation_title, ConstraintSet.BOTTOM);
         }
         c.applyTo(nv);
+    }
+
+    private void updateFloorIndicator() {
+        TextView tv = findViewById(R.id.floor_name);
+        tv.setText(building.getFloorMap().get(mapView.currentFloor));
     }
 
     /*---------*

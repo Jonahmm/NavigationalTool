@@ -122,7 +122,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/navigation_title" />
 
             <TextView
-                android:id="@+id/textView3"
+                android:id="@+id/nav_txt_to"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
@@ -143,7 +143,7 @@
                 android:text="@string/click_to_edit"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                app:layout_constraintLeft_toRightOf="@+id/textView3"
+                app:layout_constraintLeft_toRightOf="@+id/nav_txt_to"
                 app:layout_constraintTop_toBottomOf="@+id/navigation_title" />
 
             <ImageButton
@@ -162,15 +162,29 @@
     </android.support.constraint.ConstraintLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/floor_select"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:clickable="true"
-        app:fabSize="mini"
+        app:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toTopOf="@+id/bottom_box"
         app:layout_constraintRight_toRightOf="parent"
         app:srcCompat="@drawable/ic_floor_vector" />
+
+    <LinearLayout
+        android:id="@+id/floors_box"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical"
+        android:padding="0dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/floor_select"
+        app:layout_constraintLeft_toLeftOf="@+id/floor_select"
+        app:layout_constraintRight_toRightOf="@+id/floor_select">
+
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

@@ -22,6 +22,6 @@
         android:checkable="false"
         android:title="@string/disabled_access"
         app:actionLayout="@layout/switch_item"
-        app:showAsAction="always" ></item>
+        app:showAsAction="always" />
 
 </menu>
