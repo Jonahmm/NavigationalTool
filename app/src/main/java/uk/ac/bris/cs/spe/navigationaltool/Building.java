@@ -43,6 +43,9 @@ public class Building {
                 context.getAssets().open(masterFileName+".building")
         ));
 
+        //gets the directory the file is in (if it's in a subfolder of assets - to support testing)
+        String directory = masterFileName.contains("/") ? masterFileName.substring(0, masterFileName.lastIndexOf('/')+1) : "";
+
         String ln;
         //Get building name
         do {
@@ -70,7 +73,7 @@ public class Building {
                 "Building should have a default floor.");
 
         //Load all floors
-        for (String f : floorNames.keySet()) loadFloor(f);
+        for (String f : floorNames.keySet()) loadFloor(directory + f);
 
         //Finally load cross-floor paths
         reader = new BufferedReader(new InputStreamReader(
