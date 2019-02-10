@@ -21,15 +21,22 @@ public class Search extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
+        setContentView(R.layout.container_list_item_view);
+        handleIntent(getIntent());
 
-        // Get the intent, verify the action and get the query
-        Intent intent = getIntent();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        setIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             doMySearch(query);
         }
-
     }
 
     public void doMySearch(String query){
@@ -39,7 +46,7 @@ public class Search extends AppCompatActivity {
                 " WHERE upper(" + DatabaseConstants.COL_LOC_NAME + ") like '%" + query.toUpperCase() + "%'", null);
         ListAdapter adapter = new SimpleCursorAdapter(this, R.layout.container_list_item_view, cursor,
                 new String[] {DatabaseConstants.COL_LOC_NAME }, new int[]{R.id.list_item});
-        ListView mainListView = (ListView) findViewById(R.id.list_item);
+        ListView mainListView = findViewById(R.id.list_item);
         mainListView.setAdapter(adapter);
     }
 
@@ -51,13 +58,13 @@ public class Search extends AppCompatActivity {
 
         // Get the SearchView and set the searchable configuration
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchViewOrigin = (SearchView) menu.findItem(R.id.search).getActionView();
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
 
         // Assumes current activity is the searchable activity
-        searchViewOrigin.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchViewOrigin.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
 
-        searchViewOrigin.requestFocus();
+        searchView.requestFocus();
 
         return true;
     }
