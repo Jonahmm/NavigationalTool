@@ -103,6 +103,8 @@ public class DisplayDrawer extends AppCompatActivity
      */
     private Selecting selecting = Selecting.SELECTION;
 
+    private SQLiteHelper _dbHelper;
+
 
     /*----------------*
      * INITIALISATION *
@@ -141,7 +143,7 @@ public class DisplayDrawer extends AppCompatActivity
         //Allows updating access requirements from menu
         navigationView.setNavigationItemSelectedListener(this);
 
-
+        _dbHelper = new SQLiteHelper(this);
 
         loadBuilding();
         loadMaps();
@@ -740,5 +742,9 @@ public class DisplayDrawer extends AppCompatActivity
     public void openSearchScreen(){
         Intent intent = new Intent(this,Search.class);
         startActivity(intent);
+    }
+
+    public SQLiteHelper getDbHelper() {
+        return _dbHelper;
     }
 }

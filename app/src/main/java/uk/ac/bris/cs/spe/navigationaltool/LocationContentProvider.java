@@ -12,11 +12,10 @@ public class LocationContentProvider extends ContentProvider {
     private static final String AUTHORITY = "uk.ac.bris.cs.spe.navigationaltool.LocationContentProvider";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
             + "/" + DatabaseConstants.TABLE_LOC);
-    private SQLiteHelper dbHelper;
+
 
     @Override
     public boolean onCreate() {
-        dbHelper = new SQLiteHelper(getContext());
         return true;
     }
 
@@ -26,7 +25,7 @@ public class LocationContentProvider extends ContentProvider {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables(DatabaseConstants.TABLE_LOC);
         String orderBy = DatabaseConstants.COL_LOC_NAME + " asc";
-        Cursor cursor = qb.query(dbHelper.getReadableDatabase(),
+        Cursor cursor = qb.query(getDbHelper().getReadableDatabase(),
                 new String[] { DatabaseConstants.COL_LOC_ID,
                         DatabaseConstants.COL_LOC_NAME }, null,
                 null, null, null, orderBy);
@@ -51,5 +50,9 @@ public class LocationContentProvider extends ContentProvider {
     public int update(Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
         return 0;
+    }
+
+    public SQLiteHelper getDbHelper() {
+        return ((DisplayDrawer)getContext()).getDbHelper();
     }
 }

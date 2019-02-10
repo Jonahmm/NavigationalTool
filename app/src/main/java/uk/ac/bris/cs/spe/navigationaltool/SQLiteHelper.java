@@ -21,6 +21,7 @@ public class SQLiteHelper extends SQLiteOpenHelper implements DatabaseConstants 
                 + " INTEGER PRIMARY KEY NOT NULL, " + " " + COL_LOC_NAME
                 + " VARCHAR(50) NOT NULL);");
         insertLocation(db, "Powell");
+        insertLocation(db, "G.12 Mott Lecture Theatre");
     }
 
     private static void insertLocation(SQLiteDatabase db, String location) {
