@@ -9,11 +9,10 @@ import android.graphics.Point;
 import android.util.ArrayMap;
 import android.util.ArraySet;
 import android.util.AttributeSet;
-import android.widget.TextView;
 
 import com.github.chrisbanes.photoview.PhotoView;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -56,7 +55,12 @@ public class MapView extends PhotoView {
     /**
      * Paints for navigation
      */
-    Paint pathPaint, highlightPaint, originPaint, destPaint, selectPaint;
+    Paint pathPaint, highlightPaint, originPaint, destPaint, selectPaint, otherFloorPaint;
+
+    /**
+     * The {@link OnFloorChangeListener} to be notified when the floor displayed changes
+     */
+    OnFloorChangeListener onFloorChangeListener;
 
     // Default constructors taken from the parent.
     public MapView(Context context) { this(context, null); }
@@ -85,6 +89,25 @@ public class MapView extends PhotoView {
         destPaint = new Paint(originPaint); destPaint.setColor(Color.GREEN);
         selectPaint = new Paint(originPaint); selectPaint.setColor(Color.RED);
         selectPaint.setAlpha(192);
+
+        otherFloorPaint = new Paint(pathPaint);
+        otherFloorPaint.setAlpha(64);
+    }
+
+    /**
+     * Set the listener to be notified on floor changes
+     * @param l The {@link OnFloorChangeListener} to be set as the new {@link #onFloorChangeListener}
+     */
+    void setOnFloorChangeListener(OnFloorChangeListener l) {
+        onFloorChangeListener = l;
+    }
+
+    /**
+     * If {@link #onFloorChangeListener} isn't null, notify it of a floor change
+     */
+    private void notifyOnFloorChangeListener() {
+        if (onFloorChangeListener != null)
+            onFloorChangeListener.onFloorChanged(this, currentFloor);
     }
 
     /*-----------------*
@@ -112,9 +135,9 @@ public class MapView extends PhotoView {
      * @param to The final location.
      * @param paths The list of paths that connect "from" and "to".
      */
-    public void drawRoute(Location from, Location to, List<Path> paths){
+    public void drawRoute(Location from, Location to, Collection<Path> paths){
         getFloors(paths).forEach(this::refreshBuffer);
-        drawPathListToBuffer(paths, pathPaint);
+        drawPathsToBuffer(paths, pathPaint, otherFloorPaint);
         dotLocation(from, originPaint);
         dotLocation(to, destPaint);
         showFloorBuffer(from.getFloor());
@@ -148,8 +171,6 @@ public class MapView extends PhotoView {
     /**
      * Draws a path between two Points on the buffer. Uses the value of fct to scale the given
      * points to their counterparts on the map
-     * @param p1
-     * @param p2
      */
     private void drawPathToBuffer(Point p1, Point p2, Paint pathPaint) {
         canv.get(currentFloor).drawLine(p1.x * fct, p1.y * fct, p2.x * fct, p2.y * fct, pathPaint);
@@ -166,9 +187,26 @@ public class MapView extends PhotoView {
     }
 
     /**
+     * Slightly different to {@link #drawPathToBuffer(Path, Paint)}, this method draws the path to
+     * every floor specified, using different paints to distinguish whether the path is on the floor
+     * or not
+     * @param p The path to be drawn
+     * @param thisFloor The paint to use when a path is wholly or partly on a floor
+     * @param otherFloor The paint to use otherwise
+     * @param floors The list of floors to use: if a route only uses some floors, only draw to those
+     *               involved.
+     */
+    private void drawPathToBuffer(Path p, Paint thisFloor, Paint otherFloor, Collection<String> floors) {
+        for (String f : floors) {
+            canv.get(f).drawLine(p.getLocA().getX() * fct, p.getLocA().getY() * fct,
+                    p.getLocB().getX() * fct, p.getLocB().getY() * fct,
+                    (f.equals(p.getLocA().getFloor()) || f.equals(p.getLocB().getFloor())) ?
+                    thisFloor : otherFloor);
+        }
+    }
+
+    /**
      * guess
-     * @param text
-     * @param loc
      */
     private void drawTextToBuffer(String floor, String text, Point loc) {
         //TODO Extract this paint
@@ -180,7 +218,6 @@ public class MapView extends PhotoView {
 
     /**
      * Uses {@link #drawTextToBuffer(String, String, Point)} to write either code + name or just code
-     * @param l
      */
     private void drawLocToBuffer(Location l) {
         drawTextToBuffer(l.getFloor(), l.hasName() ? l.getCode() + ", " + l.getName() : l.getCode(), l.getLocation());
@@ -188,11 +225,22 @@ public class MapView extends PhotoView {
 
     /**
      * Like {@link #drawPathToBuffer(Point, Point, Paint pathPaint)} but lots
-     * @param paths The list of paths to draw
+     * @param paths The collection of paths to draw
      */
-    private void drawPathListToBuffer(List<Path> paths, Paint pathPaint) {
+    private void drawPathsToBuffer(Collection<Path> paths, Paint pathPaint) {
         for (Path p : paths) {
             drawPathToBuffer(p, pathPaint);
+        }
+    }
+
+    /**
+     * Like {@link #drawPathToBuffer(Path, Paint, Paint, Collection)} but lots
+     * @param paths The collection of paths to draw
+     */
+    private void drawPathsToBuffer(Collection<Path> paths, Paint thisFloor, Paint otherFloor) {
+        Collection<String> floors = getFloors(paths);
+        for (Path p : paths) {
+            drawPathToBuffer(p, thisFloor, otherFloor, floors);
         }
     }
 
@@ -205,6 +253,7 @@ public class MapView extends PhotoView {
         currentFloor = floor;
     //    TextView tv = findViewById(R.id.floor_name);
     //    tv.setText(building.getFloorMap().getOrDefault(currentFloor, "ERROR"));
+        notifyOnFloorChangeListener();
     }
 
     /**
@@ -227,8 +276,13 @@ public class MapView extends PhotoView {
         fct = (float) maps.get(currentFloor).getWidth() / getResources().getInteger(R.integer.map_width);
     }
 
-    private Set<String> getFloors(List<Path> paths) {
-        Set<String> fs = new ArraySet<String>();
+    /**
+     * Gets all the floors incorporated in a route. Not very efficient but not terrible either
+     * @param paths The collection of paths to work on
+     * @return The floors used by {@code paths}
+     */
+    private Set<String> getFloors(Collection<Path> paths) {
+        Set<String> fs = new ArraySet<>();
 
         paths.forEach(p -> {
             fs.add(p.getLocA().getFloor());

@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
@@ -39,6 +38,7 @@ import com.github.chrisbanes.photoview.OnPhotoTapListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -150,8 +150,8 @@ public class DisplayDrawer extends AppCompatActivity
         populateFloorsList();
         setListeners();
 
-        // mapView.showFloorBuffer(mapView.currentFloor);
-
+        //Called here to a) correctly set scale and b) update floor indicator
+        mapView.setFloor(building.getDefaultFloor(), false);
     }
 
     /**
@@ -211,6 +211,10 @@ public class DisplayDrawer extends AppCompatActivity
 
         //Sets up selection by tap
         mapView.setOnPhotoTapListener(this);
+        mapView.setOnFloorChangeListener((m,f) -> {
+            TextView fn = findViewById(R.id.floor_name);
+            fn.setText(building.getFloorMap().get(f));
+        });
 
         //Sets up disabled switch
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -233,6 +237,7 @@ public class DisplayDrawer extends AppCompatActivity
         navs.setOnClickListener(e -> startNavSelect(navs));
         Button navd = findViewById(R.id.navigation_dst_btn);
         navd.setOnClickListener(e -> startNavSelect(navd));
+
     }
 
     /**
@@ -255,6 +260,9 @@ public class DisplayDrawer extends AppCompatActivity
         }
     }
 
+    /**
+     * Initialises all the floor-selection buttons
+     */
     private void populateFloorsList() {
         LinearLayout fl = findViewById(R.id.floors_box);
         FloatingActionButton b;
@@ -267,7 +275,6 @@ public class DisplayDrawer extends AppCompatActivity
             b.setImageDrawable(new FabTextDrawable(f.toUpperCase(), Color.WHITE));
             b.setOnClickListener(v -> {
                 mapView.setFloor(f, false);
-                updateFloorIndicator();
                 fl.setVisibility(View.GONE);
             });
             b.setSize(FloatingActionButton.SIZE_MINI);
@@ -289,7 +296,9 @@ public class DisplayDrawer extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            if (navigationDst != null || navigationSrc != null) exitNavigation();
+            LinearLayout fb = findViewById(R.id.floors_box);
+            if (fb.getVisibility()==View.VISIBLE) fb.setVisibility(View.GONE);
+            else if (navigationDst != null || navigationSrc != null) exitNavigation();
             else if (selectedLocation != null) {
                 deselect();
             }
@@ -448,7 +457,7 @@ public class DisplayDrawer extends AppCompatActivity
      * Uses the Navigator to compute the path between all pairs of nodes x,y, where the codes of x
      * and y match those of navigationSrc and navigationDst respectively, then selects the path with the lowest
      * total weight using {@link #weight(List)}. It draws this route to the buffer using
-     * {@link MapView#drawPathListToBuffer(List, Paint)}, places dots at the start and end of the route, then
+     * {@link MapView#drawRoute(Location, Location, Collection)}, places dots at the start and end of the route, then
      * shows the buffer.
      */
     private void doNavigation() {
@@ -478,12 +487,18 @@ public class DisplayDrawer extends AppCompatActivity
     /**
      * Selection by search. Note that it calls {@link #select(Location)} not
      * {@link #showLocation(Location)} as selection may be used for navigation not just display
+     * If the floor selector is shown, it hides it instead of search.
      * @param view The origin of the event. In our case always == mapView
      * @param x The 0-1 value denoting the x on the image of the tap
      * @param y The 0-1 value denoting the y on the image of the tap
      */
     @Override
     public void onPhotoTap(ImageView view, float x, float y) {
+        LinearLayout fb = findViewById(R.id.floors_box);
+        if(fb.getVisibility()==View.VISIBLE) {
+            fb.setVisibility(View.GONE);
+            return;
+        }
         final float xx = x * getResources().getInteger(R.integer.map_width);
         final float yy = y * getResources().getInteger(R.integer.map_height);
 
@@ -644,11 +659,6 @@ public class DisplayDrawer extends AppCompatActivity
             c.connect(R.id.navigation_dst_btn, ConstraintSet.TOP, R.id.navigation_title, ConstraintSet.BOTTOM);
         }
         c.applyTo(nv);
-    }
-
-    private void updateFloorIndicator() {
-        TextView tv = findViewById(R.id.floor_name);
-        tv.setText(building.getFloorMap().get(mapView.currentFloor));
     }
 
     /*---------*

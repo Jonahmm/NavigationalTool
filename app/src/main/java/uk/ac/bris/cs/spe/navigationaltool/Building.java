@@ -19,6 +19,9 @@ import uk.ac.bris.cs.spe.navigationaltool.navigator.Navigator;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * Holds the {@link Graph} and more information about the building
+ */
 public class Building {
 
     private Graph graph;
@@ -36,6 +39,13 @@ public class Building {
         build(fileName);
     }
 
+    /**
+     * Uses the {@code .building} file to generate the graph, populating floor names, locations
+     * (per floor), paths (per floor), and inter-floor paths in order.
+     * @param masterFileName The building filename, not including the {@code .building} file
+     *                       extension
+     * @throws IOException if loading of any file fails
+     */
     private void build(String masterFileName) throws IOException {
         graph = new Graph();
 
@@ -92,6 +102,12 @@ public class Building {
         }
     }
 
+    /**
+     * Loads all the locations and paths for a floor, using the {@code .locations} and
+     * {@code .paths} files respectively
+     * @param f The code of the floor to populate
+     * @throws IOException If loading of either file mentioned above fails
+     */
     private void loadFloor(String f) throws IOException {
         ////////////////////
         // Load Locations //
@@ -130,47 +146,7 @@ public class Building {
         }
     }
 
-    public void buildGraph() throws IOException {
-        ////////////////////
-        // Load Locations //
-        ////////////////////
-        graph = new Graph();
-        BufferedReader buffer = new BufferedReader(new InputStreamReader(
-                context.getAssets().open(name+".locations")));
-
-        String ln;
-
-        while ((ln = buffer.readLine()) != null) {
-            if(!ln.startsWith("#")) { //Support comments
-                String[] fields = ln.split(",");
-                //x,y,floor,code,name
-                //Log.d("Adding ", ln);
-                graph.addLocation(new Location(Integer.parseInt(fields[0]), (fields.length > 4 ? Integer.parseInt(fields[4]) : 0),
-                        (fields.length > 5 ? Integer.parseInt(fields[5]) : 0), fields[3], fields[1], fields[2]));
-            }
-        }
-
-
-        ////////////////
-        // Load Paths //
-        ////////////////
-        buffer = new BufferedReader( new InputStreamReader(
-                context.getAssets().open(name+".paths")));
-        while ((ln = buffer.readLine()) != null) {
-            if(!ln.startsWith("#")) {
-                String[] fields = ln.split(",");
-                //Log.d("adding path: ", fields[0] + "<->" + fields[1]);
-                graph.addPath(
-                        new Path(graph.getLocationById(Integer.parseInt(fields[0])),
-                                 graph.getLocationById(Integer.parseInt(fields[1])),
-                        Arrays.stream(fields[2].split(" ")).map(this::getUserFromString).
-                                collect(Collectors.toList())));
-            }
-        }
-
-    }
-
-    public Map<String, String> getFloorMap() {
+    Map<String, String> getFloorMap() {
         return floorNames;
     }
 
@@ -184,7 +160,7 @@ public class Building {
         }
     }
 
-    public void setNavigator(Navigator navigator) {
+    void setNavigator(Navigator navigator) {
         this.navigator = navigator;
     }
 
@@ -192,7 +168,7 @@ public class Building {
         return graph;
     }
 
-    public Navigator getNavigator() {
+    Navigator getNavigator() {
         return navigator;
     }
 
@@ -200,7 +176,7 @@ public class Building {
         return name;
     }
 
-    public String getDefaultFloor() {
+    String getDefaultFloor() {
         return  defaultFloor;
     }
 }
