@@ -93,6 +93,7 @@ public class Graph {
     public ArrayList<Location> getAllLocationsSerializable() {
         ArrayList<Location> s = new ArrayList<>();
         s.addAll(getAllLocations());
+        s.remove(getLocationById(155));
         return s;
     }
 

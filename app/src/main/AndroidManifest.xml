@@ -11,28 +11,31 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
         <activity
             android:name=".DisplayDrawer"
             android:label="@string/title_activity_display_drawer"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.SEARCH" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".LocationListActivity" >
+            </meta-data>
+        </activity>
+
+        <!--<activity android:name=".Search" >-->
+
+        <!--</activity>-->
+        <activity android:name=".SearchActivity"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
             <meta-data android:name="android.app.searchable"
-                android:resource="@xml/searchable"/>
-        </activity>
-
-        <meta-data
-            android:name="com.google.android.actions"
-            android:resource="@xml/searchable" />
-
-        <activity android:name=".Search" >
-
-        </activity>
-        <activity android:name=".SearchActivity">
-
+                android:resource="@xml/searchable" />
         </activity>
         <provider
             android:name=".LocationContentProvider"

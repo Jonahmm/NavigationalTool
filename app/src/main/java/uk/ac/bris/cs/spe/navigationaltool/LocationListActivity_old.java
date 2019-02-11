@@ -54,7 +54,7 @@ public class LocationListActivity_old extends ListActivity implements LoaderMana
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.options_menu, menu);
+        getMenuInflater().inflate(R.menu.search_activity, menu);
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView =

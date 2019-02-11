@@ -8,21 +8,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-
 import uk.ac.bris.cs.spe.navigationaltool.database.DatabaseConstants;
-import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 
 public class Search extends AppCompatActivity {
-
-    ArrayList<Location> locations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,15 +34,8 @@ public class Search extends AppCompatActivity {
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            locations = (ArrayList<Location>) intent.getSerializableExtra("LOCATIONS");
-            //doMySearch(query);
-            search(query);
+            doMySearch(query);
         }
-    }
-
-    void search(String s) {
-        ListView l = findViewById(R.id.list_item);
-        l.setAdapter(new LocationListAdapter(this, locations));
     }
 
     public void doMySearch(String query){
@@ -67,7 +53,7 @@ public class Search extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the options menu from XML
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu, menu);
+        inflater.inflate(R.menu.search_activity, menu);
 
         // Get the SearchView and set the searchable configuration
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);

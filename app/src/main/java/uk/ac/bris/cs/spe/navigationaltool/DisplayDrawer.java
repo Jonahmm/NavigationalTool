@@ -1,5 +1,7 @@
 package uk.ac.bris.cs.spe.navigationaltool;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -31,6 +33,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SearchView;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -193,6 +196,26 @@ public class DisplayDrawer extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.display_drawer, menu);
+        // Get the SearchView and set the searchable configuration
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.app_bar_search).getActionView();
+
+        // Assumes current activity is the searchable activity
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                if (s.isEmpty()) return false;
+                startSearch(s);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
+
         return true;
     }
 
@@ -318,10 +341,10 @@ public class DisplayDrawer extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == R.id.show_search) {
-            openSearchScreen();
-            return true;
-        }
+//        if (id == R.id.show_search) {
+//            startSearch();
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -749,8 +772,13 @@ public class DisplayDrawer extends AppCompatActivity
         }
     }
 
-    public void openSearchScreen(){
-        onSearchRequested();
+    public void startSearch(String q){
+        Intent intent = new Intent(Intent.ACTION_SEARCH, null, this, SearchActivity.class);
+        intent.putExtra("LOCATIONS", building.getGraph().getAllLocationsSerializable());
+        intent.putExtra(SearchManager.QUERY, q);
+//        Bundle b = new Bundle();
+//        b.putSerializable("LOCATIONS", building.getGraph().getAllLocationsSerializable());
+        startActivity(intent);
     }
 
 

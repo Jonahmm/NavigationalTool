@@ -47,7 +47,7 @@ public class LocationListAdapter implements ListAdapter {
 
     @Override
     public Object getItem(int i) {
-        return null;
+        return locations.get(i);
     }
 
     @Override
@@ -69,7 +69,10 @@ public class LocationListAdapter implements ListAdapter {
         TextView tv = view.findViewById(R.id.location_list_item_title);
         tv.setText(l.hasName() ? l.getName() : l.getCode());
         tv = view.findViewById(R.id.location_list_item_code);
-        if (l.hasName()) tv.setText(l.getCode());
+        if (l.hasName()) {
+            tv.setText(l.getCode());
+            tv.setVisibility(View.VISIBLE);
+        }
         else tv.setVisibility(View.GONE);
 
         return view;
@@ -82,7 +85,7 @@ public class LocationListAdapter implements ListAdapter {
 
     @Override
     public int getViewTypeCount() {
-        return 0;
+        return 1;
     }
 
     @Override
