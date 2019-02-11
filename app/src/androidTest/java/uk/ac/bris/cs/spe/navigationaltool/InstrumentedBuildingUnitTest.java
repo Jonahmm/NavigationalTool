@@ -11,7 +11,6 @@ import org.junit.runner.RunWith;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -109,6 +108,14 @@ public class InstrumentedBuildingUnitTest {
     @Test
     public void testBadFileLayoutFails() throws Exception{
         assertThatThrownBy(() -> new Building("test/badFileLayout/badFileLayout", new DijkstraNavigator(), context))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void testOnlyOneDefaultFloor() throws Exception{
+        assertThatThrownBy(() -> new Building("test/badDefaultFloors/manyDefaultFloors", new DijkstraNavigator(), context))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new Building("test/badDefaultFloors/noDefaultFloors", new DijkstraNavigator(), context))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
