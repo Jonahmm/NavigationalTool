@@ -3,6 +3,7 @@ package uk.ac.bris.cs.spe.navigationaltool;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import android.util.ArrayMap;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,7 +11,9 @@ import org.junit.runner.RunWith;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.Graph;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
@@ -49,11 +52,19 @@ public class InstrumentedBuildingUnitTest {
         Location locB = new Location(1, 0,1,"0","locB", "Location B");
         Location locC = new Location(2, 2, 3,"0","locC", "Location C");
         Location locD = new Location(3, 4, 1,"0","locD", "Location D");
+        Location locE = new Location(4, 0, 0,"1","locE", "Location E");
+        Location locF = new Location(5, 4, 5,"1","locF", "Location F");
+        Location locG = new Location(6, 3, 6,"1","locG", "Location G");
+        Location locH = new Location(7,4,4,"1","locH","Location H");
 
         assertThat(g.getLocationByCode("locA").equals(locA)).isTrue();
         assertThat(g.getLocationByCode("locB").equals(locB)).isTrue();
         assertThat(g.getLocationByCode("locC").equals(locC)).isTrue();
         assertThat(g.getLocationByCode("locD").equals(locD)).isTrue();
+        assertThat(g.getLocationByCode("locE").equals(locE)).isTrue();
+        assertThat(g.getLocationByCode("locF").equals(locF)).isTrue();
+        assertThat(g.getLocationByCode("locG").equals(locG)).isTrue();
+        assertThat(g.getLocationByCode("locH").equals(locH)).isTrue();
     }
 
     @Test
@@ -65,16 +76,28 @@ public class InstrumentedBuildingUnitTest {
         Location locB = new Location(1, 0,1,"0","locB", "Location B");
         Location locC = new Location(2, 2, 3,"0","locC", "Location C");
         Location locD = new Location(3, 4, 1,"0","locD", "Location D");
+        Location locE = new Location(4, 0, 0,"1","locE", "Location E");
+        Location locF = new Location(5, 4, 5,"1","locF", "Location F");
+        Location locG = new Location(6, 3, 6,"1","locG", "Location G");
 
         Path p1 = new Path (locA, locB, notDisabled);
         Path p2 = new Path (locB, locC, onlyStaff);
         Path p3 = new Path (locA, locC, allUsers);
         Path p4 = new Path (locD, locB, onlyStaff);
+        Path p5 = new Path (locE, locF, notDisabled);
+        Path p6 = new Path (locE, locG, onlyStaff);
+        Path p7 = new Path (locF, locG, allUsers);
+        Path l1 = new Path (locB, locG, onlyStaff);
+        Path l2 = new Path (locC, locF, allUsers);
 
         assertThat(g.getPathsFromLocationCode("locA").equals(Arrays.asList(p1,p3))).isTrue();
-        assertThat(g.getPathsFromLocationCode("locB").equals(Arrays.asList(p1, p2, p4))).isTrue();
-        assertThat(g.getPathsFromLocationCode("locC").equals(Arrays.asList(p2, p3))).isTrue();
+        assertThat(g.getPathsFromLocationCode("locB").equals(Arrays.asList(p1, p2, p4, l1))).isTrue();
+        assertThat(g.getPathsFromLocationCode("locC").equals(Arrays.asList(p2, p3, l2))).isTrue();
         assertThat(g.getPathsFromLocationCode("locD").equals(Arrays.asList(p4))).isTrue();
+        assertThat(g.getPathsFromLocationCode("locE").equals(Arrays.asList(p5, p6))).isTrue();
+        assertThat(g.getPathsFromLocationCode("locF").equals(Arrays.asList(p5, p7, l2))).isTrue();
+        assertThat(g.getPathsFromLocationCode("locG").equals(Arrays.asList(p6, p7, l1))).isTrue();
+        assertThat(g.getPathsFromLocationCode("locH").isEmpty()).isTrue();
     }
 
     @Test
@@ -124,7 +147,15 @@ public class InstrumentedBuildingUnitTest {
     public void testGetNameIsCorrect() throws Exception {
         Building building = new Building("test/goodTest/goodTest", new DijkstraNavigator(), context);
         assertThat(building.getName().equals("goodTest")).isTrue();
+    }
 
+    @Test
+    public void testGetFloorMapIsCorrect() throws Exception {
+        Building building = new Building("test/goodTest/goodTest", new DijkstraNavigator(), context);
+        Map <String,String> m = new ArrayMap<>();
+        m.put("0","Ground Floor");
+        m.put("1","First Floor");
+        assertThat(building.getFloorMap().equals(m)).isTrue();
     }
 
     @Test
