@@ -750,9 +750,9 @@ public class DisplayDrawer extends AppCompatActivity
     }
 
     public void openSearchScreen(){
-        Intent intent = new Intent(this,Search.class);
-        startActivity(intent);
+        onSearchRequested();
     }
+
 
     public SQLiteHelper getDbHelper() {
         return _dbHelper;

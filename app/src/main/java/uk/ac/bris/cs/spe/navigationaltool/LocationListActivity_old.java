@@ -15,7 +15,7 @@ import android.widget.SimpleCursorAdapter;
 
 import uk.ac.bris.cs.spe.navigationaltool.database.DatabaseConstants;
 
-public class LocationListActivity extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class LocationListActivity_old extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final int LOADER_ID = 42;
     private CursorAdapter _adapter;
 
@@ -35,7 +35,7 @@ public class LocationListActivity extends ListActivity implements LoaderManager.
         if (id != LOADER_ID) {
             return null;
         }
-        return new CursorLoader(LocationListActivity.this,
+        return new CursorLoader(LocationListActivity_old.this,
                 LocationContentProvider.CONTENT_URI,
                 new String[] { DatabaseConstants.COL_LOC_ID, DatabaseConstants.COL_LOC_NAME }, null, null,
                 null);

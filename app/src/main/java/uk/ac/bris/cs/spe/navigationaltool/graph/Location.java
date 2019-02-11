@@ -2,11 +2,12 @@ package uk.ac.bris.cs.spe.navigationaltool.graph;
 
 import android.graphics.Point;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
-public class Location {
+public class Location implements Serializable {
     final int id;
 
     public final int x, y;

@@ -85,9 +85,21 @@ public class Graph {
         return graph.keySet();
     }
 
+    /**
+     * This is used for passing the set of locations between activities, as {@link ArrayList} is
+     * guaranteed serializable
+     * @return An ArrayList containing all the {@link Location Locations} in the graph
+     */
+    public ArrayList<Location> getAllLocationsSerializable() {
+        ArrayList<Location> s = new ArrayList<>();
+        s.addAll(getAllLocations());
+        return s;
+    }
+
     public Set<Path> getAllPaths() {
         Set<Path> paths = new ArraySet<>();
         graph.values().forEach(paths::addAll);
         return paths.stream().distinct().collect(Collectors.toSet());
     }
 }
+
