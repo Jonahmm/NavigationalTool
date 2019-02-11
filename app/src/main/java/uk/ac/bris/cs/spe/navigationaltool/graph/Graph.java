@@ -91,8 +91,7 @@ public class Graph {
      * @return An ArrayList containing all the {@link Location Locations} in the graph
      */
     public ArrayList<Location> getAllLocationsSerializable() {
-        ArrayList<Location> s = new ArrayList<>();
-        s.addAll(getAllLocations());
+        ArrayList<Location> s = new ArrayList<>(getAllLocations());
         s.remove(getLocationById(155));
         return s;
     }

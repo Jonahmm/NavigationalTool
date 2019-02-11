@@ -131,11 +131,12 @@ public class InstrumentedBuildingUnitTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Test // ie: If you have two 'islands' of locations that do not have connecting paths, then this should fail after loading.
-    public void testHavingUnconnectedLocationsFails() throws Exception{
-        assertThatThrownBy(() -> new Building("test/unconnectedLocations/unconnectedLocations", new DijkstraNavigator(), context))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
+//    Now obsolete as our graph contains unconnected locations on purpose.
+//    @Test // ie: If you have two 'islands' of locations that do not have connecting paths, then this should fail after loading.
+//    public void testHavingUnconnectedLocationsFails() throws Exception{
+//        assertThatThrownBy(() -> new Building("test/unconnectedLocations/unconnectedLocations", new DijkstraNavigator(), context))
+//                .isInstanceOf(IllegalArgumentException.class);
+//    }
 
     ///// Construction Tests End /////
 
