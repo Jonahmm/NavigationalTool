@@ -41,6 +41,9 @@ public class Graph {
     }
 
     public void addPath(Path e){
+        if(graph.values().stream().anyMatch(e2 -> e2.contains(e))) throw new IllegalArgumentException(
+                "Path " + e.locA.id + "<->" + e.locB.id + " already exists in graph"
+        );
         if(!graph.containsKey(e.locA) || !graph.containsKey(e.locB)) throw new IllegalArgumentException(
                 "Cannot add an edge that connects to nodes not in the graph: occurred when adding "
                         + e.locA.getCode() + "," + e.locB.getCode());
