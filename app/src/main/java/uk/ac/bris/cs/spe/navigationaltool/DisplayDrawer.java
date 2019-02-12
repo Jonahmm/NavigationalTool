@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
@@ -33,6 +34,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -45,6 +47,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
@@ -428,8 +431,8 @@ public class DisplayDrawer extends AppCompatActivity
         navigationSrc = l;
         Button btn = findViewById(R.id.navigation_src_btn);
         cancelNavSelect(btn);
-        if (navigationDst != null) doNavigation();
         selecting = Selecting.SELECTION;
+        if (navigationDst != null) doNavigation();
         formatNav();
     }
 
@@ -456,14 +459,15 @@ public class DisplayDrawer extends AppCompatActivity
         navigationDst = l;
         Button btn = findViewById(R.id.navigation_dst_btn);
         cancelNavSelect(btn);
-        if (navigationSrc != null) doNavigation();
         selecting = Selecting.SELECTION;
+        if (navigationSrc != null) doNavigation();
         formatNav();
     }
 
     /**
      * The big one, the one we've all been waiting for, The actual point of our app.
      *
+     * Instantiates a new {@link NavigateTask}, which…
      * Uses the Navigator to compute the path between all pairs of nodes x,y, where the codes of x
      * and y match those of navigationSrc and navigationDst respectively, then selects the path with the lowest
      * total weight using {@link #weight(List)}. It draws this route to the buffer using
@@ -471,23 +475,66 @@ public class DisplayDrawer extends AppCompatActivity
      * shows the buffer.
      */
     private void doNavigation() {
-        User user = getUserFromParams(access, disabl);
-        List<Path> paths = new ArrayList<>();
-        Location from = null, to = null;
-        for (Location l : building.getGraph().getLocationsByCode(navigationSrc.getCode())) {
-            for (Location m : building.getGraph().getLocationsByCode(navigationDst.getCode())) {
-                try {
-                    List<Path> p = building.getNavigator().navigate(l,m,building.getGraph(),user);
-                    if (weight(p) < weight(paths)) {
-                        paths = p;
-                        from = l; to = m;
-                    }
-                } catch (IllegalArgumentException ignored) {}
-            }
+        new NavigateTask().execute(building);
+    }
+
+    /**
+     * An {@link AsyncTask} that sets up, runs and presents navigation.
+     */
+    private class NavigateTask extends AsyncTask<Building, Integer, List<Path>> {
+        User user;
+        Location from, to;
+        ProgressBar p;
+        @Override
+        protected void onPreExecute() {
+            user = getUserFromParams(access, disabl);
+            from = navigationSrc;
+            to = navigationDst;
+            p = findViewById(R.id.wait_indicator);
+            p.setProgress(0, false);
+            p.setVisibility(View.VISIBLE);
+            bottomBarHide();
         }
-        if(from != null) {
-            mapView.drawRoute(from, to, paths);
-        } else alertMsg(getString(R.string.navigation_failure));
+
+        @Override
+        protected List<Path> doInBackground(Building... buildings) {
+            Building b = buildings[0];
+            List<Path> paths = new ArrayList<>();
+            Set<Location> froms = b.getGraph().getLocationsByCode(from.getCode());
+            Set<Location>  tos  = b.getGraph().getLocationsByCode( to .getCode());
+            float mult = 100 / (froms.size() * tos.size());
+            int count = 0;
+            for (Location l : froms) {
+                for (Location m : tos) {
+                    try {
+                        List<Path> p = b.getNavigator().navigate(l,m,b.getGraph(),user);
+                        if (weight(p) < weight(paths)) {
+                            paths = p;
+                            from = l; to = m;
+                        }
+                    } catch (Exception ignored) {
+                    }
+                    count++;
+                    publishProgress((int) (count * mult));
+                }
+            }
+            return paths;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            p.setProgress(values[0], true);
+        }
+
+        @Override
+        protected void onPostExecute(List<Path> paths) {
+            findViewById(R.id.wait_indicator).setVisibility(View.GONE);
+            bottomBarShowNavigation();
+            if(paths != null && !paths.isEmpty()) {
+                mapView.drawRoute(from, to, paths);
+            } else alertMsg(getString(R.string.navigation_failure));
+            //super.onPostExecute(paths);
+        }
     }
 
     /*-----------*
