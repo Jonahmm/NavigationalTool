@@ -62,6 +62,11 @@ public class MapView extends PhotoView {
      */
     OnFloorChangeListener onFloorChangeListener;
 
+    static int RESET_NONE = 0;
+    static int RESET_CURRENT = 1;
+    static int RESET_ALL = -1;
+
+
     // Default constructors taken from the parent.
     public MapView(Context context) { this(context, null); }
     public MapView(Context context, AttributeSet attr) {this(context, attr, 0); }
@@ -117,11 +122,12 @@ public class MapView extends PhotoView {
     /**
      * Sets the MapView to display the given floor.
      * @param floor The floor to display.
-     * @param resetFloor Whether to clear the floor of added graphics.
+     * @param reset Whether to clear the floor of added graphics.
      */
-    public void setFloor(String floor, boolean resetFloor){
+    public void setFloor(String floor, int reset){
         if(maps.containsKey(floor)) {
-            if(resetFloor) refreshBuffer(floor);
+            if(reset==RESET_CURRENT) refreshBuffer(floor);
+            else if (reset==RESET_ALL) refreshAllFloors();
             showFloorBuffer(floor);
         }
         else{

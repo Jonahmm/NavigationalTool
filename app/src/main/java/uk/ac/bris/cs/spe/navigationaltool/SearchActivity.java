@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 
@@ -27,7 +29,13 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         setContentView(R.layout.activity_search);
         list = findViewById(R.id.search_list);
         handleIntent(getIntent());
-
+        list.setOnItemClickListener((adapterView, view, i, id) -> {
+            Location l = (Location) list.getAdapter().getItem(i);
+            Intent data = new Intent();
+            data.putExtra("RESULT", l);
+            setResult(RESULT_OK, data);
+            finish();
+        });
     }
 
     @Override
@@ -59,15 +67,14 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
             ArrayList<Location> ls = (ArrayList<Location>) intent.getSerializableExtra("LOCATIONS");
             //Get distinct locations
             for(Location l : ls) {
                 if(locations.stream().noneMatch(m -> l.getCode().equals(m.getCode())))
                     locations.add(l);
             }
-            search(query);
         }
+        updateSearch("");
     }
 
 

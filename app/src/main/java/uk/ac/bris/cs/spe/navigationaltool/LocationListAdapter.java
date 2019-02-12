@@ -92,4 +92,5 @@ public class LocationListAdapter implements ListAdapter {
     public boolean isEmpty() {
         return false;
     }
+
 }

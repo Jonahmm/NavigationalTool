@@ -154,7 +154,7 @@ public class DisplayDrawer extends AppCompatActivity
         setListeners();
 
         //Called here to a) correctly set scale and b) update floor indicator
-        mapView.setFloor(building.getDefaultFloor(), false);
+        mapView.setFloor(building.getDefaultFloor(), MapView.RESET_NONE);
     }
 
     /**
@@ -177,7 +177,7 @@ public class DisplayDrawer extends AppCompatActivity
 
         //Initialise image
 
-        mapView.setFloor(building.getDefaultFloor(), false);
+        mapView.setFloor(building.getDefaultFloor(), MapView.RESET_NONE);
         mapView.updateFCT();
         mapView.setMaximumScale(12f);
 
@@ -197,23 +197,10 @@ public class DisplayDrawer extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.display_drawer, menu);
         // Get the SearchView and set the searchable configuration
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.app_bar_search).getActionView();
-
-        // Assumes current activity is the searchable activity
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                if (s.isEmpty()) return false;
-                startSearch(s);
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                return false;
-            }
+        MenuItem srch = menu.findItem(R.id.app_bar_search);
+        srch.setOnMenuItemClickListener(e -> {
+            startSearch();
+            return true;
         });
 
         return true;
@@ -297,7 +284,7 @@ public class DisplayDrawer extends AppCompatActivity
             b.setLayoutParams(lp);
             b.setImageDrawable(new FabTextDrawable(f.toUpperCase(), Color.WHITE));
             b.setOnClickListener(v -> {
-                mapView.setFloor(f, false);
+                mapView.setFloor(f, MapView.RESET_NONE);
                 fl.setVisibility(View.GONE);
             });
             b.setSize(FloatingActionButton.SIZE_MINI);
@@ -571,7 +558,7 @@ public class DisplayDrawer extends AppCompatActivity
       //      mapView.refreshBuffer(mapView.currentFloor);
             bottomBarHide();
       //      mapView.showFloorBuffer(mapView.currentFloor);
-            mapView.setFloor(mapView.currentFloor, true);
+            mapView.setFloor(mapView.currentFloor, MapView.RESET_ALL);
         }
 
     }
@@ -772,15 +759,19 @@ public class DisplayDrawer extends AppCompatActivity
         }
     }
 
-    public void startSearch(String q){
+    public void startSearch(){
         Intent intent = new Intent(Intent.ACTION_SEARCH, null, this, SearchActivity.class);
         intent.putExtra("LOCATIONS", building.getGraph().getAllLocationsSerializable());
-        intent.putExtra(SearchManager.QUERY, q);
-//        Bundle b = new Bundle();
-//        b.putSerializable("LOCATIONS", building.getGraph().getAllLocationsSerializable());
-        startActivity(intent);
+        startActivityForResult(intent, 1);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode==RESULT_OK) {
+            select((Location) data.getSerializableExtra("RESULT"));
+        }
+        else super.onActivityResult(requestCode, resultCode, data);
+    }
 
     public SQLiteHelper getDbHelper() {
         return _dbHelper;

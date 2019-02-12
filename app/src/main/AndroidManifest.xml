@@ -27,9 +27,6 @@
             </meta-data>
         </activity>
 
-        <!--<activity android:name=".Search" >-->
-
-        <!--</activity>-->
         <activity android:name=".SearchActivity"
             android:launchMode="singleTop">
             <intent-filter>
