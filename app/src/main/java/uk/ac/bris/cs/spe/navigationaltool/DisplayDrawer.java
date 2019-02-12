@@ -758,7 +758,7 @@ public class DisplayDrawer extends AppCompatActivity
      * @param s floor code
      * @return The image associated with {@code s}
      */
-    private int getImageResourceFromCode(String s) {
+    public static int getImageResourceFromCode(String s) {
         switch (s) {
             case "b": return R.drawable.mapb;
             case "0": return R.drawable.map0;
