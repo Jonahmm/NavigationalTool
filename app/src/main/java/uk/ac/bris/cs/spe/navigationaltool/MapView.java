@@ -136,7 +136,7 @@ public class MapView extends PhotoView {
      * @param paths The list of paths that connect "from" and "to".
      */
     public void drawRoute(Location from, Location to, Collection<Path> paths){
-        getFloors(paths).forEach(this::refreshBuffer);
+        refreshAllFloors();
         drawPathsToBuffer(paths, pathPaint, otherFloorPaint);
         dotLocation(from, originPaint);
         dotLocation(to, destPaint);
@@ -144,14 +144,21 @@ public class MapView extends PhotoView {
     }
 
     /**
-     * Draws a dot at a location.
+     * Draws a dot at a location, also clears all routes on the map.
      * @param l The location to draw.
      */
     public void drawLocation(Location l){
-        refreshBuffer(l.getFloor());
+        refreshAllFloors();
         dotLocation(l, selectPaint);
         drawLocToBuffer(l);
         showFloorBuffer(l.getFloor());
+    }
+
+    /**
+     * Clears all floor images of any graphics which have been added to them.
+     */
+    private void refreshAllFloors(){
+        maps.keySet().forEach(this::refreshBuffer);
     }
 
 
