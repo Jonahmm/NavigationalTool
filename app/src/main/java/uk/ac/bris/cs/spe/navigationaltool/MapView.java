@@ -156,7 +156,7 @@ public class MapView extends PhotoView {
     public void drawLocation(Location l){
         refreshAllFloors();
         dotLocation(l, selectPaint);
-        drawLocToBuffer(l);
+        //drawLocToBuffer(l);
         showFloorBuffer(l.getFloor());
     }
 

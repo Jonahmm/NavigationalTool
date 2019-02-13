@@ -135,7 +135,6 @@
                 android:id="@+id/navigation_dst_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
-                android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/rounded_rect_btn"
                 android:drawableEnd="@drawable/ic_edit"
@@ -144,8 +143,8 @@
                 android:text="@string/click_to_edit"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                app:layout_constraintLeft_toRightOf="@+id/nav_txt_to"
-                app:layout_constraintTop_toBottomOf="@+id/navigation_title" />
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/navigation_src_btn" />
 
             <ImageButton
                 android:id="@+id/navigation_swap_btn"
@@ -166,13 +165,22 @@
         android:id="@+id/floor_select"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_margin="8dp"
         android:clickable="true"
         app:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toTopOf="@+id/bottom_box"
         app:layout_constraintRight_toRightOf="parent"
         app:srcCompat="@drawable/ic_floor_vector" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/navigation_show"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="@+id/floor_select"
+        app:layout_constraintRight_toLeftOf="@+id/floor_select"
+        app:srcCompat="@drawable/ic_navigate" />
 
     <ProgressBar
         android:id="@+id/wait_indicator"

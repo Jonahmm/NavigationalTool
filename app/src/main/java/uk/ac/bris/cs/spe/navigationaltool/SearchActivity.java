@@ -3,23 +3,26 @@ package uk.ac.bris.cs.spe.navigationaltool;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.ArrayMap;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 
 public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
     ArrayList<Location> locations = new ArrayList<>();
+    List<Location> filtered = new ArrayList<>();
     ListView list;
     SearchView sv;
 
@@ -74,12 +77,13 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                     locations.add(l);
             }
         }
+        filtered = locations;
         updateSearch("");
     }
 
 
     void search(String s) {
-        List<Location> filtered = locations.stream().filter(
+        filtered = locations.stream().filter(
                 l -> l.getCode().contains(s.toUpperCase())
                         || (l.hasName() && l.getName().toUpperCase().contains(s.toUpperCase())))
                 .distinct().collect(Collectors.toList());

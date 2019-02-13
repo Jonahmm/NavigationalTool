@@ -214,12 +214,13 @@ public class DisplayDrawer extends AppCompatActivity
      * that respond to events)
      */
     void setListeners() {
-        //For testing, swaps between ground floor and basement.
         FloatingActionButton fab = findViewById(R.id.floor_select);
         fab.setOnClickListener(view -> {
             LinearLayout fl = findViewById(R.id.floors_box);
             fl.setVisibility(fl.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
         });
+        FloatingActionButton nav = findViewById(R.id.navigation_show);
+        nav.setOnClickListener(e -> bottomBarShowNavigation());
 
 
         //Sets up selection by tap
@@ -250,6 +251,17 @@ public class DisplayDrawer extends AppCompatActivity
         navs.setOnClickListener(e -> startNavSelect(navs));
         Button navd = findViewById(R.id.navigation_dst_btn);
         navd.setOnClickListener(e -> startNavSelect(navd));
+
+        ImageButton swap = findViewById(R.id.navigation_swap_btn);
+        swap.setOnClickListener(e -> {
+            Location src = navigationSrc;
+            Location dst = navigationDst;
+        //These are set to null to avoid the first setNavigationSrc call trying to calculate a route
+            navigationSrc = null;
+            navigationDst = null;
+            setNavigationSrc(dst);
+            setNavigationDst(src);
+        });
 
     }
 
@@ -311,6 +323,8 @@ public class DisplayDrawer extends AppCompatActivity
         } else {
             LinearLayout fb = findViewById(R.id.floors_box);
             if (fb.getVisibility()==View.VISIBLE) fb.setVisibility(View.GONE);
+            else if (findViewById(R.id.bottom_box).getVisibility() == View.VISIBLE)
+                bottomBarHide();
             else if (navigationDst != null || navigationSrc != null) exitNavigation();
             else if (selectedLocation != null) {
                 deselect();
@@ -432,8 +446,8 @@ public class DisplayDrawer extends AppCompatActivity
         Button btn = findViewById(R.id.navigation_src_btn);
         cancelNavSelect(btn);
         selecting = Selecting.SELECTION;
-        if (navigationDst != null) doNavigation();
-        formatNav();
+        //formatNav();
+        doNavigation();
     }
 
     /**
@@ -460,8 +474,7 @@ public class DisplayDrawer extends AppCompatActivity
         Button btn = findViewById(R.id.navigation_dst_btn);
         cancelNavSelect(btn);
         selecting = Selecting.SELECTION;
-        if (navigationSrc != null) doNavigation();
-        formatNav();
+        doNavigation();
     }
 
     /**
@@ -475,6 +488,7 @@ public class DisplayDrawer extends AppCompatActivity
      * shows the buffer.
      */
     private void doNavigation() {
+        if (navigationDst == null || navigationSrc == null) return;
         new NavigateTask().execute(building);
     }
 
@@ -597,13 +611,13 @@ public class DisplayDrawer extends AppCompatActivity
      * Resets selection parameters. The check is used to avoid unnecessary graphics operations
      */
     private void deselect() {
+        bottomBarHide();
         if (selectedLocation != null || navigationSrc != null || navigationDst != null) {
             selectedLocation = null;
             navigationSrc = null;
             navigationDst = null;
             selecting = Selecting.SELECTION;
       //      mapView.refreshBuffer(mapView.currentFloor);
-            bottomBarHide();
       //      mapView.showFloorBuffer(mapView.currentFloor);
             mapView.setFloor(mapView.currentFloor, MapView.RESET_ALL);
         }
@@ -653,7 +667,7 @@ public class DisplayDrawer extends AppCompatActivity
         botBox.setVisibility(View.VISIBLE);
         botBox.findViewById(R.id.selected_details).setVisibility(View.VISIBLE);
         botBox.findViewById(R.id.navigation_panel).setVisibility(View.GONE);
-
+        findViewById(R.id.navigation_show).setVisibility(View.GONE);
     }
 
     /**
@@ -664,6 +678,7 @@ public class DisplayDrawer extends AppCompatActivity
         botBox.setVisibility(View.VISIBLE);
         botBox.findViewById(R.id.navigation_panel).setVisibility(View.VISIBLE);
         botBox.findViewById(R.id.selected_details).setVisibility(View.GONE);
+        findViewById(R.id.navigation_show).setVisibility(View.GONE);
     }
 
     /**
@@ -671,6 +686,7 @@ public class DisplayDrawer extends AppCompatActivity
      */
     private void bottomBarHide() {
         findViewById(R.id.bottom_box).setVisibility(View.GONE);
+        findViewById(R.id.navigation_show).setVisibility(View.VISIBLE);
     }
 
     /**
@@ -701,19 +717,22 @@ public class DisplayDrawer extends AppCompatActivity
      * Not working very well currently
      */
     private void formatNav() {
-        ImageButton sp = findViewById(R.id.navigation_swap_btn);
+        Button dst = findViewById(R.id.navigation_dst_btn);
+        Button src = findViewById(R.id.navigation_src_btn);
         ConstraintLayout nv = findViewById(R.id.navigation_panel);
-        Log.d("Right bounds", sp.getRight() + " " + nv.getRight());
         ConstraintSet c = new ConstraintSet();
         c.clone(nv);
-        if(sp.getRight() > nv.getRight()) {
+        if(dst.getText().length() + src.getText().length() > 22) {
             c.clear(R.id.navigation_dst_btn, ConstraintSet.TOP);
             c.connect(R.id.navigation_dst_btn, ConstraintSet.TOP, R.id.navigation_src_btn, ConstraintSet.BOTTOM);
             c.clear(R.id.navigation_dst_btn, ConstraintSet.LEFT);
+            c.setMargin(R.id.navigation_dst_btn, ConstraintSet.LEFT, 8);
+
         } else {
             c.connect(R.id.navigation_dst_btn, ConstraintSet.LEFT, R.id.nav_txt_to, ConstraintSet.RIGHT);
             c.clear(R.id.navigation_dst_btn, ConstraintSet.TOP);
             c.connect(R.id.navigation_dst_btn, ConstraintSet.TOP, R.id.navigation_title, ConstraintSet.BOTTOM);
+            c.setMargin(R.id.navigation_dst_btn, ConstraintSet.TOP, 8);
         }
         c.applyTo(nv);
     }

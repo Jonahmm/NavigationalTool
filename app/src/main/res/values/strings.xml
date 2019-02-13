@@ -14,7 +14,7 @@
     <string name="saved_access">ACCESS</string>
     <string name="saved_disabl">SAVEDDISAB</string>
     <string name="search_title">Search locations…</string>
-    <string name="selecting_text">Tap to cancel </string>
-    <string name="click_to_edit">Tap to edit </string>
+    <string name="selecting_text">Search or tap a location, or tap to cancel </string>
+    <string name="click_to_edit">Tap to set </string>
     <string name="navigation_failure">No path found for specified access level</string>
 </resources>
