@@ -184,7 +184,7 @@ public class DisplayDrawer extends AppCompatActivity
         mapView.updateFCT();
         mapView.setMaximumScale(12f);
 
-        mapView.setMinimumScale(MAP_MIN_SCALE);
+//        mapView.setMinimumScale(MAP_MIN_SCALE);
         mapView.setScale(MAP_MIN_SCALE);
         /* The above doesn't seem to actually update the view, it waits until you interact with it,
            which is *really* annoying */
