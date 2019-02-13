@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -57,10 +58,6 @@ import uk.ac.bris.cs.spe.navigationaltool.navigator.DijkstraNavigator;
 public class DisplayDrawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         OnPhotoTapListener{
-    /**
-     * The scale st the map's width == screen width (should be set depending on AR, but this works for 16:9)
-     */
-    protected static final float MAP_MIN_SCALE = 1.25f;
     /**
      * The distance (in px) that locations should be < to a screen tap in order to be selected
      */
@@ -184,8 +181,17 @@ public class DisplayDrawer extends AppCompatActivity
         mapView.updateFCT();
         mapView.setMaximumScale(12f);
 
-        mapView.setMinimumScale(MAP_MIN_SCALE);
-        mapView.setScale(MAP_MIN_SCALE);
+        float minMapScale, mapScale, screenScale;
+        Point size = new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+
+        mapScale  = ((float) mapView.bufs.get(building.getDefaultFloor()).getWidth())/ ((float) mapView.bufs.get(building.getDefaultFloor()).getHeight());
+        screenScale = ((float) size.x) / ((float) size.y);
+
+        minMapScale = mapScale/screenScale;
+
+        mapView.setMinimumScale(minMapScale);
+        mapView.setScale(minMapScale);
         /* The above doesn't seem to actually update the view, it waits until you interact with it,
            which is *really* annoying */
     }
