@@ -4,7 +4,7 @@ H.H. Wills Physics Laboratory
 b,Basement
 *0,Ground Floor
 1,First Floor
-#M,Mezzanine
-#2,Second Floor
+m,Mezzanine
+2,Second Floor
 3,Third Floor
-#4,Fourth Floor
+4,Fourth Floor
