@@ -4,7 +4,7 @@
 1718,B.CT,Central Toilets,b,801,3700
 1714,B.FC,Front Corridor,b,914,3950
 1720,B.21,,b,802,3356
-1710,B.PS,Powell Stairs,b,479,4389
+1710,B.PS,Stairs,b,479,4389
 1722,B.FL,Front Lift,b,1110,3138
 1690,B.11B,,b,1618,4389
 1736,B.FC,Front Corridor,b,995,2248
@@ -15,7 +15,7 @@
 1726,B.FS,Front Stairs,b,1362,3261
 1704,B.16/17,Enderby Lecture Theatre,b,412,5270
 1695,B.FC,Front Corridor,b,914,4263
-1708,B.PS,Powell Stairs,b,603,4302
+1708,B.PS,Stairs,b,603,4302
 1735,B.FC,Front Corridor,b,995,2347
 1699,B.EF,Enderby Foyer,b,727,4500
 1717,B.FC,Front Corridor,b,914,3700
@@ -44,7 +44,7 @@
 1743,B.29,,b,882,2248
 1723,B.FS,Front Stairs,b,1151,3356
 1712,B.19,,b,727,4240
-1709,B.PS,Powell Stairs,b,479,4302
+1709,B.PS,Stairs,b,479,4302
 1745,B.31,,b,1107,2148
 1716,B.20,,b,801,3950
 1686,B.BL,Back Lift,b,3644,4384

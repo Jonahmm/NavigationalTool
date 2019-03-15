@@ -2,19 +2,19 @@
 466,1.27,,1,2031,4389
 446,1.CC,Central Corridor,1,2031,4263
 482,1.FL,Front Landing,1,1110,3356
-475,1.31A/31B,,1,1259,4075
+475,1.31A/B,,1,1259,4075
 501,1.45,,1,881,2451
 430,1.BL,Back Landing,1,3774,4263
-413,1.TF,Tyndal Foyer,1,3543,5698
+413,1.TF,Tyndall Foyer,1,3543,5698
 440,1.CC,Central Corridor,1,3090,4263
 427,1.BS,Back Stairs,1,3906,4353
 472,1.35,,1,1146,4389
-415,1.11,Tyndal Lecture Theatre,1,3543,5595
+415,1.11,Tyndall Lecture Theatre,1,3543,5595
 456,1.23,,1,2493,4134
-459,1.31C/31D,,1,1445,4134
+459,1.31C/D,,1,1445,4134
 492,1.40,,1,681,3175
 477,1.FC,Front Corridor,1,995,3575
-416,1.11,Tyndal Lecture Theatre,1,3543,4989
+416,1.11,Tyndall Lecture Theatre,1,3543,4989
 460,1.17,,1,3216,4389
 483,1.FL,Front Lift,1,1110,3138
 434,1.BL,Back Landing,1,3644,4263
@@ -41,8 +41,8 @@
 479,1.38,,1,995,3734
 462,1.20,,1,2981,4389
 452,1.16,,1,3216,4134
-412,1.TF,Tyndal Foyer,1,3938,5698
-414,1.11,Tyndal Lecture Theatre,1,3938,5595
+412,1.TF,Tyndall Foyer,1,3938,5698
+414,1.11,Tyndall Lecture Theatre,1,3938,5595
 449,1.CC,Central Corridor,1,1445,4263
 444,1.CC,Central Corridor,1,2256,4263
 421,1.12,,1,3905,4723
@@ -74,8 +74,8 @@
 429,1.BS,Back Stairs,1,4110,4353
 442,1.CC,Central Corridor,1,2733,4263
 473,1.CC,Central Corridor,1,1146,4075
-417,1.11,Tyndal Lecture Theatre,1,3938,4989
-411,1.TF,Tyndal Foyer,1,3742,5767
+417,1.11,Tyndall Lecture Theatre,1,3938,4989
+411,1.TF,Tyndall Foyer,1,3742,5767
 499,1.FC,Front Corridor,1,995,2451
 481,1.FC,Front Corridor,1,995,3356
 424,1.BS,Back Stairs,1,3906,4549

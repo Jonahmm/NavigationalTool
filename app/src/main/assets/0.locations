@@ -1,4 +1,5 @@
-269,G.PS,Powell Stairs,0,603,4389
+#Removed ref to powell as it implied the stairs were solely for powell LT
+269,G.PS,Stairs,0,603,4389
 250,G.ER,Enderby Ramp,0,254,4500
 49,G.42,Powell Lecture Theatre,0,1246,4740
 223,G.36,,0,1787,4389
@@ -6,12 +7,12 @@
 290,G.51,,0,746,3527
 247,G.ER,Enderby Ramp,0,233,5244
 228,G.CC,Central Corridor,0,1145,4263
-281,G.44,Powell Lecture Theatre,0,1246,5197
+281,G.42,Powell Lecture Theatre,0,1246,5197
 226,G.37,,0,1445,4063
 285,G.CC,Central Corridor,0,1145,3715
 256,G.FR,Front Ramp,0,485,3445
 214,G.33,,0,2256,4134
-237,G.TS,Tyndal Stairs,0,4110,5767
+237,G.TS,Tyndall Stairs,0,4110,5767
 307,G.FS,Front Stairs,0,1362,3452
 318,G.54,,0,883,2451
 168,G.BL,Back Lift,0,3644,4384
@@ -46,12 +47,12 @@
 296,G.53,,0,1241,2991
 172,G.18,,0,4064,4365
 193,G.22,,0,3459,4134
-238,G.TS,Tyndal Stairs,0,3902,5767
+238,G.TS,Tyndall Stairs,0,3902,5767
 115,G.BB,Back Of Building,0,4237,4204
 316,G.57,,0,995,2277
 289,G.FF,Front Foyer,0,926,3527
 224,G.CC,Central Corridor,0,1445,4263
-280,G.44,Powell Lecture Theatre,0,650,4740
+280,G.42,Powell Lecture Theatre,0,650,4740
 239,G.MF,Mott Foyer,0,3902,5661
 192,G.CC,Central Corridor,0,3459,4263
 275,G.PF,Powell Foyer,0,504,4968
@@ -62,7 +63,7 @@
 205,G.28,,0,2733,4389
 299,G.FL,Front Landing,0,1110,3356
 97,G.BT,Back Toilets,0,3646,4723
-268,G.PS,Powell Stairs,0,603,4302
+268,G.PS,Stairs,0,603,4302
 286,G.38,,0,1259,3715
 259,G.FC,Front Corridor,0,485,3807
 170,G.BC,Back Corridor,0,3774,4723
@@ -115,7 +116,7 @@
 273,G.44,Frank Lecture Theatre,0,1034,3807
 186,G.12,Mott Lecture Theatre,0,3758,5305
 222,G.CC,Central Corridor,0,1787,4263
-20,G.FR,Font Ramp,0,1034,2851
+20,G.FR,Front Ramp,0,1034,2851
 212,G.31,,0,2384,4134
 161,G.BF,Back Foyer,0,3774,4204
 213,G.CC,Central Corridor,0,2256,4263
@@ -128,7 +129,7 @@
 291,G.FF,Front Foyer,0,926,3356
 220,G.34B,,0,1900,4389
 183,G.MF,Mott Foyer,0,4110,5590
-278,G.44,Powell Lecture Theatre,0,650,5197
+278,G.42,Powell Lecture Theatre,0,650,5197
 293,G.52,,0,742,3142
 264,G.FC,Front Corridor,0,412,4238
 262,G.FC,Front Corridor,0,412,3915
