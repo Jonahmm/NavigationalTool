@@ -22,10 +22,10 @@
 204,G.CC,Central Corridor,0,2733,4263
 173,G.BS,Back Stairs,0,4110,4549
 219,G.34A,,0,2031,4389
-252,G.FB,Front Of Building,0,46,2727
+252,G.FB,Front of Building,0,46,2727
 210,G.30,,0,2493,4389
 308,G.FS,Front Stairs,0,1362,3261
-287,G.48,,0,1145,3603
+287,G.48,Technical Manager,0,1145,3603
 315,G.56,,0,883,2277
 312,G.60,,0,883,1815
 233,G.39,,0,1362,4389
@@ -39,7 +39,7 @@
 208,G.29,,0,2638,4389
 199,G.CC,Central Corridor,0,3090,4263
 267,G.FC,Front Corridor,0,412,4302
-138,G.FB,Front Of Building,0,46,5314
+138,G.FB,Front of Building,0,46,5314
 96,G.16,Chaos,0,3902,4723
 246,G.ER,Enderby Ramp,0,164,5314
 83,G.20,,0,3664,4134
@@ -48,7 +48,7 @@
 172,G.18,,0,4064,4365
 193,G.22,,0,3459,4134
 238,G.TS,Tyndall Stairs,0,3902,5767
-115,G.BB,Back Of Building,0,4237,4204
+115,G.BB,Back of Building,0,4237,4204
 316,G.57,,0,995,2277
 289,G.FF,Front Foyer,0,926,3527
 224,G.CC,Central Corridor,0,1445,4263
@@ -70,14 +70,14 @@
 209,G.CC,Central Corridor,0,2493,4263
 235,G.44,Frank Lecture Theatre,0,1034,4549
 190,G.MF,Mott Foyer,0,3902,5077
-139,G.FB,Front Of Building,0,46,5428
+139,G.FB,Front of Building,0,46,5428
 169,G.17,,0,3644,4518
-240,G.RB,Right Of Building,0,3269,5930
+240,G.RB,Right of Building,0,3269,5930
 207,G.CC,Central Corridor,0,2638,4263
 313,G.59,,0,995,1957
 164,G.BF,Back Foyer,0,3774,4518
 200,G.25,,0,3090,4389
-188,G.BB,Back Of Building,0,4237,5077
+188,G.BB,Back of Building,0,4237,5077
 167,G.BF,Back Foyer,0,3644,4263
 249,G.ER,Enderby Ramp,0,254,4582
 317,G.55,,0,995,2451
@@ -112,7 +112,7 @@
 177,G.BC,Back Corridor,0,3774,5029
 306,G.FS,Front Stairs,0,1151,3452
 304,G.FS,Front Stairs,0,1151,3261
-241,G.RB,Right Of Building,0,2688,5428
+241,G.RB,Right of Building,0,2688,5428
 273,G.44,Frank Lecture Theatre,0,1034,3807
 186,G.12,Mott Lecture Theatre,0,3758,5305
 222,G.CC,Central Corridor,0,1787,4263
@@ -120,12 +120,12 @@
 212,G.31,,0,2384,4134
 161,G.BF,Back Foyer,0,3774,4204
 213,G.CC,Central Corridor,0,2256,4263
-310,G.LB,Left Of Building,0,604,2727
+310,G.LB,Left of Building,0,604,2727
 257,G.FC,Front Corridor,0,485,3730
 165,G.BF,Back Foyer,0,3774,4549
 203,G.27,,0,2981,4134
 284,G.12,Mott Lecture Theatre,0,3400,5661
-189,G.BB,Back Of Building,0,4237,5930
+189,G.BB,Back of Building,0,4237,5930
 291,G.FF,Front Foyer,0,926,3356
 220,G.34B,,0,1900,4389
 183,G.MF,Mott Foyer,0,4110,5590
@@ -139,7 +139,7 @@
 234,G.41,,0,1145,4549
 288,G.FF,Front Foyer,0,926,3715
 179,G.MF,Mott Foyer,0,3902,5029
-131,G.LB,Left Of Building,0,1034,2727
+131,G.LB,Left of Building,0,1034,2727
 300,G.FL,Front Lift,0,1110,3138
 276,G.PF,Powell Foyer,0,537,4740
 187,G.12,Mott Lecture Theatre,0,3758,5661

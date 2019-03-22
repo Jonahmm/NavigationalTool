@@ -1,9 +1,9 @@
 1152,3.FC,Front Corridor,3,995,3356
 1126,3.16,,3,2449,4134
-1138,3.28,,3,1445,4389
+1138,3.28,Deputy Technical Manager,3,1445,4389
 1112,3.CC,Central Corridor,3,3090,4263
 1100,3.BS,Back Stairs,3,3906,4549
-1130,3.29,,3,1241,4134
+1130,3.29,Access Grid Node,3,1241,4134
 1151,3.FC,Front Corridor,3,995,3622
 1146,3.34,,3,933,4095
 1103,3.BL,Back Landing,3,3774,4517
@@ -15,11 +15,11 @@
 1125,3.16,,3,3216,4134
 1181,3.FC,Front Corridor,3,995,2174
 1183,3.FC,Front Corridor,3,995,1851
-1127,3.21,,3,2256,4134
+1127,3.21,Berry,3,2256,4134
 1161,3.FS,Front Stairs,3,1151,3356
 1162,3.FS,Front Stairs,3,1151,3261
 1169,3.FC,Front Corridor,3,783,3103
-1139,3.30,,3,1241,4389
+1139,3.30,Conference Room,3,1241,4389
 1165,3.FS,Front Stairs,3,1151,3452
 1122,3.CC,Central Corridor,3,1241,4263
 1170,3.42,,3,673,3103
@@ -49,24 +49,27 @@
 1179,3.FC,Front Corridor,3,995,2508
 1182,3.FC,Front Corridor,3,995,2015
 1155,4.FC,Front Corridor,3,783,3622
-1131,3.15,,3,3090,4389
+1131,3.15,Study Space,3,3090,4389
 1101,3.BS,Back Stairs,3,3906,4450
 1099,3.BS,Back Stairs,3,4110,4549
-1124,3.13,,3,3459,4134
-1135,3.22,,3,2256,4389
+1124,3.13,Study Space,3,3459,4134
+1135,3.22,Head of School,3,2256,4389
 1119,3.CC,Central Corridor,3,1862,4263
 1108,3.CC,Central Corridor,3,3459,4263
-1137,3.26,,3,1673,4389
+1137,3.26,School Manager,3,1673,4389
 1160,3.FL,Front Lift,3,1110,3138
-1133,3.19,,3,2733,4389
+1133,3.19,Student Admin. Manager,3,2733,4389
+#Extra node for other name?
 1115,3.CC,Central Corridor,3,2493,4263
 1173,3.FC,Front Corridor,3,995,3023
-1136,3.23,,3,2031,4389
+1136,3.23,Executive Admin. Manager,3,2031,4389
+#Extra node for other name?
+#1196,3.23,Administrative Assistant,3,2031,4388
 1111,3.CC,Central Corridor,3,3216,4263
 1123,3.CC,Central Corridor,3,1045,4263
 1176,3.41,,3,1241,3123
-1134,3.20,,3,2493,4389
-1141,3.32,,3,933,4263
+1134,3.20,UG Student Administrator,3,2493,4389
+1141,3.32,Staff & PG Common Room,3,933,4263
 1175,3.FT,Front Toilets,3,1368,3023
 1107,3.BL,Back Landing,3,3644,4263
 1145,3.CC,Central Corridor,3,1045,3768

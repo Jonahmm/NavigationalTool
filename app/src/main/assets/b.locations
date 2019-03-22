@@ -13,13 +13,13 @@
 1696,B.FC,Front Corridor,b,914,4389
 1719,B.FC,Front Corridor,b,914,3356
 1726,B.FS,Front Stairs,b,1362,3261
-1704,B.16/17,Enderby Lecture Theatre,b,412,5270
+1704,B.16/17,Enderby Room,b,412,5270
 1695,B.FC,Front Corridor,b,914,4263
 1708,B.PS,Stairs,b,603,4302
 1735,B.FC,Front Corridor,b,995,2347
 1699,B.EF,Enderby Foyer,b,727,4500
 1717,B.FC,Front Corridor,b,914,3700
-1705,B.16/17,Enderby Lecture Theatre,b,727,5270
+1705,B.16/17,Enderby Room,b,727,5270
 1724,B.FS,Front Stairs,b,1151,3452
 1691,B.11C,,b,1770,4389
 1721,B.FL,Front Landing,b,1110,3356
@@ -29,8 +29,8 @@
 1688,B.CC,Central Corridor,b,1435,4263
 1707,B.FT,Front Toilets,b,412,4040
 1692,B.CC,Central Corridor,b,1207,4263
-1703,B.16/17,Enderby Lecture Theatre,b,727,4666
-1702,B.16/17,Enderby Lecture Theatre,b,412,4666
+1703,B.16/17,Enderby Room,b,727,4666
+1702,B.16/17,Enderby Room,b,412,4666
 1689,B.11A,,b,1435,4389
 1740,B.25,,b,882,2451
 1715,B.12,,b,1026,3950
