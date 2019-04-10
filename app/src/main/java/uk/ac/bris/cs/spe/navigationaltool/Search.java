@@ -39,7 +39,7 @@ public class Search extends AppCompatActivity {
     }
 
     public void doMySearch(String query){
-        SQLiteHelper sqLiteHelper = ((DisplayDrawer) getApplicationContext()).getDbHelper();
+        SQLiteHelper sqLiteHelper = ((MapActivity) getApplicationContext()).getDbHelper();
         Cursor cursor = sqLiteHelper.getReadableDatabase().rawQuery("SELECT " + DatabaseConstants.COL_LOC_ID + ", " +
                 DatabaseConstants.COL_LOC_NAME + " FROM " + DatabaseConstants.TABLE_LOC +
                 " WHERE upper(" + DatabaseConstants.COL_LOC_NAME + ") like '%" + query.toUpperCase() + "%'", null);

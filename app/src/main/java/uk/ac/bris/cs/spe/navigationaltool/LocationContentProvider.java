@@ -53,6 +53,6 @@ public class LocationContentProvider extends ContentProvider {
     }
 
     public SQLiteHelper getDbHelper() {
-        return ((DisplayDrawer)getContext()).getDbHelper();
+        return ((MapActivity)getContext()).getDbHelper();
     }
 }

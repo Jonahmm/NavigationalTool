@@ -22,6 +22,11 @@ import java.util.stream.Collectors;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 
+/**
+ * Takes a serialized {@link ArrayList} of {@link Location Locations}, and presents the locations
+ * as well as some quick-access shortcuts, passing the selected {@link Location} back to the calling
+ * activity.
+ */
 public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
     ArrayList<Location> locations = new ArrayList<>();
     List<Location> filtered = new ArrayList<>();

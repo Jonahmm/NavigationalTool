@@ -1,5 +1,8 @@
 package uk.ac.bris.cs.spe.navigationaltool.graph;
 
+/**
+ * Redirects room-related getters to its parent location
+ */
 public class ChildLocation extends Location {
     private Location parent;
 

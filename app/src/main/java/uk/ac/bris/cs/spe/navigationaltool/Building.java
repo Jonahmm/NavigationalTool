@@ -107,7 +107,8 @@ public class Building {
 
     /**
      * Loads all the locations and paths for a floor, using the {@code .locations} and
-     * {@code .paths} files respectively
+     * {@code .paths} files respectively. Once a location has been added, any others with the same
+     * code will be added as {@link ChildLocation Child Locations}.
      * @param f The code of the floor to populate
      * @throws IOException If loading of either file mentioned above fails
      */

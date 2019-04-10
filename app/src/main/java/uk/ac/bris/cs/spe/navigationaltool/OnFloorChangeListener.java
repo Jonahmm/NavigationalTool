@@ -2,7 +2,7 @@ package uk.ac.bris.cs.spe.navigationaltool;
 
 /**
  * A callback to be invoked when a {@link MapView} changes its currently displayed floor.
- * Introduced so that {@link DisplayDrawer} can update its floor indicator even when the floor is
+ * Introduced so that {@link MapActivity} can update its floor indicator even when the floor is
  * changed from an internal {@link MapView#showFloorBuffer(String)} call.
  */
 public interface OnFloorChangeListener {

@@ -1,7 +1,5 @@
 package uk.ac.bris.cs.spe.navigationaltool;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -35,7 +33,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.SearchView;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -54,7 +51,7 @@ import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
 import uk.ac.bris.cs.spe.navigationaltool.graph.User;
 import uk.ac.bris.cs.spe.navigationaltool.navigator.DijkstraNavigator;
 
-public class DisplayDrawer extends AppCompatActivity
+public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         OnPhotoTapListener{
     /**
@@ -119,7 +116,7 @@ public class DisplayDrawer extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display_drawer);
+        setContentView(R.layout.activity_map);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

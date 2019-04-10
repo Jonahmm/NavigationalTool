@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
 
-// This is all functionality that was previously in DisplayDrawer, but has been moved to help keep the code cleaner.
+// This is all functionality that was previously in MapActivity, but has been moved to help keep the code cleaner.
 
 /**
  * Handles all graphic changes to the map.
