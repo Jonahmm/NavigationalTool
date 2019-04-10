@@ -10,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.ArrayMap;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 
@@ -23,6 +25,7 @@ import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
     ArrayList<Location> locations = new ArrayList<>();
     List<Location> filtered = new ArrayList<>();
+    LinearLayout extra;
     ListView list;
     SearchView sv;
 
@@ -31,6 +34,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         list = findViewById(R.id.search_list);
+        extra = findViewById(R.id.search_extra);
         handleIntent(getIntent());
         list.setOnItemClickListener((adapterView, view, i, id) -> {
             Location l = (Location) list.getAdapter().getItem(i);
@@ -93,8 +97,9 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     private boolean updateSearch(String s) {
         if(s.isEmpty()) {
             list.setAdapter(new LocationListAdapter(this, locations));
+            extra.setVisibility(View.VISIBLE);
             return false;
-        }
+        } else extra.setVisibility(View.GONE);
         search(s);
         return true;
     }

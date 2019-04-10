@@ -262,10 +262,7 @@ public class MapView extends PhotoView {
      */
     private void showFloorBuffer(String floor) {
         setImageBitmap(bufs.get(floor).copy(bufs.get(floor).getConfig(), false));
-        setScale(DisplayDrawer.MAP_MIN_SCALE);
         currentFloor = floor;
-    //    TextView tv = findViewById(R.id.floor_name);
-    //    tv.setText(building.getFloorMap().getOrDefault(currentFloor, "ERROR"));
         notifyOnFloorChangeListener();
     }
 

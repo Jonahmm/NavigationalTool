@@ -58,10 +58,6 @@ public class DisplayDrawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         OnPhotoTapListener{
     /**
-     * The scale st the map's width == screen width (should be set depending on AR, but this works for 16:9)
-     */
-    protected static final float MAP_MIN_SCALE = 1.25f;
-    /**
      * The distance (in px) that locations should be < to a screen tap in order to be selected
      */
     private static final int NEAR_DISTANCE = 300;
@@ -177,17 +173,14 @@ public class DisplayDrawer extends AppCompatActivity
             mapView.bufs.put(s, m);
             mapView.canv.put(s, new Canvas(m));
         }
-
         //Initialise image
 
         mapView.setFloor(building.getDefaultFloor(), MapView.RESET_NONE);
         mapView.updateFCT();
         mapView.setMaximumScale(12f);
 
-//        mapView.setMinimumScale(MAP_MIN_SCALE);
-        mapView.setScale(MAP_MIN_SCALE);
-        /* The above doesn't seem to actually update the view, it waits until you interact with it,
-           which is *really* annoying */
+        mapView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        mapView.setMinimumScale(mapView.getScale());
     }
 
     /**
@@ -827,7 +820,7 @@ public class DisplayDrawer extends AppCompatActivity
 
     public void startSearch(){
         Intent intent = new Intent(Intent.ACTION_SEARCH, null, this, SearchActivity.class);
-        intent.putExtra("LOCATIONS", building.getGraph().getAllLocationsSerializable());
+        intent.putExtra("LOCATIONS", building.getPrincipalLocations());
         startActivityForResult(intent, 1);
     }
 

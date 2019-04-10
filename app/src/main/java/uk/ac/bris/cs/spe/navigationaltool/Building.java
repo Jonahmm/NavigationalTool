@@ -7,10 +7,12 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import uk.ac.bris.cs.spe.navigationaltool.graph.ChildLocation;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Graph;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
@@ -29,6 +31,7 @@ public class Building {
     private String name;
     private Context context;
     private Map<String, String> floorNames = new ArrayMap<>();
+    private ArrayList<Location> principals = new ArrayList<>();
     private String defaultFloor;
 
     public Building(String fileName, Navigator nav, Context c) throws IOException {
@@ -120,10 +123,18 @@ public class Building {
         while ((ln = buffer.readLine()) != null) {
             if(!ln.startsWith("#")) { //Support comments
                 String[] fields = ln.split(",");
-                //x,y,floor,code,name
+                //Constructor format id,x,y,floor,code,name
+                //File format ID,Code…
                 Log.d("Adding ", ln);
-                graph.addLocation(new Location(Integer.parseInt(fields[0]), (fields.length > 4 ? Integer.parseInt(fields[4]) : 0),
-                        (fields.length > 5 ? Integer.parseInt(fields[5]) : 0), fields[3], fields[1], fields[2]));
+                Location l = principals.stream().filter(s->s.getCode().equals(fields[1])).findFirst().orElse(null);
+                if (l == null) {
+                    l = new Location(Integer.parseInt(fields[0]), (fields.length > 4 ? Integer.parseInt(fields[4]) : 0),
+                            (fields.length > 5 ? Integer.parseInt(fields[5]) : 0), fields[3], fields[1], fields[2]);
+                    principals.add(l);
+                }
+                else l = new ChildLocation(Integer.parseInt(fields[0]), Integer.parseInt(fields[4]),
+                        Integer.parseInt(fields[5]), fields[3], l);
+                graph.addLocation(l);
             }
         }
 
@@ -178,5 +189,9 @@ public class Building {
 
     String getDefaultFloor() {
         return  defaultFloor;
+    }
+
+    ArrayList<Location> getPrincipalLocations() {
+        return principals;
     }
 }
