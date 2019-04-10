@@ -13,8 +13,8 @@ public class Location implements Serializable {
     public final int x, y;
     public final String floor;
 
-    public final String code;
-    public String name;
+    private final String code;
+    private String name;
 
     public Location(int id, int x, int y, String floor, String code){
         this.id = id;

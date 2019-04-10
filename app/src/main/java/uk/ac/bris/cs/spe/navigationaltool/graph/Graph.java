@@ -54,13 +54,13 @@ public class Graph {
     }
 
     public Location getLocationByCode(String s){
-        Location n = graph.keySet().stream().filter(n2 -> n2.code.equals(s) /* Causes error and not required yet || n2.name.equals(s)*/).findFirst().orElse(null);
+        Location n = graph.keySet().stream().filter(n2 -> n2.getCode().equals(s) /* Causes error and not required yet || n2.name.equals(s)*/).findFirst().orElse(null);
         if(n == null) throw new IllegalArgumentException("Location does not exist.");
         return n;
     }
 
     public Set<Location> getLocationsByCode(String s) {
-        return graph.keySet().stream().filter(l -> l.code.equals(s)).collect(Collectors.toSet());
+        return graph.keySet().stream().filter(l -> l.getCode().equals(s)).collect(Collectors.toSet());
     }
 
     public Location getLocationById(int id) {

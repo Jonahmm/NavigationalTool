@@ -151,14 +151,14 @@ public class GraphUnitTest {
 
         assertThat(g.getPathsFromLocation(locA).equals(paths)).isTrue();
 
-        assertThat(g.getPathsFromLocationCode(locA.code).equals(paths)).isTrue();
+        assertThat(g.getPathsFromLocationCode(locA.getCode()).equals(paths)).isTrue();
 
         assertThatThrownBy(() -> {
             g.getPathsFromLocation(locD);
         }).isInstanceOf(RuntimeException.class);
 
         assertThatThrownBy(() -> {
-            g.getPathsFromLocationCode(locD.code);
+            g.getPathsFromLocationCode(locD.getCode());
         }).isInstanceOf(RuntimeException.class);
 
     }

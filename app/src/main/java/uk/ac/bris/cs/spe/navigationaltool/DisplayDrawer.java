@@ -509,7 +509,7 @@ public class DisplayDrawer extends AppCompatActivity
             List<Path> paths = new ArrayList<>();
             Set<Location> froms = b.getGraph().getLocationsByCode(from.getCode());
             Set<Location>  tos  = b.getGraph().getLocationsByCode( to .getCode());
-            float mult = 100 / (froms.size() * tos.size());
+            float mult = 100f / (froms.size() * tos.size());
             int count = 0;
             for (Location l : froms) {
                 for (Location m : tos) {

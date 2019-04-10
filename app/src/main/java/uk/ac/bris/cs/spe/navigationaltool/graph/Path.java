@@ -14,10 +14,10 @@ public class Path {
     public final Location locA;
     public final Location locB;
 
-    public final int length;
-    public final Point direction;
+    private final int length;
+    private final Point direction;
 
-    public final List<User> users;
+    private final List<User> users;
 
     public Path(Location a, Location b, List<User> users){
         requireNonNull(a);
