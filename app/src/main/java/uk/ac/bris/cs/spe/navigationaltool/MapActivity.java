@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
@@ -207,7 +208,8 @@ public class MapActivity extends AppCompatActivity
         FloatingActionButton fab = findViewById(R.id.floor_select);
         fab.setOnClickListener(view -> {
             LinearLayout fl = findViewById(R.id.floors_box);
-            fl.setVisibility(fl.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+            fl.setVisibility(View.VISIBLE);
+            fab.setVisibility(View.GONE);
         });
         FloatingActionButton nav = findViewById(R.id.navigation_show);
         nav.setOnClickListener(e -> bottomBarShowNavigation());
@@ -291,6 +293,7 @@ public class MapActivity extends AppCompatActivity
             b.setOnClickListener(v -> {
                 mapView.setFloor(f, MapView.RESET_NONE);
                 fl.setVisibility(View.GONE);
+                findViewById(R.id.floor_select).setVisibility(View.VISIBLE);
             });
             b.setSize(FloatingActionButton.SIZE_MINI);
             fl.addView(b);
@@ -312,7 +315,10 @@ public class MapActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             LinearLayout fb = findViewById(R.id.floors_box);
-            if (fb.getVisibility()==View.VISIBLE) fb.setVisibility(View.GONE);
+            if (fb.getVisibility()==View.VISIBLE) {
+                fb.setVisibility(View.GONE);
+                findViewById(R.id.floor_select).setVisibility(View.VISIBLE);
+            }
             else if (findViewById(R.id.bottom_box).getVisibility() == View.VISIBLE)
                 bottomBarHide();
             else if (navigationDst != null || navigationSrc != null) exitNavigation();
@@ -558,6 +564,7 @@ public class MapActivity extends AppCompatActivity
         LinearLayout fb = findViewById(R.id.floors_box);
         if(fb.getVisibility()==View.VISIBLE) {
             fb.setVisibility(View.GONE);
+            findViewById(R.id.floor_select).setVisibility(View.VISIBLE);
             return;
         }
         final float xx = x * getResources().getInteger(R.integer.map_width);

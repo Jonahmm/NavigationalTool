@@ -105,7 +105,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingBottom="4dp"
-                android:text="Route from" />
+                android:text="Route from"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <Button
                 android:id="@+id/navigation_src_btn"
@@ -168,18 +170,19 @@
         android:layout_margin="8dp"
         android:clickable="true"
         app:backgroundTint="@color/colorPrimary"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_box"
+        app:fabSize="mini"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/floor_name"
         app:srcCompat="@drawable/ic_floor_vector" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/navigation_show"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="8dp"
+        android:layout_margin="8dp"
         android:clickable="true"
-        app:layout_constraintBottom_toBottomOf="@+id/floor_select"
-        app:layout_constraintRight_toLeftOf="@+id/floor_select"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_box"
+        app:layout_constraintRight_toRightOf="parent"
         app:srcCompat="@drawable/ic_navigate" />
 
     <ProgressBar
@@ -199,13 +202,12 @@
         android:id="@+id/floors_box"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="8dp"
         android:orientation="vertical"
-        android:padding="0dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/floor_select"
-        app:layout_constraintLeft_toLeftOf="@+id/floor_select"
-        app:layout_constraintRight_toRightOf="@+id/floor_select">
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/floor_name">
 
     </LinearLayout>
 
