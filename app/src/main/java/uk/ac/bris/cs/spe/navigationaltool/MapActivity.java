@@ -103,9 +103,6 @@ public class MapActivity extends AppCompatActivity
      */
     private Selecting selecting = Selecting.SELECTION;
 
-    private SQLiteHelper _dbHelper;
-
-
     /*----------------*
      * INITIALISATION *
      *----------------*/
@@ -142,9 +139,7 @@ public class MapActivity extends AppCompatActivity
 
         //Allows updating access requirements from menu
         navigationView.setNavigationItemSelectedListener(this);
-
-        _dbHelper = new SQLiteHelper(this);
-
+        
         loadBuilding();
         loadMaps();
         populateFloorsList();
@@ -846,9 +841,5 @@ public class MapActivity extends AppCompatActivity
             select((Location) data.getSerializableExtra("RESULT"));
         }
         else super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    public SQLiteHelper getDbHelper() {
-        return _dbHelper;
     }
 }
