@@ -12,5 +12,5 @@ gradlew.bat
 gradle/
 .gradle/
 
-
+assets/maps.zip
 *.DS_Store
