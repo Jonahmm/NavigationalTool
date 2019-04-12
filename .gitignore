@@ -9,7 +9,7 @@ local.properties
 
 gradlew
 gradlew.bat
-gradle/
+#gradle/
 .gradle/
 
 assets/maps.zip
