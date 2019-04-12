@@ -212,7 +212,10 @@ public class MapActivity extends AppCompatActivity
             fab.setVisibility(View.GONE);
         });
         FloatingActionButton nav = findViewById(R.id.navigation_show);
-        nav.setOnClickListener(e -> bottomBarShowNavigation());
+        nav.setOnClickListener(e -> {
+            resetNavButtons();
+            bottomBarShowNavigation();
+        });
 
 
         //Sets up selection by tap
@@ -319,8 +322,8 @@ public class MapActivity extends AppCompatActivity
                 fb.setVisibility(View.GONE);
                 findViewById(R.id.floor_select).setVisibility(View.VISIBLE);
             }
-            else if (findViewById(R.id.bottom_box).getVisibility() == View.VISIBLE)
-                bottomBarHide();
+//            else if (findViewById(R.id.bottom_box).getVisibility() == View.VISIBLE)
+//                bottomBarHide();
             else if (navigationDst != null || navigationSrc != null) exitNavigation();
             else if (selectedLocation != null) {
                 deselect();
@@ -515,16 +518,25 @@ public class MapActivity extends AppCompatActivity
             float mult = 100f / (froms.size() * tos.size());
             int count = 0;
             for (Location l : froms) {
-                for (Location m : tos) {
-                    try {
-                        List<Path> p = b.getNavigator().navigate(l,m,b.getGraph(),user);
-                        if (weight(p) < weight(paths)) {
-                            paths = p;
-                            from = l; to = m;
+                if (b.getGraph().getPathsFromLocation(l).size() != 0) {
+                    for (Location m : tos) {
+                        if (b.getGraph().getPathsFromLocation(m).size() != 0) {
+                            try {
+                                List<Path> p = b.getNavigator().navigate(l, m, b.getGraph(), user);
+                                if (weight(p) < weight(paths)) {
+                                    paths = p;
+                                    from = l;
+                                    to = m;
+                                }
+                            } catch (Exception ignored) {
+                            }
                         }
-                    } catch (Exception ignored) {
+                        ++count;
+                        publishProgress((int) (count * mult));
                     }
-                    count++;
+                }
+                else {
+                    count += tos.size();
                     publishProgress((int) (count * mult));
                 }
             }

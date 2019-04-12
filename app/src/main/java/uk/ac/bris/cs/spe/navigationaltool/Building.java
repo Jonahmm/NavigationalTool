@@ -68,6 +68,9 @@ public class Building {
         name = ln;
         boolean gotDefault = false;
 
+        Map<String, Integer> floorBaseIDs = new ArrayMap<>();
+        int base = 0;
+
         //Get floors
         while ((ln = reader.readLine()) != null) if (!ln.startsWith("#")) {
             String[] fields = ln.split(",");
@@ -80,13 +83,13 @@ public class Building {
                     gotDefault = true;
                 }
             }
+            floorBaseIDs.put(fields[0], base);
+            Log.d("Adding Floor", fields[1] + " from base ID " + base);
             floorNames.put(fields[0], fields[1]);
+            base += loadFloor(fields[0], base);
         }
         if (!gotDefault) throw new IllegalArgumentException("Bad file format. " +
                 "Building should have a default floor.");
-
-        //Load all floors
-        for (String f : floorNames.keySet()) loadFloor(directory + f);
 
         //Finally load cross-floor paths
         reader = new BufferedReader(new InputStreamReader(
@@ -95,24 +98,28 @@ public class Building {
         while ((ln = reader.readLine()) != null) {
             if(!ln.startsWith("#")) {
                 String[] fields = ln.split(",");
-                Log.d("adding link: ", fields[0] + "<->" + fields[1]);
+                String[] l0 = fields[0].split(":");
+                String[] l1 = fields[1].split(":");
+                Log.d("adding link", l0[1] + " on " + l0[0] + "<->" + l1[1] + " on " + l1[0]);
                 graph.addPath(
-                        new Path(graph.getLocationById(Integer.parseInt(fields[0])),
-                                graph.getLocationById(Integer.parseInt(fields[1])),
-                                Arrays.stream(fields[2].split(" ")).map(this::getUserFromString).
-                                        collect(Collectors.toList())));
+                    new Path(graph.getLocationById(floorBaseIDs.get(l0[0]) + Integer.parseInt(l0[1])),
+                             graph.getLocationById(floorBaseIDs.get(l1[0]) + Integer.parseInt(l1[1])),
+                                 Arrays.stream(fields[2].split(" ")).map(this::getUserFromString)
+                                     .collect(Collectors.toList())));
             }
         }
     }
 
     /**
-     * Loads all the locations and paths for a floor, using the {@code .locations} and
-     * {@code .paths} files respectively. Once a location has been added, any others with the same
-     * code will be added as {@link ChildLocation Child Locations}.
+     * Loads all the {@link Location locations} and {@link Path paths} for a floor, using the
+     * {@code .locations} and {@code .paths} files respectively. Once a location has been added,
+     * any others with the same code will be added as {@link ChildLocation Child Locations}.
      * @param f The code of the floor to populate
+     * @param base The lowest Location ID that can be used
+     * @return The next free Location ID offset
      * @throws IOException If loading of either file mentioned above fails
      */
-    private void loadFloor(String f) throws IOException {
+    private int loadFloor(String f, int base) throws IOException {
         ////////////////////
         // Load Locations //
         ////////////////////
@@ -120,20 +127,23 @@ public class Building {
                 context.getAssets().open(f+".locations")));
 
         String ln;
+        int last = 0;
 
         while ((ln = buffer.readLine()) != null) {
             if(!ln.startsWith("#")) { //Support comments
                 String[] fields = ln.split(",");
-                //Constructor format id,x,y,floor,code,name
-                //File format ID,Code…
-                Log.d("Adding ", ln);
+                //Location Constructor format id,x,y,floor,code,name
+                //File format ID,Code,name,floor,x,y
                 Location l = principals.stream().filter(s->s.getCode().equals(fields[1])).findFirst().orElse(null);
+                int id = Integer.parseInt(fields[0]);
+                last = id < last ? last : id;
+                Log.d("Adding ", fields[1] + " with id " + (base + id));
                 if (l == null) {
-                    l = new Location(Integer.parseInt(fields[0]), (fields.length > 4 ? Integer.parseInt(fields[4]) : 0),
-                            (fields.length > 5 ? Integer.parseInt(fields[5]) : 0), fields[3], fields[1], fields[2]);
+                    l = new Location(base + id, Integer.parseInt(fields[4]),
+                            Integer.parseInt(fields[5]), fields[3], fields[1], fields[2]);
                     principals.add(l);
                 }
-                else l = new ChildLocation(Integer.parseInt(fields[0]), Integer.parseInt(fields[4]),
+                else l = new ChildLocation(base + id, Integer.parseInt(fields[4]),
                         Integer.parseInt(fields[5]), fields[3], l);
                 graph.addLocation(l);
             }
@@ -148,14 +158,16 @@ public class Building {
         while ((ln = buffer.readLine()) != null) {
             if(!ln.startsWith("#")) {
                 String[] fields = ln.split(",");
-                Log.d("adding path: ", fields[0] + "<->" + fields[1]);
+//                Log.d("adding path: ", fields[0] + "<->" + fields[1]);
                 graph.addPath(
-                        new Path(graph.getLocationById(Integer.parseInt(fields[0])),
-                                graph.getLocationById(Integer.parseInt(fields[1])),
+                        new Path(graph.getLocationById(base + Integer.parseInt(fields[0])),
+                                graph.getLocationById(base + Integer.parseInt(fields[1])),
                                 Arrays.stream(fields[2].split(" ")).map(this::getUserFromString).
                                         collect(Collectors.toList())));
             }
         }
+
+        return last + 1;
     }
 
     Map<String, String> getFloorMap() {

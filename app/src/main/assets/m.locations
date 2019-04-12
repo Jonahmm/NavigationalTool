@@ -1,31 +1,35 @@
-618,M.FC,Front Corridor,m,995,1844
-608,M.FC,Front Corridor,m,995,3023
-629,M.20,,m,881,2343
-625,M.25,,m,1107,1953
-620,M.15,,m,881,2775
-630,M.22,,m,881,2124
-622,M.17,,m,1107,2508
-613,M.FC,Front Corridor,m,995,2678
-614,M.FC,Front Corridor,m,995,2508
-607,M.FS,Front Stairs,m,1151,3452
-600,M.FC,Front Corridor,m,995,3356
-615,M.FC,Front Corridor,m,995,2343
-609,M.FC,Front Corridor,m,1241,3023
-605,M.FS,Front Stairs,m,1362,3261
-624,M.21,,m,1107,2124
-621,M.16,,m,1107,2678
-603,M.FL,Front Lift,m,1110,3138
-611,M.FT,Front Toilets,m,1368,3023
-626,M.26,,m,1107,1844
-610,M.11,,m,1241,3123
-628,M.18,,m,881,2508
-619,M.14,,m,1107,2775
-616,M.FC,Front Corridor,m,995,2124
-606,M.FS,Front Stairs,m,1362,3452
-601,M.FL,Front Landing,m,1110,3356
-602,M.FS,Front Stairs,m,1151,3356
-631,M.24,,m,881,1953
-604,M.FS,Front Stairs,m,1151,3261
-617,M.FC,Front Corridor,m,995,1953
-612,M.FC,Front Corridor,m,995,2775
-623,M.19,,m,1107,2343
+10,M.11,,m,1241,3123
+19,M.14,,m,1107,2775
+20,M.15,,m,881,2775
+21,M.16,,m,1107,2678
+22,M.17,,m,1107,2508
+27,M.18,,m,881,2508
+23,M.19,,m,1107,2343
+28,M.20,,m,881,2343
+24,M.21,,m,1107,2124
+29,M.22,,m,881,2124
+30,M.24,,m,881,1953
+25,M.25,,m,1107,1953
+26,M.26,,m,1107,1844
+8,M.FC,Front Corridor,m,995,3023
+1,M.FL,Front Landing,m,1110,3356
+2,M.FS,Front Stairs,m,1151,3356
+11,M.FT,Front Toilets,m,1368,3023
+#
+#    All locations below this point are children.
+#    For proper ordering ensure children have name set to '#'
+#
+3,LF,#,m,1110,3138
+9,M.FC,#,m,1241,3023
+17,M.FC,#,m,995,1953
+14,M.FC,#,m,995,2508
+16,M.FC,#,m,995,2124
+12,M.FC,#,m,995,2775
+18,M.FC,#,m,995,1844
+13,M.FC,#,m,995,2678
+15,M.FC,#,m,995,2343
+0,M.FC,#,m,995,3356
+5,M.FS,#,m,1362,3261
+7,M.FS,#,m,1151,3452
+6,M.FS,#,m,1362,3452
+4,M.FS,#,m,1151,3261

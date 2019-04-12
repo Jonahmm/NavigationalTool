@@ -10,7 +10,7 @@ import static java.util.Objects.requireNonNull;
 
 public class Path {
 
-    private static final int TRANS_FLOOR_DIST = 10000;
+    private static final int TRANS_FLOOR_DIST = 400;
     public final Location locA;
     public final Location locB;
 

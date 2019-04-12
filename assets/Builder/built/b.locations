@@ -1,57 +1,65 @@
-1747,B.34,,b,882,2000
-1746,B.33,,b,1107,2000
-1693,B.10,,b,1207,4389
-1718,B.CT,Central Toilets,b,801,3700
-1714,B.FC,Front Corridor,b,914,3950
-1720,B.21,,b,802,3356
-1710,B.PS,Powell Stairs,b,479,4389
-1722,B.FL,Front Lift,b,1110,3138
-1690,B.11B,,b,1618,4389
-1736,B.FC,Front Corridor,b,995,2248
-1729,B.FC,Front Corridor,b,995,3356
-1713,B.18,,b,558,4240
-1696,B.FC,Front Corridor,b,914,4389
-1719,B.FC,Front Corridor,b,914,3356
-1726,B.FS,Front Stairs,b,1362,3261
-1704,B.16/17,Enderby Lecture Theatre,b,412,5270
-1695,B.FC,Front Corridor,b,914,4263
-1708,B.PS,Powell Stairs,b,603,4302
-1735,B.FC,Front Corridor,b,995,2347
-1699,B.EF,Enderby Foyer,b,727,4500
-1717,B.FC,Front Corridor,b,914,3700
-1705,B.16/17,Enderby Lecture Theatre,b,727,5270
-1724,B.FS,Front Stairs,b,1151,3452
-1691,B.11C,,b,1770,4389
-1721,B.FL,Front Landing,b,1110,3356
-1742,B.29,,b,882,2347
-1700,B.EF,Enderby Foyer,b,603,4500
-1738,B.FC,Front Corridor,b,995,2000
-1688,B.CC,Central Corridor,b,1435,4263
-1707,B.FT,Front Toilets,b,412,4040
-1692,B.CC,Central Corridor,b,1207,4263
-1703,B.16/17,Enderby Lecture Theatre,b,727,4666
-1702,B.16/17,Enderby Lecture Theatre,b,412,4666
-1689,B.11A,,b,1435,4389
-1740,B.25,,b,882,2451
-1715,B.12,,b,1026,3950
-1730,B.FC,Front Corridor,b,995,2991
-1737,B.FC,Front Corridor,b,995,2148
-1701,B.EF,Enderby Foyer,b,412,4500
-1698,B.FC,Front Corridor,b,914,4500
-1727,B.22,,b,914,3161
-1687,B.CC,Central Corridor,b,3644,4263
-1739,B.24,,b,1107,2451
-1743,B.29,,b,882,2248
-1723,B.FS,Front Stairs,b,1151,3356
-1712,B.19,,b,727,4240
-1709,B.PS,Powell Stairs,b,479,4302
-1745,B.31,,b,1107,2148
-1716,B.20,,b,801,3950
-1686,B.BL,Back Lift,b,3644,4384
-1725,B.FS,Front Stairs,b,1362,3452
-1732,B.23A,,b,1241,3123
-1697,B.15,,b,1026,4389
-1734,B.FC,Front Corridor,b,995,2451
-1741,B.26/27/28,,b,1107,2347
-1744,B.30,,b,882,2148
-1731,B.23,,b,1241,2991
+11,B.10,,b,1207,4389
+7,B.11A,,b,1435,4389
+8,B.11B,,b,1618,4389
+9,B.11C,,b,1770,4389
+3,B.12,,b,1168,3824
+14,B.15,,b,1026,4389
+0,B.16/17,Enderby Room,b,576,4976
+28,B.18,,b,558,4240
+27,B.19,,b,727,4240
+31,B.20,,b,801,3950
+35,B.21,,b,802,3356
+42,B.22,,b,914,3161
+45,B.23,,b,1241,2991
+46,B.23A,,b,1241,3123
+52,B.24,,b,1107,2451
+53,B.25,,b,882,2451
+54,B.26/27/28,,b,1107,2347
+55,B.29,,b,882,2347
+56,B.30,,b,882,2248
+58,B.31,,b,1107,2148
+57,B.32,,b,882,2148
+2,B.33,,b,1152,1888
+1,B.34,,b,840,1872
+6,B.CC,Central Corridor,b,1435,4263
+33,B.CT,Central Toilets,b,801,3700
+17,B.EF,Enderby Foyer,b,603,4500
+34,B.FC,Front Corridor,b,914,3356
+38,B.FS,Front Stairs,b,1151,3356
+23,B.FT,Front Toilets,b,412,4040
+25,B.PS,Stairs,b,479,4302
+37,LF,Front Lift,b,1110,3138
+4,LR,Rear Lift,b,3644,4384
+#
+#    All locations below this point are children.
+#    For proper ordering ensure children have name set to '#'
+#
+30,B.12,#,b,1026,3950
+20,B.16/17,#,b,727,4666
+21,B.16/17,#,b,412,5270
+19,B.16/17,#,b,412,4666
+22,B.16/17,#,b,727,5270
+59,B.33,#,b,1107,2000
+60,B.34,#,b,882,2000
+5,B.CC,#,b,3644,4263
+10,B.CC,#,b,1207,4263
+18,B.EF,#,b,412,4500
+16,B.EF,#,b,727,4500
+29,B.FC,#,b,914,3950
+50,B.FC,#,b,995,2148
+13,B.FC,#,b,914,4389
+44,B.FC,#,b,995,2991
+51,B.FC,#,b,995,2000
+12,B.FC,#,b,914,4263
+49,B.FC,#,b,995,2248
+32,B.FC,#,b,914,3700
+48,B.FC,#,b,995,2347
+43,B.FC,#,b,995,3356
+47,B.FC,#,b,995,2451
+15,B.FC,#,b,914,4500
+39,B.FS,#,b,1151,3452
+36,B.FS,#,b,1110,3356
+40,B.FS,#,b,1362,3452
+41,B.FS,#,b,1362,3261
+26,B.PS,#,b,479,4389
+24,B.PS,#,b,603,4302
