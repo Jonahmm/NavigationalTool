@@ -7,13 +7,12 @@ jobs:
     environment:
       JVM_OPTS: -Xmx3200m
     steps:
-    - checkout:
-        path: ~/project
+    - checkout
     - restore_cache:
         key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
     - run:
-       name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
-       command: sudo chmod +x ./gradlew
+       name: Build Gradle Wrapper #if permission for Gradlew Dependencies fail, use this.
+       command: gradle wrapper --gradle-version 2.13
     - run:
         name: Download Dependencies
         command: ./gradlew androidDependencies
