@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/code
+    working_directory: ~/code/
     docker:
     - image: circleci/android:api-25-alpha
     environment:
@@ -10,9 +10,9 @@ jobs:
     - checkout
     - restore_cache:
         key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
-#    - run:
-#       name: Build Gradle Wrapper #if permission for Gradlew Dependencies fail, use this.
-#       command: ./gradle wrapper --gradle-version 4.6
+    - run:
+       name: Build Gradle Wrapper #if permission for Gradlew Dependencies fail, use this.
+       command: gradle wrapper --gradle-version 4.6
     - run:
         name: Download Dependencies
         command: ./gradlew androidDependencies
