@@ -7,7 +7,7 @@ target/
 build/
 local.properties
 
-gradlew
+#gradlew
 gradlew.bat
 gradle/
 .gradle/
