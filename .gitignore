@@ -7,10 +7,9 @@ target/
 build/
 local.properties
 
-
 gradlew
 gradlew.bat
-#gradle/
+gradle/
 .gradle/
 
 *.DS_Store
