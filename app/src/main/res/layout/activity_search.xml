@@ -22,95 +22,47 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/search_appbar">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/search_rlabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:text="Recent" />
+            android:text="Recent Searches"
+            app:layout_constraintLeft_toLeftOf="parent" />
 
-        <HorizontalScrollView
+        <View
+            android:id="@+id/divider"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:id="@+id/search_recents"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/eg_recent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/rounded_rect_btn"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:text="Powell LT | G.42"
-                    android:textAllCaps="false"
-                    android:textColor="@android:color/white"
-                    android:textColorLink="@android:color/white" />
-
-                <Button
-                    android:id="@+id/eg_recent4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/rounded_rect_btn"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:text="Mott LT | G.11"
-                    android:textAllCaps="false"
-                    android:textColor="@android:color/white"
-                    android:textColorLink="@android:color/white" />
-
-            </LinearLayout>
-        </HorizontalScrollView>
-
-        <TextView
-            android:id="@+id/search_qlabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="4dp"
-            android:text="Quick Access" />
-
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <LinearLayout
-                android:id="@+id/search_quick"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/eg_recent5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/rounded_rect_btn"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:text="Main Entrance"
-                    android:textAllCaps="false"
-                    android:textColor="@android:color/white"
-                    android:textColorLink="@android:color/white" />
-            </LinearLayout>
-        </HorizontalScrollView>
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:background="?android:attr/listDivider"
+            android:foreground="@color/colorAccent" />
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/search_mapselect"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_margin="16dp"
+        android:layout_weight="1"
+        android:background="@drawable/rounded_rect_bigbtn"
+        android:drawableStart="@drawable/ic_map"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:text=" Select on Map"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textColorLink="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
     <ListView
         android:id="@+id/search_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/search_extra" />
 
 </android.support.constraint.ConstraintLayout>

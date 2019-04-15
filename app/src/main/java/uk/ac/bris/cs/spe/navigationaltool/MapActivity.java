@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -188,7 +189,7 @@ public class MapActivity extends AppCompatActivity
         // Get the SearchView and set the searchable configuration
         MenuItem srch = menu.findItem(R.id.app_bar_search);
         srch.setOnMenuItemClickListener(e -> {
-            startSearch();
+            startSearch(SearchActivity.REQ_JUST_SEARCH);
             return true;
         });
 
@@ -253,6 +254,8 @@ public class MapActivity extends AppCompatActivity
             setNavigationDst(src);
         });
 
+        TextView f = findViewById(R.id.floor_name);
+        f.setOnClickListener(e -> debugDrawGraph());
     }
 
     /**
@@ -381,6 +384,7 @@ public class MapActivity extends AppCompatActivity
     private void startNavSelect(Button btn) {
         cancelNavSelect(findViewById(btn.getId() == R.id.navigation_src_btn ? R.id.navigation_dst_btn
                 : R.id.navigation_src_btn));
+        startSearch(SearchActivity.REQ_FOR_NAVIGATION);
         selecting = btn.getId() == R.id.navigation_src_btn ? Selecting.NAVSRC : Selecting.NAVDST;
         btn.setText(R.string.selecting_text);
         btn.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,R.drawable.ic_close,0);
@@ -412,7 +416,7 @@ public class MapActivity extends AppCompatActivity
         selecting = Selecting.SELECTION;
         Location l = btn.getId() == R.id.navigation_src_btn ? navigationSrc : navigationDst;
 
-        btn.setText(l != null ? (l.hasName() ? l.getName() : l.getCode()) : getString(R.string.click_to_edit));
+        btn.setText(l != null ? (l.hasName() ? l.getName() : l.getCode()) + " " : getString(R.string.click_to_edit));
         btn.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,R.drawable.ic_edit,0);
         btn.setOnClickListener(e -> startNavSelect(btn));
 
@@ -502,7 +506,9 @@ public class MapActivity extends AppCompatActivity
             p.setProgress(0, false);
             p.setVisibility(View.VISIBLE);
             bottomBarHide();
-        }
+            findViewById (R.id.floor_select)  .setVisibility(View.GONE);
+            findViewById(R.id.navigation_show).setVisibility(View.GONE);
+                    }
 
         @Override
         protected List<Path> doInBackground(Building... buildings) {
@@ -550,7 +556,8 @@ public class MapActivity extends AppCompatActivity
             if(paths != null && !paths.isEmpty()) {
                 mapView.drawRoute(from, to, paths);
             } else alertMsg(getString(R.string.navigation_failure));
-            //super.onPostExecute(paths);
+            findViewById (R.id.floor_select)  .setVisibility(View.VISIBLE);
+
         }
     }
 
@@ -654,7 +661,7 @@ public class MapActivity extends AppCompatActivity
         mapView.getDisplayMatrix(m);
         float[] pts = {l.getX() * mapView.fct, l.getY() * mapView.fct};
         m.mapPoints(pts);
-        mapView.setScale(4, pts[0], pts[1], false);
+        mapView.setScale(4, pts[0], pts[1], true);
 
         selectedLocation = l;
     }
@@ -829,10 +836,12 @@ public class MapActivity extends AppCompatActivity
         }
     }
 
-    public void startSearch(){
+    public void startSearch(int req) {
         Intent intent = new Intent(Intent.ACTION_SEARCH, null, this, SearchActivity.class);
         intent.putExtra("LOCATIONS", building.getPrincipalLocations());
-        startActivityForResult(intent, 1);
+        intent.putExtra("MAPBTNVIS", req == SearchActivity.REQ_FOR_NAVIGATION
+                ? View.VISIBLE : View.GONE);
+        startActivityForResult(intent, req);
     }
 
     @Override
@@ -840,6 +849,20 @@ public class MapActivity extends AppCompatActivity
         if(resultCode==RESULT_OK) {
             select((Location) data.getSerializableExtra("RESULT"));
         }
+        else if (requestCode == SearchActivity.REQ_FOR_NAVIGATION && resultCode == RESULT_CANCELED) {
+            cancelNavSelect(findViewById(selecting == Selecting.NAVDST
+                    ? R.id.navigation_dst_btn : R.id.navigation_src_btn));
+        }
+        else if (resultCode == SearchActivity.RESULT_SELECT_ON_MAP) {
+            // Nothing actually needs doing
+        }
         else super.onActivityResult(requestCode, resultCode, data);
     }
+
+    void debugDrawGraph() {
+        Paint p = new Paint(); p.setColor(Color.RED); p.setStrokeWidth(3); p.setAntiAlias(true);
+        mapView.drawPathsToBuffer(building.getGraph().getAllPaths(), p);
+
+    }
+
 }

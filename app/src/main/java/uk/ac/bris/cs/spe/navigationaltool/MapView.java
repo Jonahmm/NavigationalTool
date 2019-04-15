@@ -240,7 +240,7 @@ public class MapView extends PhotoView {
      * Like {@link #drawPathToBuffer(Point, Point, Paint pathPaint)} but lots
      * @param paths The collection of paths to draw
      */
-    private void drawPathsToBuffer(Collection<Path> paths, Paint pathPaint) {
+    void drawPathsToBuffer(Collection<Path> paths, Paint pathPaint) {
         for (Path p : paths) {
             drawPathToBuffer(p, pathPaint);
         }
