@@ -86,7 +86,7 @@ public class Building {
             floorBaseIDs.put(fields[0], base);
             Log.d("Adding Floor", fields[1] + " from base ID " + base);
             floorNames.put(fields[0], fields[1]);
-            base += loadFloor(fields[0], base);
+            base += loadFloor(directory + fields[0], base);
         }
         if (!gotDefault) throw new IllegalArgumentException("Bad file format. " +
                 "Building should have a default floor.");
