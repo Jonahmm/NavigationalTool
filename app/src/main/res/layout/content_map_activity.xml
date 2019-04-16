@@ -91,6 +91,20 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/selected_title" />
 
+            <Button
+                android:id="@+id/image_room"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/rounded_rect_btn"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:text=" Image"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/selected_title" />
+
         </android.support.constraint.ConstraintLayout>
 
         <android.support.constraint.ConstraintLayout
