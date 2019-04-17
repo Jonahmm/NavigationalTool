@@ -243,6 +243,10 @@ public class MapActivity extends AppCompatActivity
         Button navd = findViewById(R.id.navigation_dst_btn);
         navd.setOnClickListener(e -> startNavSelect(navd));
 
+        //Button to display image of room
+        Button vr_image = findViewById(R.id.image_room);
+        vr_image.setOnClickListener(e -> openVrPanoramaView());
+
         ImageButton swap = findViewById(R.id.navigation_swap_btn);
         swap.setOnClickListener(e -> {
             Location src = navigationSrc;
@@ -369,6 +373,11 @@ public class MapActivity extends AppCompatActivity
         }
 
         return true;
+    }
+
+    public void openVrPanoramaView(){
+        Intent intent = new Intent(this, VrPanoramaView.class);
+        startActivity(intent);
     }
 
     /*------------*
