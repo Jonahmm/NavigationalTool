@@ -27,8 +27,8 @@ public class FabTextDrawable extends Drawable {
 
     @Override
     public void draw(@NonNull Canvas canvas) {
-        p.setTextSize(canvas.getClipBounds().height()/2);
-        canvas.drawText(text, canvas.getClipBounds().centerX(), canvas.getClipBounds().bottom * 3/5, p);
+        p.setTextSize(canvas.getClipBounds().height() / 2f);
+        canvas.drawText(text, canvas.getClipBounds().centerX(), canvas.getClipBounds().bottom * 3/5f, p);
     }
 
     @Override

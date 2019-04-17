@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 
-public class LocationListAdapter implements ListAdapter {
+public class LocationListAdapter extends BaseAdapter {
     private final Context context;
     private final List<Location> locations;
 
@@ -80,11 +81,6 @@ public class LocationListAdapter implements ListAdapter {
         }
         else tv.setVisibility(View.GONE);
 
-//        Bitmap b = Bitmap.createBitmap(maps.get(l.getFloor()), (int) (l.getX() * fct) - 24,
-//                (int) (l.getY() * fct) - 24, 48, 48);
-//
-//        ImageView iv = view.findViewById(R.id.location_list_image_preview);
-//        iv.setImageBitmap(b);
         return view;
     }
 

@@ -30,6 +30,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -258,6 +259,17 @@ public class MapActivity extends AppCompatActivity
             setNavigationDst(src);
         });
 
+        CheckBox c = findViewById(R.id.navigation_show_dir);
+        c.setOnClickListener(e -> {
+            boolean b = c.isChecked();
+            findViewById(  R.id.navigation_editor  ).setVisibility(!b ? View.VISIBLE : View.GONE);
+            findViewById(R.id.navigation_directions).setVisibility( b ? View.VISIBLE : View.GONE);
+            ((TextView) findViewById(R.id.navigation_title)).setText(
+                    b ? "Route from " + navigationSrc.getCode() + " to " + navigationDst.getCode()
+                      : "Route from"
+            );
+        });
+
         TextView f = findViewById(R.id.floor_name);
         f.setOnClickListener(e -> debugDrawGraph());
     }
@@ -268,7 +280,7 @@ public class MapActivity extends AppCompatActivity
      */
     void loadBuilding() {
         try {
-            building = new Building("physics", new DijkstraNavigator(),
+            building = new Building("physics/physics", new DijkstraNavigator(),
                     getApplicationContext());
             snackMsg( "Imported " + building.getGraph().getAllLocations().size()
                        + " locations and " + building.getGraph().getAllPaths().size()
@@ -408,6 +420,7 @@ public class MapActivity extends AppCompatActivity
     private void exitNavigation() {
         navigationSrc = null;
         navigationDst = null;
+        resetNavView();
         if (selectedLocation != null) {
             showLocation(selectedLocation);
         }
@@ -453,7 +466,25 @@ public class MapActivity extends AppCompatActivity
         Button btn = findViewById(R.id.navigation_src_btn);
         cancelNavSelect(btn);
         selecting = Selecting.SELECTION;
+        findViewById(R.id.navigation_show_dir).setVisibility(
+                navigationDst == null ? View.GONE : View.VISIBLE);
         //formatNav();
+        doNavigation();
+    }
+
+    /**
+     * Basically identical to {@link #setNavigationSrc(Location)}. The two could be combined but
+     * that would require more parameters
+     * @see #setNavigationSrc(Location)
+     * @param l The {@link Location} to be the new destination
+     */
+    private void setNavigationDst(Location l) {
+        navigationDst = l;
+        Button btn = findViewById(R.id.navigation_dst_btn);
+        cancelNavSelect(btn);
+        selecting = Selecting.SELECTION;
+        findViewById(R.id.navigation_show_dir).setVisibility(
+                navigationSrc == null ? View.GONE : View.VISIBLE);
         doNavigation();
     }
 
@@ -468,20 +499,6 @@ public class MapActivity extends AppCompatActivity
         btn.setText(R.string.click_to_edit);
         btn.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,R.drawable.ic_edit,0);
 
-    }
-
-    /**
-     * Basically identical to {@link #setNavigationSrc(Location)}. The two could be combined but
-     * that would require more parameters
-     * @see #setNavigationSrc(Location)
-     * @param l The {@link Location} to be the new destination
-     */
-    private void setNavigationDst(Location l) {
-        navigationDst = l;
-        Button btn = findViewById(R.id.navigation_dst_btn);
-        cancelNavSelect(btn);
-        selecting = Selecting.SELECTION;
-        doNavigation();
     }
 
     /**
@@ -602,9 +619,8 @@ public class MapActivity extends AppCompatActivity
             select(ol.get());
             return;
         }
-        deselect();
-
-        //snackMsg("Nothing here: " + x +"," + y);
+        if (selecting == Selecting.SELECTION) deselect();
+        else snackMsg("Nothing here");
     }
 
     /**
@@ -632,6 +648,7 @@ public class MapActivity extends AppCompatActivity
      */
     private void deselect() {
         bottomBarHide();
+        resetNavView();
         if (selectedLocation != null || navigationSrc != null || navigationDst != null) {
             selectedLocation = null;
             navigationSrc = null;
@@ -698,6 +715,11 @@ public class MapActivity extends AppCompatActivity
         botBox.setVisibility(View.VISIBLE);
         botBox.findViewById(R.id.navigation_panel).setVisibility(View.VISIBLE);
         botBox.findViewById(R.id.selected_details).setVisibility(View.GONE);
+
+        ((CheckBox) findViewById(R.id.navigation_show_dir)).setChecked(false);
+        findViewById(R.id.navigation_editor).setVisibility(View.VISIBLE);
+        findViewById(R.id.navigation_directions).setVisibility(View.GONE);
+
         findViewById(R.id.navigation_show).setVisibility(View.GONE);
     }
 
@@ -732,29 +754,9 @@ public class MapActivity extends AppCompatActivity
         alert.show();
     }
 
-    /**
-     * Place the destination and swap buttons below the source button if there is not enough space.
-     * Not working very well currently
-     */
-    private void formatNav() {
-        Button dst = findViewById(R.id.navigation_dst_btn);
-        Button src = findViewById(R.id.navigation_src_btn);
-        ConstraintLayout nv = findViewById(R.id.navigation_panel);
-        ConstraintSet c = new ConstraintSet();
-        c.clone(nv);
-        if(dst.getText().length() + src.getText().length() > 22) {
-            c.clear(R.id.navigation_dst_btn, ConstraintSet.TOP);
-            c.connect(R.id.navigation_dst_btn, ConstraintSet.TOP, R.id.navigation_src_btn, ConstraintSet.BOTTOM);
-            c.clear(R.id.navigation_dst_btn, ConstraintSet.LEFT);
-            c.setMargin(R.id.navigation_dst_btn, ConstraintSet.LEFT, 8);
-
-        } else {
-            c.connect(R.id.navigation_dst_btn, ConstraintSet.LEFT, R.id.nav_txt_to, ConstraintSet.RIGHT);
-            c.clear(R.id.navigation_dst_btn, ConstraintSet.TOP);
-            c.connect(R.id.navigation_dst_btn, ConstraintSet.TOP, R.id.navigation_title, ConstraintSet.BOTTOM);
-            c.setMargin(R.id.navigation_dst_btn, ConstraintSet.TOP, 8);
-        }
-        c.applyTo(nv);
+    private void resetNavView() {
+        findViewById(R.id.navigation_show_dir).setVisibility(View.GONE);
+        ((TextView) findViewById(R.id.navigation_title)).setText("Route from");
     }
 
     /*---------*
@@ -818,8 +820,8 @@ public class MapActivity extends AppCompatActivity
      */
     private int intToId(int in) {
         switch (in) {
-            case 1: return R.id.item_ug;
-            case 2: return R.id.item_staff;
+            case  1: return R.id.item_ug;
+            case  2: return R.id.item_staff;
             default: return R.id.item_ug;
         }
     }
@@ -841,7 +843,7 @@ public class MapActivity extends AppCompatActivity
             case "3": return R.drawable.map3;
             case "4": return R.drawable.map4;
             //In a well formed build the below case is never reached.
-            default: return R.drawable.map0;
+            default:  return R.drawable.map0;
         }
     }
 
@@ -863,7 +865,7 @@ public class MapActivity extends AppCompatActivity
                     ? R.id.navigation_dst_btn : R.id.navigation_src_btn));
         }
         else if (resultCode == SearchActivity.RESULT_SELECT_ON_MAP) {
-            // Nothing actually needs doing
+            // Nothing actually needs doing - remain in nav selection mode
         }
         else super.onActivityResult(requestCode, resultCode, data);
     }
@@ -871,7 +873,6 @@ public class MapActivity extends AppCompatActivity
     void debugDrawGraph() {
         Paint p = new Paint(); p.setColor(Color.RED); p.setStrokeWidth(3); p.setAntiAlias(true);
         mapView.drawPathsToBuffer(building.getGraph().getAllPaths(), p);
-
     }
 
 }

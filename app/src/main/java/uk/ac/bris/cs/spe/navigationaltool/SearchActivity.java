@@ -10,6 +10,7 @@ import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -52,9 +53,11 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         list.setOnItemClickListener((adapterView, view, i, id)
                 -> returnLocation((Location) list.getAdapter().getItem(i)));
         list.setOnItemLongClickListener((adapterView, view, i, l) -> {
-            if (extra.getVisibility() == View.VISIBLE) {
-                view.setVisibility(View.GONE);
+            if (extra.getVisibility() == View.VISIBLE) { //i.e. displaying recents
+
                 recent.remove(i);
+                list.setAdapter(new LocationListAdapter(this, recent));
+
                 saveRecent();
                 return true;
             }
