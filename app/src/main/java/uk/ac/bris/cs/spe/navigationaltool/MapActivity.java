@@ -466,9 +466,7 @@ public class MapActivity extends AppCompatActivity
         Button btn = findViewById(R.id.navigation_src_btn);
         cancelNavSelect(btn);
         selecting = Selecting.SELECTION;
-        findViewById(R.id.navigation_show_dir).setVisibility(
-                navigationDst == null ? View.GONE : View.VISIBLE);
-        //formatNav();
+        showDirIfPossible();
         doNavigation();
     }
 
@@ -483,8 +481,7 @@ public class MapActivity extends AppCompatActivity
         Button btn = findViewById(R.id.navigation_dst_btn);
         cancelNavSelect(btn);
         selecting = Selecting.SELECTION;
-        findViewById(R.id.navigation_show_dir).setVisibility(
-                navigationSrc == null ? View.GONE : View.VISIBLE);
+        showDirIfPossible();
         doNavigation();
     }
 
@@ -757,6 +754,13 @@ public class MapActivity extends AppCompatActivity
     private void resetNavView() {
         findViewById(R.id.navigation_show_dir).setVisibility(View.GONE);
         ((TextView) findViewById(R.id.navigation_title)).setText("Route from");
+    }
+
+    private void showDirIfPossible() {
+        findViewById(R.id.navigation_show_dir).setVisibility(
+                navigationSrc != null && navigationDst != null
+                ? View.VISIBLE : View.GONE
+        );
     }
 
     /*---------*
