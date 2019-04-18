@@ -104,6 +104,7 @@ public class MapActivity extends AppCompatActivity
      * Defines the current state of the program
      */
     private Selecting selecting = Selecting.SELECTION;
+    private Route route = null;
 
     /*----------------*
      * INITIALISATION *
@@ -272,6 +273,19 @@ public class MapActivity extends AppCompatActivity
 
         TextView f = findViewById(R.id.floor_name);
         f.setOnClickListener(e -> debugDrawGraph());
+
+        ImageButton ib = findViewById(R.id.nav_dir_next);
+        ib.setOnClickListener(e -> {
+            if (route == null) return;
+            route.next();
+            ((TextView) findViewById(R.id.nav_dir_text)).setText(route.getCurrentInstruction());
+        });
+        ib = findViewById(R.id.nav_dir_prev);
+        ib.setOnClickListener(e -> {
+            if (route == null) return;
+            route.prev();
+            ((TextView) findViewById(R.id.nav_dir_text)).setText(route.getCurrentInstruction());
+        });
     }
 
     /**
@@ -356,13 +370,6 @@ public class MapActivity extends AppCompatActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-//        if (id == R.id.show_search) {
-//            startSearch();
-//            return true;
-//        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -387,7 +394,7 @@ public class MapActivity extends AppCompatActivity
         return true;
     }
 
-    public void openVrPanoramaView(){
+    private void openVrPanoramaView(){
         Intent intent = new Intent(this, VrPanoramaView.class);
         startActivity(intent);
     }
@@ -578,8 +585,14 @@ public class MapActivity extends AppCompatActivity
             bottomBarShowNavigation();
             if(paths != null && !paths.isEmpty()) {
                 mapView.drawRoute(from, to, paths);
-            } else alertMsg(getString(R.string.navigation_failure));
-            findViewById (R.id.floor_select)  .setVisibility(View.VISIBLE);
+                route = new Route(from, to, paths, building.getFloorMap());
+                findViewById(R.id.navigation_show_dir).setVisibility(View.VISIBLE);
+                ((TextView) findViewById(R.id.nav_dir_text)).setText(route.getCurrentInstruction());
+            } else {
+                alertMsg(getString(R.string.navigation_failure));
+                findViewById(R.id.navigation_show_dir).setVisibility(View.GONE);
+            }
+            findViewById (R.id.floor_select).setVisibility(View.VISIBLE);
 
         }
     }
