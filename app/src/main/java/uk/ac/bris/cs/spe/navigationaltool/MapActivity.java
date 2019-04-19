@@ -395,7 +395,7 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void openVrPanoramaView(){
-        Intent intent = new Intent(this, VrPanoramaView.class);
+        Intent intent = new Intent(this, VrView.class);
         startActivity(intent);
     }
 
