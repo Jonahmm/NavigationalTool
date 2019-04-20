@@ -272,13 +272,16 @@ public class MapActivity extends AppCompatActivity
         TextView f = findViewById(R.id.floor_name);
         f.setOnClickListener(e -> debugDrawGraph());
 
+
         ImageButton ib = findViewById(R.id.nav_dir_next);
-        ib.setOnClickListener(e -> {
+        View.OnClickListener l = (e -> {
             if (route == null) return;
             if (route.next()) mapView.drawRoute(route);
-
             ((TextView) findViewById(R.id.nav_dir_text)).setText(route.getCurrentInstruction());
         });
+        ib.setOnClickListener(l);
+        findViewById(R.id.nav_dir_text).setOnClickListener(l);
+
         ib = findViewById(R.id.nav_dir_prev);
         ib.setOnClickListener(e -> {
             if (route == null) return;
