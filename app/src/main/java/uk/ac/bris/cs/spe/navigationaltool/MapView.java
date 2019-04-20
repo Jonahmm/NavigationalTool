@@ -55,7 +55,8 @@ public class MapView extends PhotoView {
     /**
      * Paints for navigation
      */
-    Paint pathPaint, highlightPaint, originPaint, destPaint, selectPaint, otherFloorPaint;
+    Paint pathPaint, highlightPaint, originPaint, destPaint, selectPaint, otherFloorPaint,
+            donePaint, doneOtherPaint;
 
     /**
      * The {@link OnFloorChangeListener} to be notified when the floor displayed changes
@@ -81,7 +82,7 @@ public class MapView extends PhotoView {
      */
     private void initPaints() {
         pathPaint = new Paint();
-        pathPaint.setColor(Color.RED); pathPaint.setAntiAlias(true); pathPaint.setStrokeWidth(10);
+        pathPaint.setColor(0xFF206680); pathPaint.setAntiAlias(true); pathPaint.setStrokeWidth(20);
         pathPaint.setStrokeCap(Paint.Cap.ROUND);
 
         highlightPaint = new Paint();
@@ -97,6 +98,12 @@ public class MapView extends PhotoView {
 
         otherFloorPaint = new Paint(pathPaint);
         otherFloorPaint.setAlpha(64);
+
+        donePaint = new Paint(pathPaint);
+        donePaint.setColor(0xFF3FCCFF);
+
+        doneOtherPaint = new Paint(donePaint);
+        doneOtherPaint.setAlpha(64);
     }
 
     /**
@@ -144,9 +151,30 @@ public class MapView extends PhotoView {
     public void drawRoute(Location from, Location to, Collection<Path> paths){
         refreshAllFloors();
         drawPathsToBuffer(paths, pathPaint, otherFloorPaint);
-        dotLocation(from, originPaint);
-        dotLocation(to, destPaint);
-        showFloorBuffer(from.getFloor());
+    }
+
+    /**
+     * Draw the done paths and those yet to do in different colours. Not very optimised as yet
+     * @param route
+     */
+    public void drawRoute(Route route) {
+        refreshAllFloors();
+        Collection<String> floors = getFloors(route.getAllPaths());
+        drawPathsToBuffer(route.getPathsToDo(), pathPaint, otherFloorPaint, floors);
+        drawPathsToBuffer(route.getDonePaths(), donePaint,  doneOtherPaint, floors);
+        dotLocation(route.getStart(), originPaint);
+        dotLocation( route.getEnd() ,  destPaint );
+        showFloorBuffer(route.getCurrentStepStartPoint().getFloor());
+    }
+
+    /**
+     * Called after {@link Route#next()} or before {@link Route#prev()}, colours the current step in
+     * the route according to whether it's done or not
+     */
+    public void updateRoute(Route route, boolean forward) {
+        drawPathsToBuffer(route.getCurrentPaths(),
+                forward ? donePaint : pathPaint, forward ? doneOtherPaint : otherFloorPaint);
+        showFloorBuffer(route.getCurrentStepStartPoint().getFloor());
     }
 
     /**
@@ -237,7 +265,7 @@ public class MapView extends PhotoView {
     }
 
     /**
-     * Like {@link #drawPathToBuffer(Point, Point, Paint pathPaint)} but lots
+     * Like {@link #drawPathToBuffer(Point, Point, Paint)} but lots
      * @param paths The collection of paths to draw
      */
     void drawPathsToBuffer(Collection<Path> paths, Paint pathPaint) {
@@ -250,12 +278,20 @@ public class MapView extends PhotoView {
      * Like {@link #drawPathToBuffer(Path, Paint, Paint, Collection)} but lots
      * @param paths The collection of paths to draw
      */
+    private void drawPathsToBuffer(Collection<Path> paths, Paint thisFloor, Paint otherFloor,
+            Collection<String> floors) {
+        for (Path p : paths) drawPathToBuffer(p, thisFloor, otherFloor, floors);
+    }
+
+    /**
+     * Wrapper for {@link #drawPathsToBuffer(Collection, Paint, Paint, Collection)} that generates
+     * the floors collection
+     */
     private void drawPathsToBuffer(Collection<Path> paths, Paint thisFloor, Paint otherFloor) {
         Collection<String> floors = getFloors(paths);
-        for (Path p : paths) {
-            drawPathToBuffer(p, thisFloor, otherFloor, floors);
-        }
+        drawPathsToBuffer(paths, thisFloor, otherFloor, floors);
     }
+
 
     /**
      * Replaces the map on screen with the buffer from memory

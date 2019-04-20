@@ -13,7 +13,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
-import android.support.constraint.ConstraintSet;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -47,7 +46,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
@@ -277,13 +275,14 @@ public class MapActivity extends AppCompatActivity
         ImageButton ib = findViewById(R.id.nav_dir_next);
         ib.setOnClickListener(e -> {
             if (route == null) return;
-            route.next();
+            if (route.next()) mapView.drawRoute(route);
+
             ((TextView) findViewById(R.id.nav_dir_text)).setText(route.getCurrentInstruction());
         });
         ib = findViewById(R.id.nav_dir_prev);
         ib.setOnClickListener(e -> {
             if (route == null) return;
-            route.prev();
+            if (route.prev()) mapView.drawRoute(route);
             ((TextView) findViewById(R.id.nav_dir_text)).setText(route.getCurrentInstruction());
         });
     }
@@ -527,6 +526,12 @@ public class MapActivity extends AppCompatActivity
         User user;
         Location from, to;
         ProgressBar p;
+
+        /**
+         * Prepare for navigation; set up progress bar and hide views that can interfere with the
+         * process. Instantiates {@code user, from, to} in this class to provide some measure of
+         * thread-safety
+         */
         @Override
         protected void onPreExecute() {
             user = getUserFromParams(access, disabl);
@@ -538,8 +543,14 @@ public class MapActivity extends AppCompatActivity
             bottomBarHide();
             findViewById (R.id.floor_select)  .setVisibility(View.GONE);
             findViewById(R.id.navigation_show).setVisibility(View.GONE);
-                    }
+        }
 
+        /**
+         * Use the building's navigator to calculate routes between all potential origin-destination
+         * pairs, selecting the shortest (if present) as the route.
+         * @param buildings only ever {{@link #building}}
+         * @return The list representing the route found (or empty)
+         */
         @Override
         protected List<Path> doInBackground(Building... buildings) {
             Building b = buildings[0];
@@ -579,13 +590,21 @@ public class MapActivity extends AppCompatActivity
             p.setProgress(values[0], true);
         }
 
+        /**
+         * Takes the result from {@link #doInBackground(Building...)} and creates a {@link Route}
+         * object to generate directions. Hides the progress bar and the translucent filter, and
+         * brings up any hidden UI elements again. Displays a message and removes the directions
+         * option if no route was found.
+         * @param paths A (potentially empty) list representing the route found (if any)
+         */
         @Override
         protected void onPostExecute(List<Path> paths) {
             findViewById(R.id.wait_indicator).setVisibility(View.GONE);
             bottomBarShowNavigation();
             if(paths != null && !paths.isEmpty()) {
-                mapView.drawRoute(from, to, paths);
+//                mapView.drawRoute(from, to, paths);
                 route = new Route(from, to, paths, building.getFloorMap());
+                mapView.drawRoute(route);
                 findViewById(R.id.navigation_show_dir).setVisibility(View.VISIBLE);
                 ((TextView) findViewById(R.id.nav_dir_text)).setText(route.getCurrentInstruction());
             } else {
@@ -605,7 +624,7 @@ public class MapActivity extends AppCompatActivity
      * Selection by search. Note that it calls {@link #select(Location)} not
      * {@link #showLocation(Location)} as selection may be used for navigation not just display
      * If the floor selector is shown, it hides it instead of search.
-     * @param view The origin of the event. In our case always == mapView
+     * @param view The origin of the event. In our case always == {@link #mapView}
      * @param x The 0-1 value denoting the x on the image of the tap
      * @param y The 0-1 value denoting the y on the image of the tap
      */
