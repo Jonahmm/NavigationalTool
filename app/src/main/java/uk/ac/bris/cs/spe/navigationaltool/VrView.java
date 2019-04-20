@@ -28,7 +28,7 @@ public class VrView extends AppCompatActivity {
         AssetManager assetManager = getAssets();
 
         try{
-            inputStream = assetManager.open("basement entrance front.jpg");
+            inputStream = assetManager.open("images/basement entrance front.jpg");
             options.inputType = VrPanoramaView.Options.TYPE_MONO;
             mVRPanoramaView.loadImageFromBitmap(BitmapFactory.decodeStream(inputStream),options);
             inputStream.close();
