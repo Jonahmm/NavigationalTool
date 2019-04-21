@@ -1,14 +1,14 @@
 package uk.ac.bris.cs.spe.navigationaltool;
 
-import android.content.Intent;
+
 import android.content.res.AssetManager;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
+import android.widget.TextView;
 import com.google.vr.sdk.widgets.pano.VrPanoramaView;
-
 import java.io.InputStream;
+
 
 public class VrView extends AppCompatActivity {
 
@@ -26,9 +26,12 @@ public class VrView extends AppCompatActivity {
         VrPanoramaView.Options options = new VrPanoramaView.Options();
         InputStream inputStream = null;
         AssetManager assetManager = getAssets();
+        TextView text = findViewById(R.id.selected_subtitle);
+        String code = text.getText().toString();
+        String locCode = "images/" + code + ".jpg";
 
         try{
-            inputStream = assetManager.open("images/basement entrance front.jpg");
+            inputStream = assetManager.open(locCode);
             options.inputType = VrPanoramaView.Options.TYPE_MONO;
             mVRPanoramaView.loadImageFromBitmap(BitmapFactory.decodeStream(inputStream),options);
             inputStream.close();
