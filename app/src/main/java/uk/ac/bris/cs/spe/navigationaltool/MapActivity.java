@@ -148,6 +148,12 @@ public class MapActivity extends AppCompatActivity
 
         //Called here to a) correctly set scale and b) update floor indicator
         mapView.setFloor(building.getDefaultFloor(), MapView.RESET_NONE);
+
+        //Set up the voronoi diagram
+        View navHeader = navigationView.getHeaderView(0);
+        ImageView voronoiDiagram = navHeader.findViewById(R.id.voronoi);
+        VoronoiDrawable voronoiDrawable = new VoronoiDrawable();
+        voronoiDiagram.setImageDrawable(voronoiDrawable);
     }
 
     /**
