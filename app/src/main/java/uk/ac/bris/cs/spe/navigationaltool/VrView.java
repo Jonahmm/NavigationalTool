@@ -1,6 +1,7 @@
 package uk.ac.bris.cs.spe.navigationaltool;
 
 
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
@@ -18,21 +19,24 @@ public class VrView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vr_view);
         mVRPanoramaView = findViewById(R.id.vrPanoramaView);
-        loadPhotoSphere();
+        handleIntent(getIntent());
+    }
+
+    private void handleIntent(Intent intent){
+        String code = intent.getStringExtra("CODE");
+        String locCode = "images/" + code + ".jpg";
+        loadPhotoSphere(locCode);
     }
 
 
-    private void loadPhotoSphere(){
+    private void loadPhotoSphere(String name){
         VrPanoramaView.Options options = new VrPanoramaView.Options();
         InputStream inputStream = null;
         AssetManager assetManager = getAssets();
-        TextView text = findViewById(R.id.selected_subtitle);
-
 
         try{
-            String code = text.getText().toString();
-            String locCode = "images/" + code + ".jpg";
-            inputStream = assetManager.open(locCode);
+
+            inputStream = assetManager.open(name);
             options.inputType = VrPanoramaView.Options.TYPE_MONO;
             mVRPanoramaView.loadImageFromBitmap(BitmapFactory.decodeStream(inputStream),options);
             inputStream.close();
