@@ -27,10 +27,11 @@ public class VrView extends AppCompatActivity {
         InputStream inputStream = null;
         AssetManager assetManager = getAssets();
         TextView text = findViewById(R.id.selected_subtitle);
-        String code = text.getText().toString();
-        String locCode = "images/" + code + ".jpg";
+
 
         try{
+            String code = text.getText().toString();
+            String locCode = "images/" + code + ".jpg";
             inputStream = assetManager.open(locCode);
             options.inputType = VrPanoramaView.Options.TYPE_MONO;
             mVRPanoramaView.loadImageFromBitmap(BitmapFactory.decodeStream(inputStream),options);
