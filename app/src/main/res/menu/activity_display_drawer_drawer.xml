@@ -5,23 +5,27 @@
     tools:showIn="navigation_view">
 
     <group
-        android:id="@+id/access_picker"
+        android:id="@+id/building_picker"
         android:checkableBehavior="single">
         <item
-            android:enabled="false"
-            android:title="@string/i_am_a" />
+            android:id="@+id/building_physics"
+            android:contentDescription="physics/physics"
+            android:title="@string/physics_building" />
         <item
-            android:id="@+id/item_ug"
-            android:title="@string/undergrad_student" />
-        <item
-            android:id="@+id/item_staff"
-            android:title="@string/staff_member" />
+            android:id="@+id/building_maths"
+            android:title="@string/fry_building" />
     </group>
+    <item
+        android:id="@+id/staff_switch"
+        android:checked="false"
+        android:title="@string/staff_access"
+        app:actionLayout="@layout/switch_item"
+        app:showAsAction="always" />
     <item
         android:id="@+id/disabled_item"
         android:checkable="false"
         android:title="@string/disabled_access"
         app:actionLayout="@layout/switch_item"
-        app:showAsAction="always" />
+        app:showAsAction="always" ></item>
 
 </menu>

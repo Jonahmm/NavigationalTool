@@ -13,9 +13,9 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".MapActivity"
-            android:label="@string/title_activity_display_drawer"
+            android:label="@string/map_activity_def_title"
             android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar"> <!-- This is set so that callbacks don't invoke a new activity -->
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,7 +24,7 @@
 
             <meta-data
                 android:name="android.app.default_searchable"
-                android:value=".LocationListActivity"></meta-data>
+                android:value=".LocationListActivity" />
         </activity>
         <activity
             android:name=".SearchActivity"
@@ -37,7 +37,7 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity android:name=".VrView"></activity>
+        <activity android:name=".VrView" />
     </application>
 
 </manifest>

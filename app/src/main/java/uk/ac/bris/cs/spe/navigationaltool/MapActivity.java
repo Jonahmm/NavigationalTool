@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -78,7 +79,7 @@ public class MapActivity extends AppCompatActivity
     /**
      * True if user requires accessible route
      */
-    private Boolean disabl;
+    private Boolean disabl, staff;
 
     /**
      * Stores the selected location
@@ -96,7 +97,7 @@ public class MapActivity extends AppCompatActivity
     /**
      * Keeps track of what a selection (either by tap or search) is for
      */
-    private enum Selecting {SELECTION, NAVSRC, NAVDST}
+    private enum Selecting {NONE, SELECTION, NAVSRC, NAVDST}
 
     /**
      * Defines the current state of the program
@@ -119,8 +120,9 @@ public class MapActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //Load access requirements from saved preferences (if set, otherwise assume able UG)
-        access = getPreferences(MODE_PRIVATE).getInt(getString(R.string.saved_access), 1);
+        int bindex = getPreferences(MODE_PRIVATE).getInt(getString(R.string.saved_building), 0);
+
+        staff  = getPreferences(MODE_PRIVATE).getBoolean(getString(R.string.saved_staff), false);
         disabl = getPreferences(MODE_PRIVATE).getBoolean(getString(R.string.saved_disabl), false);
 
         //Makes the drawer behave
@@ -133,21 +135,23 @@ public class MapActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
 
         //Set menu items to be checked depending on saved values
-        navigationView.getMenu().findItem(intToId(access)).setChecked(true);
+        navigationView.getMenu().findItem(intToId(bindex)).setChecked(true);
+
         Switch s = navigationView.getMenu().findItem(R.id.disabled_item)
-                .getActionView().findViewById(R.id.disabled_switch);
+                .getActionView().findViewById(R.id.sswitch);
         s.setChecked(disabl);
+
+        s = navigationView.getMenu().findItem(R.id.staff_switch)
+                .getActionView().findViewById(R.id.sswitch);
+        s.setChecked(staff);
 
         //Allows updating access requirements from menu
         navigationView.setNavigationItemSelectedListener(this);
         
-        loadBuilding();
-        loadMaps();
-        populateFloorsList();
-        setListeners();
+        new BuildingLoader().execute(loadFromIndex(bindex));
+//        setListeners();
 
         //Called here to a) correctly set scale and b) update floor indicator
-        mapView.setFloor(building.getDefaultFloor(), MapView.RESET_NONE);
 
         //Set up the voronoi diagram
         View navHeader = navigationView.getHeaderView(0);
@@ -156,26 +160,72 @@ public class MapActivity extends AppCompatActivity
         voronoiDiagram.setImageDrawable(voronoiDrawable);
     }
 
+    private class BuildingLoader extends AsyncTask<String, Integer, Building> {
+
+        @Override
+        protected Building doInBackground(String... strings) {
+
+            try {
+                Building b = new Building(strings[0], new DijkstraNavigator(), getApplicationContext());
+                return b;
+            } catch (IOException e) {
+                alertMsg("Error loading building!");
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            ProgressBar p = findViewById(R.id.loading_wait);
+            p.setVisibility(View.VISIBLE);
+            p.setClickable(true);
+
+            selectedLocation = navigationDst = navigationSrc = null;
+            bottomBarHide();
+            visUIElements(View.GONE);
+        }
+
+        @Override
+        protected void onPostExecute(Building b) {
+            ProgressBar p = findViewById(R.id.loading_wait);
+            p.setVisibility(View.GONE);
+            p.setClickable(false);
+            p.setIndeterminate(false);
+            loadMaps(b);
+            populateFloorsList(b);
+            building = b;
+            setListeners();
+            mapView.setFloor(b.getDefaultFloor(), MapView.RESET_NONE);
+            visUIElements(View.VISIBLE);
+            setTitle(building.getName());
+        }
+    }
+
+    private void visUIElements(int vis) {
+        findViewById(R.id.navigation_show).setVisibility(vis);
+        findViewById(R.id.floor_select).setVisibility(vis);
+//        findViewById(R.id.app_bar_search).setVisibility(vis);
+    }
+
     /**
      * Called after {@link #loadBuilding()}, this method uses {@link #building} to decode and load
-     * the floors into memory, and sets the current floor. Due to the way android handles resources,
-     * we must unfortunately hard-code the images that it loads, though using the helper method
-     * {@link #getImageResourceFromCode(String)} makes this easily swappable.
+     * the floors into memory, and sets the current floor.
      */
-    private void loadMaps() {
+    private void loadMaps(Building b) {
         mapView = findViewById(R.id.mapviewer);
 
-        Resources r = getResources();
-        for (String s : building.getFloorMap().keySet()) {
-            Bitmap m = BitmapFactory.decodeResource(r, getImageResourceFromCode(s));
-            mapView.maps.put(s, m);
-            m = m.copy(m.getConfig(), true);
-            mapView.bufs.put(s, m);
-            mapView.canv.put(s, new Canvas(m));
+        Map<String, Bitmap> maps = new ArrayMap<>();
+        try {
+            for (String s : b.getFloorMap().keySet())
+                maps.put(s, BitmapFactory.decodeStream(getAssets()
+                        .open(b.getDirectory() + "map" + s + ".png")));
+        } catch (IOException e) {
+            throw new RuntimeException("Map could not be loaded!");
         }
+        mapView.setMaps(maps);
         //Initialise image
 
-        mapView.setFloor(building.getDefaultFloor(), MapView.RESET_NONE);
+        mapView.setFloor(b.getDefaultFloor(), MapView.RESET_NONE);
         mapView.updateFCT();
         mapView.setMaximumScale(12f);
 
@@ -230,28 +280,33 @@ public class MapActivity extends AppCompatActivity
         //Sets up disabled switch
         NavigationView navigationView = findViewById(R.id.nav_view);
         Switch s = navigationView.getMenu().findItem(R.id.disabled_item).getActionView()
-                .findViewById(R.id.disabled_switch);
+                .findViewById(R.id.sswitch);
         s.setOnCheckedChangeListener((compoundButton, b) -> {
             disabl = b;
             SharedPreferences.Editor e = getPreferences(MODE_PRIVATE).edit();
             e.putBoolean(getString(R.string.saved_disabl), disabl);
             e.apply();
-
+        });
+        s = navigationView.getMenu().findItem(R.id.staff_switch).getActionView()
+                .findViewById(R.id.sswitch);
+        s.setOnCheckedChangeListener((cb, b) -> {
+            staff = b;
+            SharedPreferences.Editor e = getPreferences(MODE_PRIVATE).edit();
+            e.putBoolean(getString(R.string.saved_staff), staff);
+            e.apply();
         });
 
         //Button to start nav
-        Button navgo = findViewById(R.id.selected_get_directions);
-        navgo.setOnClickListener(e -> startNavigationTo(selectedLocation));
+        findViewById(R.id.selected_get_directions).setOnClickListener(v -> startNavigationTo(selectedLocation));
 
         //Navigation buttons
         Button navs = findViewById(R.id.navigation_src_btn);
-        navs.setOnClickListener(e -> startNavSelect(navs));
+        navs.setOnClickListener(v -> startNavSelect(navs));
         Button navd = findViewById(R.id.navigation_dst_btn);
-        navd.setOnClickListener(e -> startNavSelect(navd));
+        navd.setOnClickListener(v -> startNavSelect(navd));
 
 
-        ImageButton swap = findViewById(R.id.navigation_swap_btn);
-        swap.setOnClickListener(e -> {
+        findViewById(R.id.navigation_swap_btn).setOnClickListener(v -> {
             Location src = navigationSrc;
             Location dst = navigationDst;
         //These are set to null to avoid the first setNavigationSrc call trying to calculate a route
@@ -262,7 +317,7 @@ public class MapActivity extends AppCompatActivity
         });
 
         CheckBox c = findViewById(R.id.navigation_show_dir);
-        c.setOnClickListener(e -> {
+        c.setOnClickListener(v -> {
             boolean b = c.isChecked();
             findViewById(  R.id.navigation_editor  ).setVisibility(!b ? View.VISIBLE : View.GONE);
             findViewById(R.id.navigation_directions).setVisibility( b ? View.VISIBLE : View.GONE);
@@ -272,12 +327,8 @@ public class MapActivity extends AppCompatActivity
             );
         });
 
-        TextView f = findViewById(R.id.floor_name);
-        f.setOnClickListener(e -> debugDrawGraph());
-
-
         ImageButton ib = findViewById(R.id.nav_dir_next);
-        View.OnClickListener l = (e -> {
+        View.OnClickListener l = (v -> {
             if (route == null) return;
             if (route.next()) mapView.drawRoute(route);
             ((TextView) findViewById(R.id.nav_dir_text)).setText(route.getCurrentInstruction());
@@ -286,7 +337,7 @@ public class MapActivity extends AppCompatActivity
         findViewById(R.id.nav_dir_text).setOnClickListener(l);
 
         ib = findViewById(R.id.nav_dir_prev);
-        ib.setOnClickListener(e -> {
+        ib.setOnClickListener(v -> {
             if (route == null) return;
             if (route.prev()) mapView.drawRoute(route);
             ((TextView) findViewById(R.id.nav_dir_text)).setText(route.getCurrentInstruction());
@@ -320,8 +371,9 @@ public class MapActivity extends AppCompatActivity
     /**
      * Initialises all the floor-selection buttons
      */
-    private void populateFloorsList() {
+    private void populateFloorsList(Building building) {
         LinearLayout fl = findViewById(R.id.floors_box);
+        fl.removeAllViews();
         FloatingActionButton b;
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -391,21 +443,46 @@ public class MapActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id != R.id.disabled_item) {
+        if (id != R.id.disabled_item && id != R.id.staff_switch) {
             SharedPreferences.Editor e = getPreferences(MODE_PRIVATE).edit();
-            access = idToInt(id);
-            e.putInt(getString(R.string.saved_access), access);
+            int index = idToInt(id);
+            e.putInt(getString(R.string.saved_building), index);
             DrawerLayout drawer = findViewById(R.id.drawer_layout);
             drawer.closeDrawer(GravityCompat.START);
             e.apply();
+            new BuildingLoader().execute(loadFromIndex(index));
         }
 
         return true;
     }
 
+    private int intToId(int in) {
+        switch (in) {
+            case 0: return R.id.building_physics;
+            case 1: return R.id.building_maths;
+            default: return R.id.building_physics;
+        }
+    }
+
+    private int idToInt(int id) {
+        switch (id) {
+            case R.id.building_physics: return 0;
+            case R.id.building_maths  : return 1;
+            default: return 0;
+        }
+    }
+
+    private String loadFromIndex(int in) {
+        switch (in) {
+            case  1: return "maths/maths";
+            default: return "physics/physics";
+        }
+    }
+
     private void openVrPanoramaView(){
         Intent intent = new Intent(this, VrView.class);
         intent.putExtra("CODE", selectedLocation.getCode());
+        intent.putExtra("PATH", building.getDirectory());
         startActivity(intent);
     }
 
@@ -422,8 +499,8 @@ public class MapActivity extends AppCompatActivity
     private void startNavSelect(Button btn) {
         cancelNavSelect(findViewById(btn.getId() == R.id.navigation_src_btn ? R.id.navigation_dst_btn
                 : R.id.navigation_src_btn));
-        startSearch(SearchActivity.REQ_FOR_NAVIGATION);
         selecting = btn.getId() == R.id.navigation_src_btn ? Selecting.NAVSRC : Selecting.NAVDST;
+        startSearch(SearchActivity.REQ_FOR_NAVIGATION);
         btn.setText(R.string.selecting_text);
         btn.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,R.drawable.ic_close,0);
         btn.refreshDrawableState();
@@ -519,11 +596,11 @@ public class MapActivity extends AppCompatActivity
      * The big one, the one we've all been waiting for, The actual point of our app.
      *
      * Instantiates a new {@link NavigateTask}, which…
-     * Uses the Navigator to compute the path between all pairs of nodes x,y, where the codes of x
-     * and y match those of navigationSrc and navigationDst respectively, then selects the path with the lowest
-     * total weight using {@link #weight(List)}. It draws this route to the buffer using
-     * {@link MapView#drawRoute(Location, Location, Collection)}, places dots at the start and end of the route, then
-     * shows the buffer.
+     * Uses the {@link uk.ac.bris.cs.spe.navigationaltool.navigator.Navigator} to compute the path
+     * between all pairs of nodes x,y, where the codes of x and y match those of navigationSrc and
+     * navigationDst respectively, then selects the path with the lowest total weight using
+     * {@link #weight(List)}. It draws this route to the buffer using
+     * {@link MapView#drawRoute(Route)}.
      */
     private void doNavigation() {
         if (navigationDst == null || navigationSrc == null) return;
@@ -545,10 +622,11 @@ public class MapActivity extends AppCompatActivity
          */
         @Override
         protected void onPreExecute() {
-            user = getUserFromParams(access, disabl);
+            selecting = Selecting.NONE;
+            user = getUserFromParams(staff, disabl);
             from = navigationSrc;
             to = navigationDst;
-            p = findViewById(R.id.wait_indicator);
+            p = findViewById(R.id.calculating_wait);
             p.setProgress(0, false);
             p.setVisibility(View.VISIBLE);
             bottomBarHide();
@@ -610,7 +688,8 @@ public class MapActivity extends AppCompatActivity
          */
         @Override
         protected void onPostExecute(List<Path> paths) {
-            findViewById(R.id.wait_indicator).setVisibility(View.GONE);
+            selecting = Selecting.SELECTION;
+            p.setVisibility(View.GONE);
             bottomBarShowNavigation();
             if(paths != null && !paths.isEmpty()) {
 //                mapView.drawRoute(from, to, paths);
@@ -651,7 +730,7 @@ public class MapActivity extends AppCompatActivity
         final float yy = y * getResources().getInteger(R.integer.map_height);
 
         Map<Location, Double> memo = new ArrayMap<>();
-        building.getGraph().getAllLocations().stream().filter(l -> l.floor.equals(mapView.currentFloor))
+        building.getGraph().getAllLocations().stream().filter(l -> l.floor.equals(mapView.getCurrentFloor()))
                 .forEach(l -> memo.put(l,absDist(l,xx,yy)));
         Optional<Location> ol = memo.keySet().parallelStream().filter(l -> memo.get(l) < NEAR_DISTANCE)
                 .reduce((a,b) -> memo.get(a) < memo.get(b) ? a : b);
@@ -696,7 +775,7 @@ public class MapActivity extends AppCompatActivity
             selecting = Selecting.SELECTION;
       //      mapView.refreshBuffer(mapView.currentFloor);
       //      mapView.showFloorBuffer(mapView.currentFloor);
-            mapView.setFloor(mapView.currentFloor, MapView.RESET_ALL);
+            mapView.setFloor(mapView.getCurrentFloor(), MapView.RESET_ALL);
         }
 
     }
@@ -725,7 +804,7 @@ public class MapActivity extends AppCompatActivity
 
         Matrix m = new Matrix();
         mapView.getDisplayMatrix(m);
-        float[] pts = {l.getX() * mapView.fct, l.getY() * mapView.fct};
+        float[] pts = {mapView.translate(l.getX()), mapView.translate(l.getY())};
         m.mapPoints(pts);
         mapView.setScale(4, pts[0], pts[1], true);
 
@@ -820,15 +899,10 @@ public class MapActivity extends AppCompatActivity
         return p.stream().reduce(0, (d,e) -> d + e.getLength(), Integer::sum);
     }
 
-    /**
-     * Gets a User object from access requirements
-     */
-    private User getUserFromParams(Integer access, Boolean disabl) {
-        switch (intToId(access)) {
-            case R.id.item_ug: return disabl ? User.DISABLED_STUDENT : User.STUDENT;
-            case R.id.item_staff: return disabl ? User.DISABLED_STAFF : User.STAFF;
-            default: return User.STUDENT;
-        }
+    private User getUserFromParams(boolean staff, boolean disabled) {
+        return staff
+                ? (disabled ? User.DISABLED_STAFF : User.STAFF)
+                : (disabled ? User.DISABLED_STUDENT : User.STUDENT);
     }
 
     /**
@@ -841,64 +915,13 @@ public class MapActivity extends AppCompatActivity
         return Math.sqrt(Math.pow(l.getX() - x, 2) + Math.pow(l.getY() - y, 2));
     }
 
-    /**
-     * Because we can't store User objects primitively, it makes sense to convert them into types
-     * that can denote access rights and ability. This function converts the ID of a MenuItem
-     * (specifically, those in the drawer) to an int which we can store using SharedPreferences. We
-     * can't just use the int ID of the MenuItem because its value can change between builds.
-     * This value corresponds to that of the {@link #access} variable that stores the current access
-     * rights.
-     * @param id The ID of the MenuItem that has been selected
-     * @return The integer value representing the access level corresponding to the MenuItem
-     * @see #onCreate(Bundle) for an example of usage
-     */
-    private int idToInt(int id) {
-        switch (id) {
-            case R.id.item_ug:    return 1;
-            case R.id.item_staff: return 2;
-            default: return 1;
-        }
-    }
-
-    /**
-     * Inverse of {@link #idToInt(int)}
-     * @param in The value to convert to the ID
-     * @return The ID of the MenuItem corresponding the the access level represented by {@code in}
-     */
-    private int intToId(int in) {
-        switch (in) {
-            case  1: return R.id.item_ug;
-            case  2: return R.id.item_staff;
-            default: return R.id.item_ug;
-        }
-    }
-
-    /**
-     * Because we can't do a direct string -> resource function, this helper will have to be used.
-     * The alternative would be to use the assets/ folder instead of res/, however this would remove
-     * the option to have different images for devices with different dpi.
-     * @param s floor code
-     * @return The image associated with {@code s}
-     */
-    public static int getImageResourceFromCode(String s) {
-        switch (s) {
-            case "b": return R.drawable.mapb;
-            case "0": return R.drawable.map0;
-            case "1": return R.drawable.map1;
-            case "m": return R.drawable.mapm;
-            case "2": return R.drawable.map2;
-            case "3": return R.drawable.map3;
-            case "4": return R.drawable.map4;
-            //In a well formed build the below case is never reached.
-            default:  return R.drawable.map0;
-        }
-    }
 
     public void startSearch(int req) {
         Intent intent = new Intent(Intent.ACTION_SEARCH, null, this, SearchActivity.class);
         intent.putExtra("LOCATIONS", building.getPrincipalLocations());
         intent.putExtra("MAPBTNVIS", req == SearchActivity.REQ_FOR_NAVIGATION
                 ? View.VISIBLE : View.GONE);
+        intent.putExtra("PATH", building.getDirectory());
         startActivityForResult(intent, req);
     }
 
@@ -915,11 +938,6 @@ public class MapActivity extends AppCompatActivity
             // Nothing actually needs doing - remain in nav selection mode
         }
         else super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    void debugDrawGraph() {
-        Paint p = new Paint(); p.setColor(Color.RED); p.setStrokeWidth(3); p.setAntiAlias(true);
-        mapView.drawPathsToBuffer(building.getGraph().getAllPaths(), p);
     }
 
 }

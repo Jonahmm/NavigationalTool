@@ -29,6 +29,7 @@ public class Building {
     private Graph graph;
     private Navigator navigator;
     private String name;
+    private String directory;
     private Context context;
     private Map<String, String> floorNames = new ArrayMap<>();
     private ArrayList<Location> principals = new ArrayList<>();
@@ -57,7 +58,7 @@ public class Building {
         ));
 
         //gets the directory the file is in (if it's in a subfolder of assets - to support testing)
-        String directory = masterFileName.contains("/") ? masterFileName.substring(0, masterFileName.lastIndexOf('/')+1) : "";
+        directory = masterFileName.contains("/") ? masterFileName.substring(0, masterFileName.lastIndexOf('/')+1) : "";
 
         String ln;
         //Get building name
@@ -206,5 +207,9 @@ public class Building {
 
     ArrayList<Location> getPrincipalLocations() {
         return principals;
+    }
+
+    String getDirectory() {
+        return directory;
     }
 }

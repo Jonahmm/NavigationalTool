@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">NavigationalTool</string>
-    <string name="title_activity_display_drawer">Physics Building</string>
+    <string name="app_name">Navigational Tool</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">University of Bristol</string>
@@ -10,12 +9,16 @@
     <string name="undergrad_student">Undergraduate Student</string>
     <string name="staff_member">Staff Member</string>
     <string name="disabled_access">Disabled Access?</string>
-    <string name="i_am_a">I am a…</string>
-    <string name="saved_access">ACCESS</string>
     <string name="saved_disabl">SAVEDDISAB</string>
     <string name="search_title">Search locations…</string>
     <string name="selecting_text">"Search or tap a location, or tap to cancel "</string>
     <string name="click_to_edit">"Tap to set "</string>
     <string name="navigation_failure">No path found for specified access level</string>
     <string name="voronoi">Voronoi diagram</string>
+    <string name="staff_access">Staff Access</string>
+    <string name="saved_staff">STAFF</string>
+    <string name="physics_building">Physics Building</string>
+    <string name="fry_building">Fry Building</string>
+    <string name="saved_building">BUILDING</string>
+    <string name="map_activity_def_title">UoB Navigate</string>
 </resources>

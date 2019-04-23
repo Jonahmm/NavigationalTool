@@ -39,6 +39,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     LinearLayout extra;
     ListView list;
     SearchView sv;
+    String dir;
     public static final int RESULT_SELECT_ON_MAP = 2;
     public static final int REQ_FOR_NAVIGATION = 1;
     public static final int REQ_JUST_SEARCH = 2;
@@ -111,6 +112,9 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             locations = (ArrayList<Location>) intent.getSerializableExtra("LOCATIONS");
             //Get locations
             filtered = locations;
+            dir = intent.getStringExtra("PATH");
+            // Cut off path separator - just concatenate
+            dir = dir.substring(0, dir.indexOf('/'));
             recent = loadRecent();
             findViewById(R.id.search_mapselect).setVisibility(
                     intent.getIntExtra("MAPBTNVIS", View.VISIBLE));
@@ -127,7 +131,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         List<Location> ls = new ArrayList<>();
         try {
             BufferedReader b = new BufferedReader(
-                    new InputStreamReader(openFileInput("recent")));
+                    new InputStreamReader(openFileInput(dir + "recent")));
             List<String> ss = new ArrayList<>();
             String ln;
             while ((ln = b.readLine()) != null) ss.add(ln);
@@ -145,14 +149,14 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     private void saveRecent() {
         try {
             BufferedWriter f = new BufferedWriter(new OutputStreamWriter(
-                    openFileOutput("recent", MODE_PRIVATE)));
+                    openFileOutput(dir + "recent", MODE_PRIVATE)));
             for (Location l : recent) {
                 f.write(Integer.toString(l.getId()));
                 f.newLine();
             }
             f.close();
         } catch (IOException e) {
-            throw new RuntimeException("AAAGH");
+            throw new RuntimeException("Could not save recent locations");
         }
     }
 

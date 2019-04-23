@@ -30,38 +30,38 @@ public class MapView extends PhotoView {
     /**
      * The original bitmaps for each floor
      */
-    Map<String, Bitmap> maps = new ArrayMap<>();
+    private Map<String, Bitmap> maps = new ArrayMap<>();
 
     /**
      * Editable bitmaps for each floor
      */
-    Map<String, Bitmap> bufs = new ArrayMap<>();
+    private Map<String, Bitmap> bufs = new ArrayMap<>();
 
     /**
      * Canvas for drawing to each floor
      */
-    Map<String, Canvas> canv = new ArrayMap<>();
+    private Map<String, Canvas> canv = new ArrayMap<>();
 
     /**
      * Keeps track of which floor is displayed
      */
-    String currentFloor;
+    private String currentFloor;
 
     /**
      * The value st x * fct = y where x is a location and y is that of its representation on the map
      */
-    float fct;
+    private float fct;
 
     /**
      * Paints for navigation
      */
-    Paint pathPaint, highlightPaint, originPaint, destPaint, selectPaint, otherFloorPaint,
+    private Paint pathPaint, originPaint, destPaint, selectPaint, otherFloorPaint,
             donePaint, doneOtherPaint;
 
     /**
      * The {@link OnFloorChangeListener} to be notified when the floor displayed changes
      */
-    OnFloorChangeListener onFloorChangeListener;
+    private OnFloorChangeListener onFloorChangeListener;
 
     static int RESET_NONE = 0;
     static int RESET_CURRENT = 1;
@@ -85,10 +85,6 @@ public class MapView extends PhotoView {
         pathPaint.setColor(0xFF206680); pathPaint.setAntiAlias(true); pathPaint.setStrokeWidth(20);
         pathPaint.setStrokeCap(Paint.Cap.ROUND);
 
-        highlightPaint = new Paint();
-        highlightPaint.setColor(Color.CYAN); highlightPaint.setAntiAlias(true);
-        highlightPaint.setStrokeWidth(4); highlightPaint.setStyle(Paint.Style.STROKE);
-
         originPaint = new Paint();
         originPaint.setColor(Color.BLUE); originPaint.setAntiAlias(true);
 
@@ -104,6 +100,16 @@ public class MapView extends PhotoView {
 
         doneOtherPaint = new Paint(donePaint);
         doneOtherPaint.setAlpha(64);
+    }
+
+    void setMaps(Map<String, Bitmap> maps) {
+        this.maps = maps;
+        for (Map.Entry<String, Bitmap> entry : maps.entrySet()) {
+            Bitmap b = entry.getValue();
+            b = b.copy(b.getConfig(), true);
+            bufs.put(entry.getKey(), b);
+            canv.put(entry.getKey(), new Canvas(b));
+        }
     }
 
     /**
@@ -155,7 +161,6 @@ public class MapView extends PhotoView {
 
     /**
      * Draw the done paths and those yet to do in different colours. Not very optimised as yet
-     * @param route
      */
     public void drawRoute(Route route) {
         refreshAllFloors();
@@ -164,16 +169,6 @@ public class MapView extends PhotoView {
         drawPathsToBuffer(route.getDonePaths(), donePaint,  doneOtherPaint, floors);
         dotLocation(route.getStart(), originPaint);
         dotLocation( route.getEnd() ,  destPaint );
-        showFloorBuffer(route.getCurrentStepStartPoint().getFloor());
-    }
-
-    /**
-     * Called after {@link Route#next()} or before {@link Route#prev()}, colours the current step in
-     * the route according to whether it's done or not
-     */
-    public void updateRoute(Route route, boolean forward) {
-        drawPathsToBuffer(route.getCurrentPaths(),
-                forward ? donePaint : pathPaint, forward ? doneOtherPaint : otherFloorPaint);
         showFloorBuffer(route.getCurrentStepStartPoint().getFloor());
     }
 
@@ -209,14 +204,6 @@ public class MapView extends PhotoView {
         canv.get(l.getFloor()).drawCircle(l.getX() * fct, l.getY() * fct, 20, paint);
     }
 
-    /**
-     * Draws a path between two Points on the buffer. Uses the value of fct to scale the given
-     * points to their counterparts on the map
-     */
-    private void drawPathToBuffer(Point p1, Point p2, Paint pathPaint) {
-        canv.get(currentFloor).drawLine(p1.x * fct, p1.y * fct, p2.x * fct, p2.y * fct, pathPaint);
-    }
-
     private void drawPathToBuffer(Path p, Paint pathPaint) {
         canv.get(p.getLocA().getFloor()).drawLine(p.getLocA().getX() * fct, p.getLocA().getY() * fct,
                 p.getLocB().getX() * fct, p.getLocB().getY() * fct, pathPaint);
@@ -247,25 +234,7 @@ public class MapView extends PhotoView {
     }
 
     /**
-     * guess
-     */
-    private void drawTextToBuffer(String floor, String text, Point loc) {
-        //TODO Extract this paint
-        Paint p = new Paint();
-        p.setColor(Color.BLACK); p.setTextSize(20); p.setAntiAlias(true);
-        canv.get(floor).drawText(text, (float) (loc.x - (p.getTextSize() * text.length() * 0.4)) * fct,
-                (loc.y - (p.getTextSize() / 2)) * fct, p);
-    }
-
-    /**
-     * Uses {@link #drawTextToBuffer(String, String, Point)} to write either code + name or just code
-     */
-    private void drawLocToBuffer(Location l) {
-        drawTextToBuffer(l.getFloor(), l.hasName() ? l.getCode() + ", " + l.getName() : l.getCode(), l.getLocation());
-    }
-
-    /**
-     * Like {@link #drawPathToBuffer(Point, Point, Paint)} but lots
+     * Like {@link #drawPathToBuffer(Path, Paint)} but lots
      * @param paths The collection of paths to draw
      */
     void drawPathsToBuffer(Collection<Path> paths, Paint pathPaint) {
@@ -303,14 +272,11 @@ public class MapView extends PhotoView {
     }
 
     /**
-     * Resets the image buffer to be identical to map. Recalculates fct because… not sure. That
-     * could probably be done only once in onCreate tbh but it's not the expensive part of this
-     * method.
+     * Resets the image buffer to be identical to map.
      */
     private void refreshBuffer(String floor) {
         bufs.replace(floor, maps.get(floor).copy(maps.get(floor).getConfig(), true));
         canv.replace(floor, new Canvas(bufs.get(floor)));
-        updateFCT();
     }
 
 
@@ -337,4 +303,9 @@ public class MapView extends PhotoView {
         return fs.stream().distinct().collect(Collectors.toSet());
     }
 
+    public String getCurrentFloor() {
+        return currentFloor;
+    }
+
+    public float translate(float x) {return fct * x;}
 }

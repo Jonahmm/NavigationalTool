@@ -6,7 +6,7 @@ import android.content.res.AssetManager;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.TextView;
+
 import com.google.vr.sdk.widgets.pano.VrPanoramaView;
 import java.io.InputStream;
 
@@ -24,7 +24,8 @@ public class VrView extends AppCompatActivity {
 
     private void handleIntent(Intent intent){
         String code = intent.getStringExtra("CODE");
-        String locCode = "images/" + code + ".jpg";
+        String path = intent.getStringExtra("PATH");
+        String locCode = path + "images/" + code + ".jpg";
         loadPhotoSphere(locCode);
     }
 
