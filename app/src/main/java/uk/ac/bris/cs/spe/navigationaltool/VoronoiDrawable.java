@@ -5,27 +5,29 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.kynosarges.tektosyne.geometry.PointD;
 import org.kynosarges.tektosyne.geometry.Voronoi;
 import org.kynosarges.tektosyne.geometry.VoronoiEdge;
 import org.kynosarges.tektosyne.geometry.VoronoiResults;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
-import java.util.Set;
 
+/**
+ * Drawable for a Voronoi diagram. Uses the Tektosyne API to generate a Voronoi diagram from pseudo
+ * randomly-generated points and draws the edges in white on the canvas.
+ */
 
 public class VoronoiDrawable extends Drawable {
 
     private Paint p = new Paint();
 
-    public VoronoiDrawable() {
-//        p.setColor(Color.parseColor("#B01C2E"));
+    VoronoiDrawable() {
         p.setColor(Color.WHITE);
         p.setStrokeWidth(5);
     }
@@ -34,6 +36,7 @@ public class VoronoiDrawable extends Drawable {
         int width = getBounds().width();
         int height = getBounds().height();
 
+        // Set points for the 4 corners
         PointD p1 = new PointD(-10,-10);
         PointD p2 = new PointD(-10,height+10);
         PointD p3 = new PointD(width+10,-10);
@@ -49,6 +52,7 @@ public class VoronoiDrawable extends Drawable {
         Random random = new Random();
         int count = 0;
 
+        // Get 7 randomly-generated points that are not too close to one another
         while (count < 7) {
             int x = random.nextInt(xInterval + 1);
             int y = random.nextInt(yInterval + 1);
@@ -63,17 +67,12 @@ public class VoronoiDrawable extends Drawable {
         return points;
     }
 
-    private boolean isTooCloseOrTooFar(PointD p1, PointD p2) {
-        return (Math.abs(p1.x-p2.x)<200 && Math.abs(p1.y-p2.y)<200);
-//                || (Math.abs(p1.x-p2.x)>1000 || Math.abs(p1.y-p2.y)>1000);
-    }
-
     private double distanceBetweenPoints(PointD p1, PointD p2) {
         return Math.sqrt((p1.x-p2.x)*(p1.x-p2.x) + (p1.y-p2.y)*(p1.y-p2.y));
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void draw(@NonNull Canvas canvas) {
         ArrayList<PointD> points = generatePoints();
 
         VoronoiResults voronoiResults = Voronoi.findAll(points.toArray(new PointD[points.size()]));
@@ -85,11 +84,9 @@ public class VoronoiDrawable extends Drawable {
             float y1 = (float) voronoiVertices[edge.vertex1].y;
             float x2 = (float) voronoiVertices[edge.vertex2].x;
             float y2 = (float) voronoiVertices[edge.vertex2].y;
+
             canvas.drawLine(x1, y1, x2, y2, p);
         });
-//        int width = getBounds().width();
-//        int height = getBounds().height();
-//        canvas.drawLine(0, height, width, height, p);
     }
 
     @Override
@@ -99,12 +96,12 @@ public class VoronoiDrawable extends Drawable {
 
     @Override
     public void setAlpha(int alpha) {
-
+        p.setAlpha(alpha);
     }
 
     @Override
-    public void setColorFilter(ColorFilter colorFilter) {
-
+    public void setColorFilter(@Nullable ColorFilter colorFilter) {
+        p.setColorFilter(colorFilter);
     }
 
     @Override
