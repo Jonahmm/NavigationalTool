@@ -1,2 +1,2 @@
 #!/bin/sh
-java -jar Builder-1.1.jar 6
+java -jar Builder-1.2.1.jar 6
