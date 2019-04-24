@@ -8,7 +8,7 @@
     <string name="action_settings">Settings</string>
     <string name="undergrad_student">Undergraduate Student</string>
     <string name="staff_member">Staff Member</string>
-    <string name="disabled_access">Disabled Access?</string>
+    <string name="disabled_access">Disabled Access</string>
     <string name="saved_disabl">SAVEDDISAB</string>
     <string name="search_title">Search locations…</string>
     <string name="selecting_text">"Search or tap a location, or tap to cancel "</string>
