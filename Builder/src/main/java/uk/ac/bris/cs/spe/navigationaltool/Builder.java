@@ -9,55 +9,41 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Path;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Builder implements MouseListener, ActionListener{
     private JFrame frame;
     private boolean buttonVis = true;
-    private boolean joinMode = false;
+//    private boolean joinMode = false;
+    private enum Mode {EDIT, JOIN, HIDE}
+    private Mode mode = Mode.EDIT;
     private JLabel picLabel;
     private Map<JButton, LocationDataHolder> locs = new HashMap<>();
     private java.util.List<PathDataHolder> paths = new ArrayList<>();
     private JButton selected;
     private Image img; private BufferedImage buf;
     private JTextArea log;
-    private int lastId;
+    private int nextId = 0;
     private final int factor;
     private static final String USERS = "STUDENT DISABLED_STUDENT STAFF DISABLED_STAFF";
     private final String floor;
 
     Builder(String f, int fct) {
         floor = f;
-        switch (f) {
-            case "1":
-                lastId = 299;
-                break;
-            case "m":
-                lastId = 599;
-                break;
-            case "2":
-                lastId = 699;
-                break;
-            case "3":
-                lastId = 999;
-                break;
-            case "4":
-                lastId = 1299;
-                break;
-            case "b":
-                lastId = 1599;
-                break;
-            default:
-                lastId = -1;
-                break;
-        }
         factor = fct;
         javax.swing.SwingUtilities.invokeLater(this::createAndShowGUI);
+    }
+
+    private String modeString() {
+        switch(mode) {
+            case EDIT: return "Edit Mode";
+            case JOIN: return "Join Mode";
+            default:   return "Hide Mode";
+        }
     }
 
     private void createAndShowGUI() {
@@ -71,8 +57,6 @@ public class Builder implements MouseListener, ActionListener{
             myPicture = ImageIO.read(new File("maps/map" + floor + ".png"));
         } catch (IOException e) {
             e.printStackTrace();
-            log(e.getMessage());
-            log("The program will not be able to continue. Please fix the issue and restart.");
             return;
         }
 
@@ -86,10 +70,12 @@ public class Builder implements MouseListener, ActionListener{
         picLabel.setBounds(ins.left, ins.top, picLabel.getPreferredSize().width, picLabel.getPreferredSize().height);
         frame.getLayeredPane().add(picLabel, new Integer(1));
 
-        JButton join = new JButton("Join Mode");
+        JButton join = new JButton(modeString());
         join.addActionListener(e -> {
-            joinMode = !joinMode;
-            join.setText(joinMode ? "Edit Mode" : "Join Mode");
+            mode = mode == Mode.EDIT ? Mode.JOIN
+                 : mode == Mode.JOIN ? Mode.HIDE
+                 : Mode.EDIT;
+            join.setText(modeString());
         });
 
         join.setBounds(scaleX, 24, 80, 20);
@@ -100,7 +86,7 @@ public class Builder implements MouseListener, ActionListener{
         JScrollPane sp = new JScrollPane(log);
         log.setEditable(false);
         log.setWrapStyleWord(true); log.setLineWrap(true);
-        sp.setBounds(scaleX, 50, 300, scaleY-60);
+        sp.setBounds(scaleX + 5, 50, 270, 600);
 
         JButton export = new JButton("Export");
         export.setBounds(scaleX + 100, 24, 80, 20);
@@ -109,18 +95,43 @@ public class Builder implements MouseListener, ActionListener{
         frame.getLayeredPane().add(export, new Integer(1));
 
         JButton transform = new JButton("T");
-        transform.setBounds(scaleX + 200, 24, 20, 20);
+        transform.setBounds(scaleX + 190, 24, 20, 20);
         transform.setVisible(true);
         transform.addActionListener(e -> translate());
         frame.getLayeredPane().add(transform, new Integer(1));
 
         JButton scale = new JButton("S");
-        scale.setBounds(scaleX + 240, 24, 20, 20);
+        scale.setBounds(scaleX + 220, 24, 20, 20);
         scale.setVisible(true);
         scale.addActionListener(e -> scale());
         frame.getLayeredPane().add(scale, new Integer(1));
 
-        frame.setSize(scaleX + 300,scaleY + ins.top);
+        JButton reid = new JButton("ID");
+        reid.setBounds(scaleX + 250, 24, 25, 20);
+        reid.setVisible(true);
+        reid.addActionListener(e -> reId());
+        frame.getLayeredPane().add(reid, new Integer(1));
+
+        JTextField filter = new JTextField(8);
+        filter.setBounds(scaleX, 2, 50, 20);
+        filter.setVisible(true);
+        frame.getLayeredPane().add(filter, new Integer(1));
+
+        JButton filtb = new JButton("Filter");
+        filtb.setBounds(scaleX + 60, 2, 50, 20);
+        filtb.setVisible(true);
+        filtb.addActionListener(e -> {
+            String s = filter.getText();
+            if (s.isEmpty()) for (JButton b : locs.keySet()) b.setVisible(true);
+            else {
+                for (JButton b : locs.keySet()) {
+                    if (!locs.get(b).code.startsWith(s)) b.setVisible(false);
+                }
+            }
+        });
+        frame.getLayeredPane().add(filtb, new Integer(1));
+
+        frame.setSize(scaleX + 280,scaleY + ins.top);
         frame.getLayeredPane().add(sp, new Integer(1));
 
         frame.setVisible(true);
@@ -204,15 +215,46 @@ public class Builder implements MouseListener, ActionListener{
         tframe.setVisible(true);
     }
 
+    private String familyCheck() {
+        Map <String, LocationDataHolder> _1;
+
+        for (LocationDataHolder l : locs.values()) {
+            if (locs.values().stream().filter(m -> l.code.equals(m.code) && (!m.name.equals("#"))).count() > 1) {
+                // There exists more than one potential parent for this code
+                // Allow < 1 to account for cross-floor spaces
+                return l.code;
+            }
+        }
+        return "";
+    }
+
     private void exportAll() {
+        String s = familyCheck();
+        if (!s.isEmpty()) {
+            log("WARNING: Ambiguously structured family at " + s + "!\nExporting anyway, but fixing is recommended.");
+        }
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter("built/" + floor + ".locations"));
             int x,y;
-            for (LocationDataHolder l : locs.values()) {
+            // Child list: must be added after parents
+            List<LocationDataHolder> children = new ArrayList<>();
+            for (LocationDataHolder l : locs.values().stream().sorted(Comparator.comparing(a -> a.code)).collect(Collectors.toList())) {
                 if (l.code.equals("")) throw new IllegalArgumentException("Cannot export " + l.getString() + ": code missing!");
+                if (l.name.equals("#")) children.add(l);
+                else {
+                    x = l.x;// * FACTOR;
+                    y = l.y;// * FACTOR;
+                    bw.write(l.id + "," + l.code + "," + l.name + "," + l.floor + "," + x + "," + y);
+                    bw.newLine();
+
+                }
+            }
+            bw.write("#\n#    All locations below this point are children.\n" +
+                     "#    For proper ordering ensure children have name set to '#'\n#\n");
+            for (LocationDataHolder l : children) {
                 x = l.x;// * FACTOR;
                 y = l.y;// * FACTOR;
-                bw.write( l.id + "," + l.code + "," + l.name + "," + l.floor + "," + x + "," + y);
+                bw.write(l.id + "," + l.code + "," + l.name + "," + l.floor + "," + x + "," + y);
                 bw.newLine();
             }
             bw.close();
@@ -234,6 +276,26 @@ public class Builder implements MouseListener, ActionListener{
         }
     }
 
+    private int newId() {
+        int id = 0;
+        while (id < nextId) {
+            int finalId = id;
+            if (locs.values().stream().noneMatch(l -> l.id == finalId)) return id;
+            ++id;
+        }
+        return nextId++;
+    }
+
+    private void reId() {
+        int id = 0;
+        for (LocationDataHolder l : locs.values().stream().sorted(Comparator.comparingInt(a ->a.id)).collect(Collectors.toList())) {
+            l.id = id++;
+        }
+        // To test it hasn't broken everything
+        resetBuffer();
+        drawAllPaths();
+    }
+
     private void load() {
         try {
             BufferedReader br = new BufferedReader(new FileReader("built/" + floor + ".locations"));
@@ -248,7 +310,7 @@ public class Builder implements MouseListener, ActionListener{
                     JButton btn = new JButton(l.code);
                     btn.setVisible(true);
 
-                    lastId = lastId < id ? id : lastId;
+                    if (id >= nextId) nextId = id + 1;
 
                     FontMetrics m = btn.getFontMetrics(btn.getFont());
                     int sz = m.stringWidth(btn.getText());
@@ -287,9 +349,10 @@ public class Builder implements MouseListener, ActionListener{
                     locs.put(btn, l);
                     frame.getLayeredPane().add(btn, new Integer(2));
 
-                    log("Loaded location " + l.getString());
+//                    log("Loaded location " + l.getString());
                 }
             }
+            log("Loaded " + Integer.toString(locs.keySet().size()) + " locations");
             br = new BufferedReader(new FileReader("built/" + floor + ".paths"));
             while ((ln = br.readLine()) != null) {
                 if (!ln.startsWith("#")) { //support comments
@@ -297,9 +360,10 @@ public class Builder implements MouseListener, ActionListener{
                     LocationDataHolder a = findLocById(Integer.valueOf(fields[0]));
                     LocationDataHolder b = findLocById(Integer.valueOf(fields[1]));
                     paths.add(new PathDataHolder(a,b,fields[2]));
-                    log("Loaded path " + a.getString() + "-" + b.getString());
+//                    log("Loaded path " + a.getString() + "-" + b.getString());
                 }
             }
+            log("Loaded " + Integer.toString(paths.size()) + " locations");
             drawAllPaths();
             frame.validate();
             frame.repaint();
@@ -318,18 +382,24 @@ public class Builder implements MouseListener, ActionListener{
 
     private void welcome() {
         log("Click on the map to add a location.");
-        log("Click a location to edit it");
-        log("Click the above left button to switch to join mode. In join mode, click two locations in succession to add a " +
+        log("Click the above left button to switch modes:");
+        log("In edit mode, click any location to edit its properties.");
+        log("In join mode, click two locations in succession to add a " +
                 "path between them. Doing this where a path exists will remove it.");
+        log("In hide mode, click any location to hide it.");
+        log("Show/Hide all locations by right clicking the map.");
         log("Right click any location to remove it and all connected paths");
         log("Click T to translate all locations");
         log("Click S to scale all locations");
+        log("Click ID to give all locations new IDs, starting from 0");
         log("Click Export to export .locations and .paths files");
+        log("Use the filter field to show only Locations with matching code");
     }
 
     private void log(String s) {
         log.append(s + "\n");
     }
+
     @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
@@ -372,18 +442,13 @@ public class Builder implements MouseListener, ActionListener{
                 }
             });
 
-            locs.put(btn, new LocationDataHolder(nextId(), e.getX() * factor, (e.getY() - frame.getInsets().top) * factor, floor, "", ""));
+            locs.put(btn, new LocationDataHolder(newId(), e.getX() * factor, (e.getY() - frame.getInsets().top) * factor, floor, "", ""));
             frame.getLayeredPane().add(btn, new Integer(2));
 
             frame.validate();
             frame.repaint();
             log("Added Location at (" + e.getX() * factor + "," + (e.getY()-frame.getInsets().top) * factor + ")");
             edit(btn);
-    }
-
-    private int nextId() {
-        lastId++;
-        return lastId;
     }
 
     private void deleteLoc(JButton btn) {
@@ -437,9 +502,12 @@ public class Builder implements MouseListener, ActionListener{
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (!joinMode) edit((JButton) e.getSource());
-
-        else{
+        // HIDE MODE
+        if (mode == Mode.HIDE) ((JButton) e.getSource()).setVisible(false);
+        // EDIT MODE
+        else if (mode == Mode.EDIT) edit((JButton) e.getSource());
+        // JOIN MODE
+        else {
             JButton b = (JButton) e.getSource();
             if (selected != null) {
                 PathDataHolder c = new PathDataHolder(locs.get(selected), locs.get(b));
@@ -458,8 +526,6 @@ public class Builder implements MouseListener, ActionListener{
             }
             else selected = b;
         }
-
-
     }
 
     private void drawPathToBuf(PathDataHolder p) {

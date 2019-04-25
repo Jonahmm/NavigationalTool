@@ -1,1 +1,1 @@
-java -jar Builder-1.2.1.jar 4
+java -jar Builder-1.2.2.jar 4

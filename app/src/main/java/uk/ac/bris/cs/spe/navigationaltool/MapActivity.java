@@ -62,7 +62,7 @@ public class MapActivity extends AppCompatActivity
     MapView mapView;
 
     /**
-     * The building object to be worked on. Loaded using {@link #loadBuilding()}
+     * The building object to be worked on. Loaded using {@link BuildingLoader()}
      */
     private Building building;
 
@@ -206,8 +206,8 @@ public class MapActivity extends AppCompatActivity
     }
 
     /**
-     * Called after {@link #loadBuilding()}, this method uses {@link #building} to decode and load
-     * the floors into memory, and sets the current floor.
+     * Called asynchronously in {@link BuildingLoader#doInBackground(String...)}, this loads and
+     * sets all the map images.
      */
     private void loadMaps(Building b) {
         mapView = findViewById(R.id.mapviewer);
@@ -226,6 +226,10 @@ public class MapActivity extends AppCompatActivity
 
     }
 
+    /**
+     * Called synchronously in {@link BuildingLoader#onPostExecute(Building)}, sets the UI
+     * properties of {@link #mapView}
+     */
     private void postLoadMaps(Building b) {
         mapView.setFloor(b.getDefaultFloor(), MapView.RESET_NONE);
         mapView.updateFCT();
@@ -438,7 +442,7 @@ public class MapActivity extends AppCompatActivity
         return true;
     }
 
-    private void openVrPanoramaView(){
+    private void openVrPanoramaView() {
         Intent intent = new Intent(this, VrView.class);
         intent.putExtra("CODE", selectedLocation.getCode());
         intent.putExtra("PATH", building.getDirectory());
