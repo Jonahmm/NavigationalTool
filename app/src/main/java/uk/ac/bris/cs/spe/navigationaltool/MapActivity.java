@@ -2,15 +2,10 @@ package uk.ac.bris.cs.spe.navigationaltool;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,7 +21,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.ArrayMap;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,7 +31,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -45,10 +38,8 @@ import com.github.chrisbanes.photoview.OnPhotoTapListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -76,14 +67,14 @@ public class MapActivity extends AppCompatActivity
     private Building building;
 
     /**
-     * Because we can't store User objects primitively, it makes sense to convert them into types
-     * that can denote access rights and ability.
-     */
-    private int access;
-    /**
      * True if user requires accessible route
      */
-    private Boolean disabl, staff;
+    private Boolean disabl;
+
+    /**
+     * True if user has staff access rights
+     */
+    private Boolean staff;
 
     /**
      * Stores the selected location
@@ -107,6 +98,10 @@ public class MapActivity extends AppCompatActivity
      * Defines the current state of the program
      */
     private Selecting selecting = Selecting.SELECTION;
+
+    /**
+     * Used to create directions and remember the current route.
+     */
     private Route route = null;
 
     /*----------------*
@@ -164,6 +159,9 @@ public class MapActivity extends AppCompatActivity
         voronoiDiagram.setImageDrawable(voronoiDrawable);
     }
 
+    /**
+     * Loads the {@link Building} from the given path, setting up the UI once done.
+     */
     private class BuildingLoader extends AsyncTask<String, Integer, Building> {
 
         @Override
@@ -171,6 +169,7 @@ public class MapActivity extends AppCompatActivity
 
             try {
                 Building b = new Building(strings[0], new DijkstraNavigator(), getApplicationContext());
+                loadMaps(b);
                 return b;
             } catch (IOException e) {
                 alertMsg("Error loading building!");
@@ -195,20 +194,15 @@ public class MapActivity extends AppCompatActivity
             p.setVisibility(View.GONE);
             p.setClickable(false);
             p.setIndeterminate(false);
-            loadMaps(b);
+            postLoadMaps(b);
             populateFloorsList(b);
             building = b;
             setListeners();
+            // Sets floor indicator text
             mapView.setFloor(b.getDefaultFloor(), MapView.RESET_NONE);
             visUIElements(View.VISIBLE);
             setTitle(building.getName());
         }
-    }
-
-    private void visUIElements(int vis) {
-        findViewById(R.id.navigation_show).setVisibility(vis);
-        findViewById(R.id.floor_select).setVisibility(vis);
-//        findViewById(R.id.app_bar_search).setVisibility(vis);
     }
 
     /**
@@ -229,6 +223,10 @@ public class MapActivity extends AppCompatActivity
         mapView.setMaps(maps);
         //Initialise image
 
+
+    }
+
+    private void postLoadMaps(Building b) {
         mapView.setFloor(b.getDefaultFloor(), MapView.RESET_NONE);
         mapView.updateFCT();
         mapView.setMaximumScale(12f);
@@ -325,9 +323,10 @@ public class MapActivity extends AppCompatActivity
             boolean b = c.isChecked();
             findViewById(  R.id.navigation_editor  ).setVisibility(!b ? View.VISIBLE : View.GONE);
             findViewById(R.id.navigation_directions).setVisibility( b ? View.VISIBLE : View.GONE);
+            String rtfrom = getString(R.string.route_from);
             ((TextView) findViewById(R.id.navigation_title)).setText(
-                    b ? "Route from " + navigationSrc.getCode() + " to " + navigationDst.getCode()
-                      : "Route from"
+                    b ? rtfrom + " " + navigationSrc.getCode() + " to " + navigationDst.getCode()
+                      : rtfrom
             );
         });
 
@@ -350,26 +349,6 @@ public class MapActivity extends AppCompatActivity
         //Button to display image of room
         Button vr_image = findViewById(R.id.image_room);
         vr_image.setOnClickListener(e -> openVrPanoramaView());
-    }
-
-    /**
-     * Attempts to load the building from assets. Should never fail on a working build as the assets
-     * don't change, but handles errors because java doesn't like it if it doesn't
-     */
-    void loadBuilding() {
-        try {
-            building = new Building("physics/physics", new DijkstraNavigator(),
-                    getApplicationContext());
-            snackMsg( "Imported " + building.getGraph().getAllLocations().size()
-                       + " locations and " + building.getGraph().getAllPaths().size()
-                       + " paths.");
-            Toolbar t = findViewById(R.id.toolbar);
-            t.setTitle(building.getName());
-        } catch (IOException e) {
-            Log.d("IOException: ", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            Log.d("IllegalArgumentException: ", e.getMessage());
-        }
     }
 
     /**
@@ -399,7 +378,6 @@ public class MapActivity extends AppCompatActivity
     /*--------------*
      * PROGRAM FLOW *
      *--------------*/
-
     /**
      * Handles the back button: uses {@link #exitNavigation()} or {@link #deselect()} when nav or
      * selection are active respectively
@@ -460,29 +438,6 @@ public class MapActivity extends AppCompatActivity
         return true;
     }
 
-    private int intToId(int in) {
-        switch (in) {
-            case 0: return R.id.building_physics;
-            case 1: return R.id.building_maths;
-            default: return R.id.building_physics;
-        }
-    }
-
-    private int idToInt(int id) {
-        switch (id) {
-            case R.id.building_physics: return 0;
-            case R.id.building_maths  : return 1;
-            default: return 0;
-        }
-    }
-
-    private String loadFromIndex(int in) {
-        switch (in) {
-            case  1: return "maths/maths";
-            default: return "physics/physics";
-        }
-    }
-
     private void openVrPanoramaView(){
         Intent intent = new Intent(this, VrView.class);
         intent.putExtra("CODE", selectedLocation.getCode());
@@ -490,10 +445,36 @@ public class MapActivity extends AppCompatActivity
         startActivity(intent);
     }
 
+    /**
+     * An {@link AsyncTask} that sets up, runs and presents navigation.
+     */
+    public void startSearch(int req) {
+        Intent intent = new Intent(Intent.ACTION_SEARCH, null, this, SearchActivity.class);
+        intent.putExtra("LOCATIONS", building.getPrincipalLocations());
+        intent.putExtra("MAPBTNVIS", req == SearchActivity.REQ_FOR_NAVIGATION
+                ? View.VISIBLE : View.GONE);
+        intent.putExtra("PATH", building.getDirectory());
+        startActivityForResult(intent, req);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode==RESULT_OK) {
+            select((Location) data.getSerializableExtra("RESULT"));
+        }
+        else if (requestCode == SearchActivity.REQ_FOR_NAVIGATION && resultCode == RESULT_CANCELED) {
+            cancelNavSelect(findViewById(selecting == Selecting.NAVDST
+                    ? R.id.navigation_dst_btn : R.id.navigation_src_btn));
+        }
+        else if (resultCode == SearchActivity.RESULT_SELECT_ON_MAP) {
+            // Nothing actually needs doing - remain in nav selection mode
+        }
+        else super.onActivityResult(requestCode, resultCode, data);
+    }
+
     /*------------*
      * NAVIGATION *
      *------------*/
-
     /**
      * Changes the app state st when you select a location, it is used for navigation.
      * Sets the text, icon and listener of the button it came from
@@ -510,7 +491,6 @@ public class MapActivity extends AppCompatActivity
         btn.refreshDrawableState();
         btn.setOnClickListener(e -> cancelNavSelect(btn));
     }
-
     /**
      * The navigation-specific counterpart to {@link #deselect()}. If a location was selected before
      * we started navigation, go back to showing it. Otherwise just hides the nav UI
@@ -611,14 +591,12 @@ public class MapActivity extends AppCompatActivity
         new NavigateTask().execute(building);
     }
 
-    /**
-     * An {@link AsyncTask} that sets up, runs and presents navigation.
-     */
     private class NavigateTask extends AsyncTask<Building, Integer, List<Path>> {
+
         User user;
         Location from, to;
-        ProgressBar p;
 
+        ProgressBar p;
         /**
          * Prepare for navigation; set up progress bar and hide views that can interfere with the
          * process. Instantiates {@code user, from, to} in this class to provide some measure of
@@ -637,7 +615,6 @@ public class MapActivity extends AppCompatActivity
             findViewById (R.id.floor_select)  .setVisibility(View.GONE);
             findViewById(R.id.navigation_show).setVisibility(View.GONE);
         }
-
         /**
          * Use the building's navigator to calculate routes between all potential origin-destination
          * pairs, selecting the shortest (if present) as the route.
@@ -708,6 +685,7 @@ public class MapActivity extends AppCompatActivity
             findViewById (R.id.floor_select).setVisibility(View.VISIBLE);
 
         }
+
     }
 
     /*-----------*
@@ -745,7 +723,6 @@ public class MapActivity extends AppCompatActivity
         if (selecting == Selecting.SELECTION) deselect();
         else snackMsg("Nothing here");
     }
-
     /**
      * Shows or sets navigation parameters based on the current state
      * @param l The selected {@link Location}
@@ -829,11 +806,11 @@ public class MapActivity extends AppCompatActivity
         botBox.findViewById(R.id.navigation_panel).setVisibility(View.GONE);
         findViewById(R.id.navigation_show).setVisibility(View.GONE);
     }
-
     /**
      * Inverse of {@link #bottomBarShowSelection()}
      */
     private void bottomBarShowNavigation() {
+        resetNavView();
         ConstraintLayout botBox = findViewById(R.id.bottom_box);
         botBox.setVisibility(View.VISIBLE);
         botBox.findViewById(R.id.navigation_panel).setVisibility(View.VISIBLE);
@@ -879,7 +856,7 @@ public class MapActivity extends AppCompatActivity
 
     private void resetNavView() {
         findViewById(R.id.navigation_show_dir).setVisibility(View.GONE);
-        ((TextView) findViewById(R.id.navigation_title)).setText("Route from");
+        ((TextView) findViewById(R.id.navigation_title)).setText(R.string.route_from);
     }
 
     private void showDirIfPossible() {
@@ -889,9 +866,31 @@ public class MapActivity extends AppCompatActivity
         );
     }
 
+    private void visUIElements(int vis) {
+        findViewById(R.id.navigation_show).setVisibility(vis);
+        findViewById(R.id.floor_select).setVisibility(vis);
+//        findViewById(R.id.app_bar_search).setVisibility(vis);
+    }
+
     /*---------*
      * HELPERS *
      *---------*/
+
+    private int intToId(int in) {
+        switch (in) {
+            case 0: return R.id.building_physics;
+            case 1: return R.id.building_maths;
+            default: return R.id.building_physics;
+        }
+    }
+
+    private int idToInt(int id) {
+        switch (id) {
+            case R.id.building_physics: return 0;
+            case R.id.building_maths  : return 1;
+            default: return 0;
+        }
+    }
 
     /**
      * Used by {@link #doNavigation()} to find the best route
@@ -919,29 +918,12 @@ public class MapActivity extends AppCompatActivity
         return Math.sqrt(Math.pow(l.getX() - x, 2) + Math.pow(l.getY() - y, 2));
     }
 
-
-    public void startSearch(int req) {
-        Intent intent = new Intent(Intent.ACTION_SEARCH, null, this, SearchActivity.class);
-        intent.putExtra("LOCATIONS", building.getPrincipalLocations());
-        intent.putExtra("MAPBTNVIS", req == SearchActivity.REQ_FOR_NAVIGATION
-                ? View.VISIBLE : View.GONE);
-        intent.putExtra("PATH", building.getDirectory());
-        startActivityForResult(intent, req);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode==RESULT_OK) {
-            select((Location) data.getSerializableExtra("RESULT"));
+    private String loadFromIndex(int in) {
+        switch (in) {
+            case  0: return "physics/physics";
+            case  1: return "maths/maths";
+            default: return "physics/physics";
         }
-        else if (requestCode == SearchActivity.REQ_FOR_NAVIGATION && resultCode == RESULT_CANCELED) {
-            cancelNavSelect(findViewById(selecting == Selecting.NAVDST
-                    ? R.id.navigation_dst_btn : R.id.navigation_src_btn));
-        }
-        else if (resultCode == SearchActivity.RESULT_SELECT_ON_MAP) {
-            // Nothing actually needs doing - remain in nav selection mode
-        }
-        else super.onActivityResult(requestCode, resultCode, data);
     }
 
 }

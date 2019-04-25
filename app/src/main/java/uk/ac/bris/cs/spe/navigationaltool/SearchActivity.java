@@ -10,7 +10,6 @@ import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -23,6 +22,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
@@ -98,7 +98,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
 
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setSearchableInfo(Objects.requireNonNull(searchManager)
+                .getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
         searchView.setOnQueryTextListener(this);
         searchView.setMaxWidth(Integer.MAX_VALUE);
@@ -107,9 +108,14 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         return true;
     }
 
+    /**
+     * The activity is only EVER called by {@link MapActivity#startSearch(int)} so we can guarantee
+     * the validity of the parameter and suppress unchecked cast warnings.
+     */
+    @SuppressWarnings("unchecked")
     private void handleIntent(Intent intent) {
+                locations = (ArrayList<Location>) intent.getSerializableExtra("LOCATIONS");
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            locations = (ArrayList<Location>) intent.getSerializableExtra("LOCATIONS");
             //Get locations
             filtered = locations;
             dir = intent.getStringExtra("PATH");
@@ -119,7 +125,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             findViewById(R.id.search_mapselect).setVisibility(
                     intent.getIntExtra("MAPBTNVIS", View.VISIBLE));
             updateSearch("");
-            
+
         } else finish();
     }
 
@@ -141,7 +147,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             b.close();
             return ls;
         } catch (IOException e) {
-            Log.e("*", "Failed getting recent locations: " + e.getMessage());
+            Log.e("Error", "Failed getting recent locations: " + e.getMessage());
             return ls;
         }
     }

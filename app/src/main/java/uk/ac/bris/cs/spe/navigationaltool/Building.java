@@ -31,7 +31,14 @@ public class Building {
     private String name;
     private String directory;
     private Context context;
+    /**
+     * Mapping from floors' identifiers to their names
+     */
     private Map<String, String> floorNames = new ArrayMap<>();
+
+    /**
+     * Unique codes
+     */
     private ArrayList<Location> principals = new ArrayList<>();
     private String defaultFloor;
 
@@ -39,8 +46,16 @@ public class Building {
         name = requireNonNull(fileName);
         navigator = requireNonNull(nav);
         context = requireNonNull(c);
-        //buildGraph();
         build(fileName);
+    }
+
+    /**
+     * A wrapper for Log.d that can be turned on or off easily to show where a load crashes
+     * @param s
+     */
+    private void log(String s) {
+        // Uncomment the below line to enable line-by-line logging
+        // Log.d("Building", s);
     }
 
     /**
@@ -57,7 +72,7 @@ public class Building {
                 context.getAssets().open(masterFileName+".building")
         ));
 
-        //gets the directory the file is in (if it's in a subfolder of assets - to support testing)
+        // Gets the directory the file is in
         directory = masterFileName.contains("/") ? masterFileName.substring(0, masterFileName.lastIndexOf('/')+1) : "";
 
         String ln;
@@ -85,7 +100,7 @@ public class Building {
                 }
             }
             floorBaseIDs.put(fields[0], base);
-            Log.d("Adding Floor", fields[1] + " from base ID " + base);
+            log("Adding Floor " + fields[1] + " from base ID " + base);
             floorNames.put(fields[0], fields[1]);
             base += loadFloor(directory + fields[0], base);
         }
@@ -101,7 +116,7 @@ public class Building {
                 String[] fields = ln.split(",");
                 String[] l0 = fields[0].split(":");
                 String[] l1 = fields[1].split(":");
-                Log.d("adding link", l0[1] + " on " + l0[0] + "<->" + l1[1] + " on " + l1[0]);
+                log("Adding link: " + ln);
                 graph.addPath(
                     new Path(graph.getLocationById(floorBaseIDs.get(l0[0]) + Integer.parseInt(l0[1])),
                              graph.getLocationById(floorBaseIDs.get(l1[0]) + Integer.parseInt(l1[1])),
@@ -124,6 +139,7 @@ public class Building {
         ////////////////////
         // Load Locations //
         ////////////////////
+
         BufferedReader buffer = new BufferedReader(new InputStreamReader(
                 context.getAssets().open(f+".locations")));
 
@@ -135,10 +151,11 @@ public class Building {
                 String[] fields = ln.split(",");
                 //Location Constructor format id,x,y,floor,code,name
                 //File format ID,Code,name,floor,x,y
-                Location l = principals.stream().filter(s->s.getCode().equals(fields[1])).findFirst().orElse(null);
+                Location l = principals.stream().filter(s->s.getCode().equals(fields[1]))
+                        .findFirst().orElse(null);
                 int id = Integer.parseInt(fields[0]);
                 last = id < last ? last : id;
-                Log.d("Adding ", fields[1] + " with id " + (base + id));
+                log("Adding location " + ln);
                 if (l == null) {
                     l = new Location(base + id, Integer.parseInt(fields[4]),
                             Integer.parseInt(fields[5]), fields[3], fields[1], fields[2]);
@@ -150,16 +167,16 @@ public class Building {
             }
         }
 
-
         ////////////////
         // Load Paths //
         ////////////////
-        buffer = new BufferedReader( new InputStreamReader(
+
+        buffer = new BufferedReader(new InputStreamReader(
                 context.getAssets().open(f+".paths")));
         while ((ln = buffer.readLine()) != null) {
             if(!ln.startsWith("#")) {
                 String[] fields = ln.split(",");
-//                Log.d("adding path: ", fields[0] + "<->" + fields[1]);
+                log("adding path: " + fields[0] + "<->" + fields[1]);
                 graph.addPath(
                         new Path(graph.getLocationById(base + Integer.parseInt(fields[0])),
                                 graph.getLocationById(base + Integer.parseInt(fields[1])),
@@ -175,7 +192,6 @@ public class Building {
         return floorNames;
     }
 
-    //This should probably go somewhere more sensible
     private User getUserFromString(String u) {
         switch (u) {
             case "DISABLED_STUDENT": return User.DISABLED_STUDENT;
