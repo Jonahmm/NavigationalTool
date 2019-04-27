@@ -38,8 +38,10 @@ import com.github.chrisbanes.photoview.OnPhotoTapListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -351,7 +353,7 @@ public class MapActivity extends AppCompatActivity
         });
 
         //Button to display image of room
-        Button vr_image = findViewById(R.id.image_room);
+        Button vr_image = findViewById(R.id.selected_360);
         vr_image.setOnClickListener(e -> openVrPanoramaView());
     }
 
@@ -784,7 +786,14 @@ public class MapActivity extends AppCompatActivity
             tv.setText(l.getCode());
             tv.setVisibility(View.VISIBLE);
         }
-
+        try {
+            findViewById(R.id.selected_360).setVisibility(
+                    Arrays.asList(Objects.requireNonNull(getAssets().list(building.getDirectory() + "images")))
+                    .contains(l.getCode() + ".jpg")
+                        ? View.VISIBLE : View.GONE);
+        } catch (IOException e) {
+            findViewById(R.id.selected_360).setVisibility(View.GONE);
+        }
         mapView.drawLocation(l);
 
         Matrix m = new Matrix();
@@ -884,6 +893,7 @@ public class MapActivity extends AppCompatActivity
         switch (in) {
             case 0: return R.id.building_physics;
             case 1: return R.id.building_maths;
+
             default: return R.id.building_physics;
         }
     }
@@ -892,7 +902,17 @@ public class MapActivity extends AppCompatActivity
         switch (id) {
             case R.id.building_physics: return 0;
             case R.id.building_maths  : return 1;
+
             default: return 0;
+        }
+    }
+
+    private String loadFromIndex(int in) {
+        switch (in) {
+            case  0: return "physics/physics";
+            case  1: return "maths/maths";
+
+            default: return "physics/physics";
         }
     }
 
@@ -920,14 +940,6 @@ public class MapActivity extends AppCompatActivity
      */
     private double absDist(Location l, float x, float y) {
         return Math.sqrt(Math.pow(l.getX() - x, 2) + Math.pow(l.getY() - y, 2));
-    }
-
-    private String loadFromIndex(int in) {
-        switch (in) {
-            case  0: return "physics/physics";
-            case  1: return "maths/maths";
-            default: return "physics/physics";
-        }
     }
 
 }
