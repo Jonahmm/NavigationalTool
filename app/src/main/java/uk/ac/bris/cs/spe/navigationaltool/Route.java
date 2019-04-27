@@ -63,7 +63,6 @@ class Route {
     /**
      * Generates a single step ({@code String-Collection<Path>} pair) from the bottom of the list
      * given.
-     * @return
      */
     private Location generateNextStep(Location stepStart, List<Path> paths, Map<String, String> floors) {
         List<Path> thisStep = new ArrayList<>();
@@ -88,26 +87,26 @@ class Route {
         return stepEnd;
     }
 
-    public Location getStart() {
+    Location getStart() {
         return start;
     }
 
-    public Location getEnd() {
+    Location getEnd() {
         return end;
     }
 
-    public List<Path> getAllPaths() {
+    List<Path> getAllPaths() {
         return allPaths;
     }
     
 
-    public List<Path> getDonePaths() {
+    List<Path> getDonePaths() {
         List<Path> done = new ArrayList<>();
         steps.subList(0, current + 1).forEach(done::addAll);
         return done;
     }
 
-    public List<Path> getPathsToDo() {
+    List<Path> getPathsToDo() {
         int mx = steps.size();
         List<Path> toDo = new ArrayList<>();
         steps.subList(current + 1, mx).forEach(toDo::addAll);
@@ -117,11 +116,11 @@ class Route {
         return toDo;
     }
 
-    public Location getCurrentStepStartPoint() {
+    Location getCurrentStepStartPoint() {
         return endPts.get(current);
     }
 
-    public String getCurrentInstruction() {
+    String getCurrentInstruction() {
         return directions.get(current);
     }
 
@@ -129,22 +128,22 @@ class Route {
         return steps.get(current);
     }
 
-    public boolean canNext() {
+    private boolean canNext() {
         return current < directions.size() - 1;
 
     }
 
-    public boolean canPrev() {
+    private boolean canPrev() {
         return current > 0;
     }
 
-    public boolean next() {
+    boolean next() {
         boolean b = canNext();
         if (b) ++current;
         return b;
     }
 
-    public boolean prev() {
+    boolean prev() {
         boolean b = canPrev();
         if (b) --current;
         return b;

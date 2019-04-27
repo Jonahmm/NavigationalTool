@@ -23,4 +23,8 @@
     <string name="map_activity_def_title">UoB Navigate</string>
     <string name="textRegion">textRegion</string>
     <string name="route_from">Route from</string>
+    <string name="navigate">Navigate</string>
+    <string name="to">to</string>
+    <string name="show_directions">Show Directions</string>
+    <string name="view_in_360">View in 360°</string>
 </resources>

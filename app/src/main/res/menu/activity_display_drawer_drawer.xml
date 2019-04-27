@@ -9,7 +9,6 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/building_physics"
-            android:contentDescription="physics/physics"
             android:title="@string/physics_building" />
         <item
             android:id="@+id/building_maths"

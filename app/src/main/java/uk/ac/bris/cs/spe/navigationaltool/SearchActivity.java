@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -127,10 +126,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             updateSearch("");
 
         } else finish();
-    }
-
-    private int dp(int in) {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, in, getResources().getDisplayMetrics());
     }
 
     private List<Location> loadRecent() {

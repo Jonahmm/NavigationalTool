@@ -20,7 +20,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.ArrayMap;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -472,17 +471,17 @@ public class MapActivity extends AppCompatActivity
             cancelNavSelect(findViewById(selecting == Selecting.NAVDST
                     ? R.id.navigation_dst_btn : R.id.navigation_src_btn));
         }
-        else if (resultCode == SearchActivity.RESULT_SELECT_ON_MAP) {
-            // Nothing actually needs doing - remain in nav selection mode
+        else if (resultCode != SearchActivity.RESULT_SELECT_ON_MAP) {
+            super.onActivityResult(requestCode, resultCode, data);
         }
-        else super.onActivityResult(requestCode, resultCode, data);
+        // Nothing actually needs doing - remain in nav selection mode
     }
 
     /*------------*
      * NAVIGATION *
      *------------*/
     /**
-     * Changes the app state st when you select a location, it is used for navigation.
+     * Launches search, and changes the app state st when you select a location, it is used for navigation.
      * Sets the text, icon and listener of the button it came from
      * @param btn The Button object that this came from, one of navigation_src_btn or
      *            navigation_dst_btn
@@ -530,8 +529,7 @@ public class MapActivity extends AppCompatActivity
 
     /**
      * Brings up the navigation interface with the given location as the destination
-     * @param l The location to nav to. Currently this is always == selectedLocation, but once
-     *          we have a new search interface this may be called separately
+     * @param l The location to nav to. Currently this is always == selectedLocation
      */
     private void startNavigationTo(Location l) {
         navigationSrc = null;
@@ -583,8 +581,6 @@ public class MapActivity extends AppCompatActivity
     }
 
     /**
-     * The big one, the one we've all been waiting for, The actual point of our app.
-     *
      * Instantiates a new {@link NavigateTask}, which…
      * Uses the {@link uk.ac.bris.cs.spe.navigationaltool.navigator.Navigator} to compute the path
      * between all pairs of nodes x,y, where the codes of x and y match those of navigationSrc and

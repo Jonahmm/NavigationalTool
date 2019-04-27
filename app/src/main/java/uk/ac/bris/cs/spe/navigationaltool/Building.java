@@ -51,7 +51,6 @@ public class Building {
 
     /**
      * A wrapper for Log.d that can be turned on or off easily to show where a load crashes
-     * @param s
      */
     private void log(String s) {
         // Uncomment the below line to enable line-by-line logging
