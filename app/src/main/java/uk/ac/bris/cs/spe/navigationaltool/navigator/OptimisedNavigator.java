@@ -17,7 +17,6 @@ public class OptimisedNavigator implements Navigator {
 
     @Override
     public List<Path> navigate(Location start, Location end, Graph graph, User user) {
-        System.out.println("on");
         HashMap<Location, Double> shortestDistToStart = new HashMap<>();
         HashMap<Location, ArrayList<Path>> shortestPathToStart = new HashMap<>();
 
@@ -75,8 +74,14 @@ public class OptimisedNavigator implements Navigator {
 
                 shortestPathToStart.put(end, route);
 
+                found = true; // ends up not being used, but kinda acts as a failsafe ig?
+                break;
+            }
+
+            // Essentially a failsafe, should _never_ trigger if all is working
+            if(shortestPathToStart.containsKey(end)){
                 found = true;
-                continue;
+                break;
             }
 
             exploredLocationsStart.add(closest);
@@ -125,16 +130,30 @@ public class OptimisedNavigator implements Navigator {
                     for(int i = routeEnd.size()-1; i >= 0; i--)
                         route.add(routeEnd.get(i));
 
-                shortestPathToEnd.put(end, route);
+                shortestPathToStart.put(end, route);
 
                 found = true;
-                continue;
+                break;
+            }
+
+            // Essentially a failsafe, should _never_ trigger if all is working
+            if(shortestPathToEnd.containsKey(end)){
+                ArrayList<Path> route = new ArrayList<>();
+                ArrayList<Path> routeEnd = shortestPathToEnd.get(closest);
+                for(int i = routeEnd.size()-1; i >= 0; i--)
+                    route.add(routeEnd.get(i));
+
+                shortestPathToStart.put(end, route);
+
+                found = true;
+                break;
             }
 
             exploredLocationsEnd.add(closest);
 
             // Fail when we've explored everything - could be improved by looking through both explored locations, but this may up success computation time.
             if(exploredLocationsStart.containsAll(shortestDistToStart.keySet())){
+                System.out.println("Navigator failed");
                 throw new IllegalArgumentException("Can't find route, graph must be poorly constructed.");
             }
         }

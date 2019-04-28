@@ -25,9 +25,9 @@ public class DijkstraNavigator implements Navigator{
 
         while(!shortestPathTo.containsKey(end)){
             Location closest = shortestDistTo.entrySet().stream()
-                                                                .filter(e -> !exploredLocations.contains(e.getKey()))
-                                                                .min((e, e2) -> e.getValue() > e2.getValue() ? 1 : e.getValue() == e2.getValue() ? 0 : -1)
-                                                                .get().getKey(); // If the get fails, it's all rip, no point in an orElse()
+                    .filter(e -> !exploredLocations.contains(e.getKey()))
+                    .min((e, e2) -> e.getValue() > e2.getValue() ? 1 : e.getValue() == e2.getValue() ? 0 : -1)
+                    .get().getKey(); // If the get fails, it's all rip, no point in an orElse()
 
             for(Path p : graph.getPathsFromLocation(closest)){
                 if(p.allowsUser(user)) {
