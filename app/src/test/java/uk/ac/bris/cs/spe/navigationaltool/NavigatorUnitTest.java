@@ -13,7 +13,7 @@ import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
 import uk.ac.bris.cs.spe.navigationaltool.graph.User;
 import uk.ac.bris.cs.spe.navigationaltool.navigator.BreadthFirstNavigator;
-import uk.ac.bris.cs.spe.navigationaltool.navigator.DijkstraNavigator;
+import uk.ac.bris.cs.spe.navigationaltool.navigator.OptimisedNavigator;
 import uk.ac.bris.cs.spe.navigationaltool.navigator.Navigator;
 import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -29,7 +29,7 @@ public class NavigatorUnitTest {
     public void testNavigatorFindsOptimalRoute() {
         Graph graph = new Graph();
         List<User> allUsers = new ArrayList<>(Arrays.asList(User.STUDENT, User.DISABLED_STUDENT, User.STAFF, User.DISABLED_STAFF));
-        Navigator nav = new DijkstraNavigator();
+        Navigator nav = new OptimisedNavigator();
 
         Location a = new Location(0, 0,0, "0", "a");
         Location b = new Location(1, 0,1, "0", "b");
@@ -52,7 +52,7 @@ public class NavigatorUnitTest {
         Graph graph = new Graph();
         List<User> onlyStaff = new ArrayList<>(Arrays.asList(User.DISABLED_STAFF, User.STAFF));
         List<User> notDisabled = new ArrayList<>(Arrays.asList(User.STUDENT, User.STAFF));
-        Navigator nav = new DijkstraNavigator();
+        Navigator nav = new OptimisedNavigator();
 
         Location a = new Location(0, 0,0, "0", "a");
         Location b = new Location(1, 0,1, "0", "b");
@@ -78,7 +78,7 @@ public class NavigatorUnitTest {
     @Test
     public void testNavigatorFailsWhenNoRoute() throws Exception{
         Graph graph = new Graph();
-        Navigator nav = new DijkstraNavigator();
+        Navigator nav = new OptimisedNavigator();
 
         Location a = new Location(0, 0,0, "0", "a");
         Location b = new Location(1, 0,1, "0", "b");

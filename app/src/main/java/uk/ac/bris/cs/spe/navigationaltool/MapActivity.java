@@ -48,6 +48,7 @@ import uk.ac.bris.cs.spe.navigationaltool.graph.Location;
 import uk.ac.bris.cs.spe.navigationaltool.graph.Path;
 import uk.ac.bris.cs.spe.navigationaltool.graph.User;
 import uk.ac.bris.cs.spe.navigationaltool.navigator.DijkstraNavigator;
+import uk.ac.bris.cs.spe.navigationaltool.navigator.OptimisedNavigator;
 
 public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -169,7 +170,7 @@ public class MapActivity extends AppCompatActivity
         protected Building doInBackground(String... strings) {
 
             try {
-                Building b = new Building(strings[0], new DijkstraNavigator(), getApplicationContext());
+                Building b = new Building(strings[0], new OptimisedNavigator(), getApplicationContext());
                 loadMaps(b);
                 return b;
             } catch (IOException e) {
