@@ -4,7 +4,7 @@ After the beta release we conducted heuristic evaluation to receive verbal feedb
 
 The most common instances of feedback we received are as follows:
 
-1.   “It should have the each professors name associated with their respective room.”
+1.   “It should have each professors name associated with their respective room.”
       *   We did consult with our client on implementing this, but the University’s data protection policy prevents us from including any personal details in the application. As an alternative, we have included the roles of some rooms’ occupants, so searching for “head of school” (for example) would find the correct office.
       
 2.   “It should give a written list of directions alongside the visual directions.”
