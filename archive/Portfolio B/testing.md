@@ -1,6 +1,6 @@
 # Development Testing
 
-We throroughly test the functionality of the model of the application. To do this, we used the JUnit Testing framework to develop unit tests for each of the model’s constituent classes. We used black-box testing for this.
+We throroughly test the functionality of the model of the application. To do this, we used the JUnit Testing framework to develop unit tests for each of the model’s constituent classes. We used black-box test designing to design the tests.
 
 The most important component of the system is the **Navigator**. To test it, we created sample **Graph** objects for each unit test. The **Navigator** calls its navigate method on these. The tests then check if the output path is indeed the shortest path and it obeys the access levels chosen. The tests also ensure that the **Navigator** throws an exception if the destination is not accessible to the user.
 
