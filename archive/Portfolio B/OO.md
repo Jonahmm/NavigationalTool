@@ -14,7 +14,6 @@ The app’s assets contain a fully functional model of the Physics Building, com
 
 **VrView** uses Google’s VR SDK to present 360° photos of locations where possible. It is only accessible from the **Selection** state of the **Map Activity**, and must be closed using the back button.
 
-
 ## Model & Navigator
 
 ![class diagram](class.png)
@@ -28,4 +27,3 @@ The **Navigator** interface is what gives a usable path between origin and desti
 We considered and implemented several search algorithms, from unweighted breadth-first search through a weighted (programatically, by map location) application of Dijkstra’s shortest-path algorithm and more. (Requirement **1.1**-**1.2**)
 
 The final implementation uses a bidirectional version of the weighted Dijkstra navigator, which is much faster than other implementations and satisfies requirement **5/5.1**.
-

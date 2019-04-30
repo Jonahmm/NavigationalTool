@@ -4,8 +4,6 @@
 
 The following stakeholders are present in our system:
 
-
-
 *   Client
     *   John Newby - Needs to be able to convert the application for use with the Fry Building 
 *   Building Users
@@ -17,19 +15,15 @@ The following stakeholders are present in our system:
 *   The University
     *   Building Manager - Needs to authorize tours and collection of 3D imagery in the Physics Building
 
-
 ## Use Case Diagram
 
 The following use case diagram depicts the actors present in our system, the human actors being four of the previously mentioned stakeholders - Staff, Student, Disabled Staff, Disabled Student and the non-human actors being the application navigator itself as well as the building through which the human actors navigate through. 
 
 ![use case diagram](usecase.png)
 
-
 ## Use Case Goals
 
 The following are the 3 key use case goals present in our system: 
-
-
 
 *   Enter Information
     *   Basic Flow
@@ -68,8 +62,6 @@ The following are the 3 key use case goals present in our system:
 Of all the use case goals, Calculate Route is the most important, being the core functionality of our application. The flow of this use case goal can be broken down into several atomic requirements:
 
 Functional requirements:
-
-
 
 1. The Navigator must be able to calculate the shortest route from origin to destination
     1. Various search algorithms must be considered
