@@ -1,4 +1,10 @@
 #Name
 Fry Building
 #Floor definitions
-*e,Example
+lg,Lower Ground Floor
+*g,Ground Floor
+ga,Floor GA
+1,Floor 1
+1a,Floor 1A
+2,Floor 2
+2a,Floor 2A
