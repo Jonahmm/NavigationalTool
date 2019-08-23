@@ -54,7 +54,7 @@ public class Building {
      */
     private void log(String s) {
         // Uncomment the below line to enable line-by-line logging
-        // Log.d("Building", s);
+//         Log.d("Building", s);
     }
 
     /**

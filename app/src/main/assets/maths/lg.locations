@@ -1,0 +1,72 @@
+48,AWC,Accessible Toilet,lg,2880,4232
+58,ES,East Staircase,lg,3004,4224
+2,FWC,Female Toilet,lg,2120,4408
+47,LA,Atrium Lift,lg,2768,4252
+0,LAS,Lower Atrium Stairs,lg,2244,4408
+17,LCY,Lower Courtyard,lg,2852,5284
+52,LE,East Lift,lg,3084,4308
+3,LG.01,Common Room,lg,2376,4488
+63,LG.02,Lecture Theatre,lg,2528,4808
+9,LG.03,,lg,2488,4572
+43,LG.06,Vending Room,lg,2812,4360
+12,LG.07,Common Room,lg,2812,5108
+22,LG.08,Study Space,lg,2940,4940
+23,LG.09,Study Space,lg,3228,5192
+37,LG.10,Tutorial Room,lg,3116,4776
+36,LG.11,,lg,3452,4776
+38,LG.12,Tutorial Room,lg,3116,4640
+39,LG.13,Tutorial Room,lg,3116,4556
+41,LG.14,,lg,3496,4612
+42,LG.14A,,lg,3556,4804
+30,LG.20,Seminar Room,lg,3564,5004
+26,LG.21,Computer Lab,lg,3328,5548
+19,LG.22,Seminar Room,lg,3036,5548
+32,LG.SC,Corridor,lg,3328,4640
+57,MWC,Male Toilet,lg,3272,4228
+27,SS,South Staircase,lg,3564,5260
+#
+#    All locations below this point are children.
+#    For proper ordering ensure children have name set to '#'
+#
+56,AWC,#,lg,3336,4308
+59,ES,#,lg,3004,4388
+1,LAS,#,lg,2244,4488
+18,LCY,#,lg,2928,5284
+7,LG.01,#,lg,2712,4572
+5,LG.01,#,lg,2596,4572
+6,LG.01,#,lg,2376,4572
+4,LG.01,#,lg,2596,4488
+8,LG.01,#,lg,2248,4572
+10,LG.01,#,lg,2812,4488
+61,LG.02,#,lg,2248,4644
+62,LG.02,#,lg,2712,4644
+65,LG.02,#,lg,2668,5000
+64,LG.02,#,lg,2344,5000
+44,LG.06,#,lg,2768,4360
+46,LG.06,#,lg,2916,4360
+45,LG.06,#,lg,2880,4360
+50,LG.06,#,lg,3004,4472
+49,LG.06,#,lg,2916,4472
+67,LG.07,#,lg,2576,5140
+15,LG.07,#,lg,3036,5108
+20,LG.07,#,lg,3228,5108
+13,LG.07,#,lg,2852,5108
+25,LG.07,#,lg,3328,5260
+16,LG.07,#,lg,2928,5108
+24,LG.07,#,lg,3328,5108
+66,LG.07,#,lg,2328,5136
+11,LG.07,#,lg,2812,4560
+14,LG.08,#,lg,2924,4560
+21,LG.08,#,lg,3228,4944
+40,LG.14,#,lg,3556,4492
+29,LG.20,#,lg,3564,5108
+55,LG.SC,#,lg,3180,4412
+53,LG.SC,#,lg,3180,4308
+31,LG.SC,#,lg,3328,4776
+51,LG.SC,#,lg,3004,4412
+34,LG.SC,#,lg,3328,4492
+35,LG.SC,#,lg,3328,4412
+54,LG.SC,#,lg,3272,4308
+33,LG.SC,#,lg,3328,4556
+60,MWC,#,lg,2980,4224
+28,SS,#,lg,3732,5260

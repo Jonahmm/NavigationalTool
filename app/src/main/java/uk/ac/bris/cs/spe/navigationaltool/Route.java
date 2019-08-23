@@ -57,7 +57,7 @@ class Route {
      */
     private boolean stairOrLift(Location l) {
         String s = l.getCode();
-        return s.startsWith("L") || s.endsWith("S");
+        return (s.length() == 2 && s.startsWith("L")) || s.endsWith("S");
     }
 
     /**

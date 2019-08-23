@@ -106,6 +106,8 @@ public class MapActivity extends AppCompatActivity
      */
     private Route route = null;
 
+    private List<String> order = Arrays.asList("b","lg","0","g","(gm","ga","1","1a","m","2","2a","3","4");
+
     /*----------------*
      * INITIALISATION *
      *----------------*/
@@ -121,7 +123,7 @@ public class MapActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        int bindex = getPreferences(MODE_PRIVATE).getInt(getString(R.string.saved_building), 0);
+        int bindex = getPreferences(MODE_PRIVATE).getInt(getString(R.string.saved_building), 1);
 
         staff  = getPreferences(MODE_PRIVATE).getBoolean(getString(R.string.saved_staff), false);
         disabl = getPreferences(MODE_PRIVATE).getBoolean(getString(R.string.saved_disabl), false);
@@ -355,6 +357,12 @@ public class MapActivity extends AppCompatActivity
         //Button to display image of room
         Button vr_image = findViewById(R.id.selected_360);
         vr_image.setOnClickListener(e -> openVrPanoramaView());
+
+        TextView lbl = findViewById(R.id.selected_title);
+        lbl.setOnLongClickListener(e -> {
+            lbl.setText(Integer.toString(selectedLocation.getId()));
+            return true;
+        });
     }
 
     /**
@@ -367,17 +375,21 @@ public class MapActivity extends AppCompatActivity
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         lp.setMargins(0,8,0,8);
-        for (String f : building.getFloorMap().keySet()) {
-            b = new FloatingActionButton(this);
-            b.setLayoutParams(lp);
-            b.setImageDrawable(new FabTextDrawable(f.toUpperCase(), Color.WHITE));
-            b.setOnClickListener(v -> {
-                mapView.setFloor(f, MapView.RESET_NONE);
-                fl.setVisibility(View.GONE);
-                findViewById(R.id.floor_select).setVisibility(View.VISIBLE);
-            });
-            b.setSize(FloatingActionButton.SIZE_MINI);
-            fl.addView(b);
+        List<String> keys = new ArrayList<>(building.getFloorMap().keySet());
+        keys.sort( (aa,bb) -> order.indexOf(bb) - order.indexOf(aa));
+        for (String f : keys) {
+            if (!f.startsWith("(")) {
+                b = new FloatingActionButton(this);
+                b.setLayoutParams(lp);
+                b.setImageDrawable(new FabTextDrawable(f.toUpperCase(), Color.WHITE));
+                b.setOnClickListener(v -> {
+                    mapView.setFloor(f, MapView.RESET_NONE);
+                    fl.setVisibility(View.GONE);
+                    findViewById(R.id.floor_select).setVisibility(View.VISIBLE);
+                });
+                b.setSize(FloatingActionButton.SIZE_MINI);
+                fl.addView(b);
+            }
         }
     }
 

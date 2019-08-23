@@ -1,0 +1,18 @@
+12,G.17,,(gm,3716,5372
+11,G.18,,(gm,3748,5520
+9,G.19,,(gm,3712,5720
+7,G.20,,(gm,3640,5720
+4,G.MC,Corridor,(gm,3564,5476
+#
+#    All locations below this point are children.
+#    For proper ordering ensure children have name set to '#'
+#
+13,G.17,#,(gm,3640,5372
+10,G.18,#,(gm,3788,5612
+6,G.MC,#,(gm,3640,5612
+8,G.MC,#,(gm,3712,5612
+5,G.MC,#,(gm,3640,5476
+0,SS,#,(gm,3564,5188
+2,SS,#,(gm,3736,5188
+3,SS,#,(gm,3736,5276
+1,SS,#,(gm,3564,5276
